@@ -5,7 +5,19 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$bytes = file_get_contents('php://stdin');
-\assert(\is_string($bytes) && $bytes !== '');
+use Thesis\Protobuf;
+use Thesis\Protobuf\Reflection;
+use Thesis\Protoc;
+use Thesis\Protoc\Io;
+use Thesis\Protoc\Plugin;
 
-exit(0);
+$entrypoint = new Protoc\Entrypoint(
+    new Plugin\Compiler(),
+    new Protobuf\Serializer(),
+    Reflection\Reflector::build(),
+);
+
+$entrypoint->run(
+    new Io\ReadStreamInput(),
+    new Io\WriteStreamOutput(),
+);

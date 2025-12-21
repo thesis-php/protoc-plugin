@@ -11,6 +11,7 @@ $config = new Config()
     ->setFinder(
         Finder::create()
             ->in(__DIR__ . '/src')
+            ->in(__DIR__ . '/bin')
             ->in(__DIR__ . '/tests')
             ->append([
                 __FILE__,

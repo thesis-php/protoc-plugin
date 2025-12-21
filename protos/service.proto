@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package thesis.api.v1;
+
+option php_namespace = "Thesis\\Api\\V1";
+
+// Request type enum
+enum RequestType {
+    REQUEST_TYPE_UNSPECIFIED = 0; // A comment on enum value
+    REQUEST_TYPE_POST = 1;
+}
+
+// A request message for adding new items.
+message AddItemRequest {
+  string title = 1; // The title of the item.
+  // Item type comment.
+  enum ItemType {
+    ITEM_TYPE_UNSPECIFIED = 0; // Comment on item type case.
+    ITEM_TYPE_TASK = 1;
+  }
+  ItemType item_type = 2;
+}

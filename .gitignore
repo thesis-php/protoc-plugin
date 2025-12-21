@@ -5,3 +5,4 @@
 /compose.override.yaml
 /phpstan.neon
 /phpunit.xml
+/compiled
