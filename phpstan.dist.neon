@@ -9,7 +9,6 @@ parameters:
         - src
         - bin
         - tests
-        - compiled
     tmpDir: var/phpstan
     editorUrl: ''
     editorUrlTitle: '%%relFile%%:%%line%%'
