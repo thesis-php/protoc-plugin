@@ -117,6 +117,8 @@ DOC,
                                 docType: "{$mapType}<{$keyType->resolvedType()}, {$valueType->resolvedType()}>",
                                 isMap: true,
                             );
+
+                            break;
                         }
                     }
                 }
