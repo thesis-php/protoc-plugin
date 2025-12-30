@@ -21,5 +21,6 @@ final readonly class FieldDescriptor
         public ?string $typeName = null,
         public ?Comment $comment = null,
         public ?FieldOptions $options = null,
+        public bool $optional = false,
     ) {}
 }

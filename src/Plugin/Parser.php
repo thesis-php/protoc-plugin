@@ -17,7 +17,7 @@ use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorRequest;
 final readonly class Parser
 {
     /**
-     * @return list<FileDescriptor>
+     * @return array<string, array{FileDescriptor, list<ImportDescriptor>}>
      */
     public function parse(CodeGeneratorRequest $request): array
     {
@@ -29,7 +29,8 @@ final readonly class Parser
         $files = [];
         foreach ($request->filesToGenerate as $file) {
             if (isset($protos[$file])) {
-                $files[] = $protos[$file];
+                $descriptor = $protos[$file];
+                $files[$file] = [$descriptor, self::parseImports($descriptor, $protos)];
             }
         }
 
@@ -43,7 +44,8 @@ final readonly class Parser
         );
 
         return new FileDescriptor(
-            messages: self::parseMessages($descriptor->messages, $comments),
+            file: $descriptor,
+            messages: self::parseMessages($descriptor, $descriptor->messages, $comments),
             enums: self::parseEnums($descriptor->enums, $comments),
             package: $descriptor->package,
             options: $descriptor->options,
@@ -58,6 +60,7 @@ final readonly class Parser
      * @return list<MessageDescriptor>
      */
     public static function parseMessages(
+        FileDescriptorProto $file,
         array $descriptors,
         CommentExtractor $comments,
         ?string $parent = null,
@@ -76,9 +79,9 @@ final readonly class Parser
             $messages[] = new MessageDescriptor(
                 name: $descriptor->name,
                 path: $path,
-                fields: self::parseMessageFields($descriptor->fields, $messageComments),
+                fields: self::parseMessageFields($file, $descriptor->fields, $messageComments),
                 enums: self::parseEnums($descriptor->enumTypes, $messageComments, $descriptor->name),
-                messages: self::parseMessages($descriptor->nestedTypes, $messageComments, $descriptor->name),
+                messages: self::parseMessages($file, $descriptor->nestedTypes, $messageComments, $descriptor->name),
                 comment: $messageComments->extract(),
                 options: $descriptor->options,
             );
@@ -92,6 +95,7 @@ final readonly class Parser
      * @return list<FieldDescriptor>
      */
     private static function parseMessageFields(
+        FileDescriptorProto $file,
         array $descriptors,
         CommentExtractor $comments,
     ): array {
@@ -106,6 +110,7 @@ final readonly class Parser
                 typeName: $descriptor->typeName,
                 comment: $comments->extract(\sprintf('%d.%d', Comments::MESSAGE_FIELD_COMMENT_PATH, $idx)),
                 options: $descriptor->options,
+                optional: ($file->syntax === 'proto2' && $descriptor->label === FieldDescriptorProto\Label::LABEL_OPTIONAL) || ($file->syntax === 'proto3' && $descriptor->proto3Optional === true),
             );
         }
 
@@ -165,5 +170,50 @@ final readonly class Parser
         }
 
         return $cases;
+    }
+
+    /**
+     * @param array<string, FileDescriptor> $files
+     * @return list<ImportDescriptor>
+     */
+    private static function parseImports(
+        FileDescriptor $descriptor,
+        array $files,
+    ): array {
+        $imports = [];
+
+        foreach ($descriptor->file->publicDependencies as $index) {
+            $idx = (int) $index->value;
+
+            if (!isset($descriptor->file->dependencies[$idx])) {
+                continue;
+            }
+
+            $dependency = $descriptor->file->dependencies[$idx];
+
+            if (!isset($files[$dependency])) {
+                continue;
+            }
+
+            $file = $files[$dependency];
+
+            foreach ($file->messages as $message) {
+                if (isNotMapEntry($message)) {
+                    $imports[] = new ImportDescriptor(
+                        $message->name,
+                        $message->path,
+                    );
+                }
+            }
+
+            foreach ($file->enums as $enum) {
+                $imports[] = new ImportDescriptor(
+                    $enum->name,
+                    $enum->path,
+                );
+            }
+        }
+
+        return $imports;
     }
 }

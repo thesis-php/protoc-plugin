@@ -22,10 +22,10 @@
         "ext-bcmath": "*",
         "amphp/byte-stream": "2.x-dev",
         "nette/php-generator": "^4.2@dev",
+        "thesis/package-version": "0.1.x-dev",
         "thesis/protobuf": "0.1.x-dev"
     },
     "require-dev": {
-        "ext-bcmath": "*",
         "phpunit/phpunit": "^12.4",
         "symfony/var-dumper": "^8.0"
     },
@@ -33,7 +33,10 @@
     "autoload": {
         "psr-4": {
             "Thesis\\Protoc\\": "src/"
-        }
+        },
+        "files": [
+            "src/Plugin/plugin.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

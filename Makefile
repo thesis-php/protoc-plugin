@@ -137,7 +137,7 @@ executable:
 	chmod +x bin/compiler.php
 
 compile: executable
-	protoc --plugin=protoc-gen-custom-plugin=./bin/compiler.php -I. protos/service.proto --custom-plugin_out=compiled
+	protoc --plugin=protoc-gen-custom-plugin=./bin/compiler.php -I. protos/* --custom-plugin_out=compiled
 .PHONY: compile
 
 # -----------------------

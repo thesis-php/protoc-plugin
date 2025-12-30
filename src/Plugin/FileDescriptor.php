@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin;
 
+use Thesis\Protobuf\Compiler\FileDescriptorProto;
 use Thesis\Protobuf\Compiler\FileOptions;
 
 /**
@@ -16,6 +17,7 @@ final readonly class FileDescriptor
      * @param list<EnumDescriptor> $enums
      */
     public function __construct(
+        public FileDescriptorProto $file,
         public array $messages = [],
         public array $enums = [],
         public ?string $package = null,

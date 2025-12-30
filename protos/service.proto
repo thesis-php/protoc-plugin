@@ -2,21 +2,29 @@ syntax = "proto3";
 
 package thesis.api.v1;
 
-option php_namespace = "Thesis\\Api\\V1";
+import "google/protobuf/timestamp.proto";
 
-// Request type enum
-enum RequestType {
-    REQUEST_TYPE_UNSPECIFIED = 0; // A comment on enum value
-    REQUEST_TYPE_POST = 1;
-}
+option php_namespace = "Thesis\\Api\\V1";
 
 // A request message for adding new items.
 message AddItemRequest {
-  string title = 1; // The title of the item.
-  // Item type comment.
-  enum ItemType {
-    ITEM_TYPE_UNSPECIFIED = 0; // Comment on item type case.
-    ITEM_TYPE_TASK = 1;
-  }
-  ItemType item_type = 2;
+    optional string title = 1; // The title of the item.
+    enum ItemType {
+        ITEM_TYPE_UNSPECIFIED = 0; // Comment on item type case.
+        ITEM_TYPE_TASK = 1;
+    }
+    ItemType type = 2;
+    google.protobuf.Timestamp ts = 3;
+    message Labels {
+        repeated string keys = 1; // Comment on keys
+    }
+    // Comment on Labels.
+    Labels labels = 4;
+    map<string, Value> values = 5; // Values comment
+}
+
+// Value comment
+message Value {
+    string key = 1;
+    string value = 2;
 }

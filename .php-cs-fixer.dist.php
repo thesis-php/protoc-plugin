@@ -21,7 +21,7 @@ $config = new Config()
     ->setCacheFile(__DIR__ . '/var/' . basename(__FILE__) . '.cache');
 
 new PhpCsFixerCodingStandard()->applyTo($config, [
-    // 'rule' => ['overridden' => 'config'],
+    'heredoc_indentation' => false,
 ]);
 
 return $config;
