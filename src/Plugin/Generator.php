@@ -7,6 +7,7 @@ namespace Thesis\Protoc\Plugin;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\EnumCase;
 use Nette\PhpGenerator\EnumType;
+use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
@@ -66,12 +67,72 @@ DOC,
         );
     }
 
-    public function generateMessage(MessageDescriptor $message): CodeGeneratorResponse\File
+    /**
+     * @return iterable<CodeGeneratorResponse\File>
+     */
+    public function generateMessages(MessageDescriptor $message): iterable
     {
-        $classType = new ClassType(Naming::pascalCase($message->name))
+        yield $this->generateMessage($message);
+
+        $oneofByIndex = [];
+
+        foreach ($message->fields as $field) {
+            if ($field->oneOfIndex !== null && !$field->optional) {
+                if (isset($message->oneofs[$field->oneOfIndex])) {
+                    $oneOf = $message->oneofs[$field->oneOfIndex];
+
+                    yield $this->generateOneofVariant(
+                        $message,
+                        $oneOf,
+                        $field,
+                    );
+
+                    $oneofByIndex[$field->oneOfIndex][] = $field;
+                }
+            }
+        }
+
+        foreach ($message->oneofs as $idx => $oneof) {
+            $variants = $oneofByIndex[$idx] ?? [];
+
+            if ($variants !== []) {
+                yield $this->generateOneof($message, $oneof, $variants);
+            }
+        }
+    }
+
+    public function generateEnum(EnumDescriptor $enum): CodeGeneratorResponse\File
+    {
+        $namespace = $this->createPhpNamespace($enum->path);
+
+        $enumType = new EnumType(Naming::pascalCase($enum->name))
+            ->addComment('@api')
+            ->addComment($enum->comment !== null ? "\n{$enum->comment}" : '')
+            ->setType('int')
+            ->setCases(array_map(
+                static fn(EnumCaseDescriptor $case) => new EnumCase($case->name)
+                    ->setValue($case->value)
+                    ->setComment((string) $case->comment),
+                $enum->cases,
+            ));
+
+        $namespace->add($enumType);
+
+        return $this->createFile($namespace, $enum->path);
+    }
+
+    /**
+     * @param list<string> $implements
+     */
+    private function generateMessage(MessageDescriptor $message, array $implements = []): CodeGeneratorResponse\File
+    {
+        $className = Naming::pascalCase($message->name);
+
+        $classType = new ClassType($className)
             ->addComment('@api')
             ->addComment($message->comment !== null ? "\n{$message->comment}" : '')
             ->setFinal()
+            ->setImplements($implements)
             ->setReadOnly();
 
         $namespace = $this->createPhpNamespace($message->path);
@@ -83,7 +144,15 @@ DOC,
 
             $constructor = $classType->addMethod('__construct');
 
+            $oneOfByIndex = [];
+
             foreach ($message->fields as $field) {
+                if ($field->oneOfIndex !== null && !$field->optional) {
+                    $oneOfByIndex[$field->oneOfIndex][] = $field;
+
+                    continue;
+                }
+
                 $parameter = $constructor->addPromotedParameter(Naming::camelCase($field->name));
 
                 $type = null;
@@ -111,10 +180,12 @@ DOC,
                                 ]),
                                 uses: [
                                     'Thesis\Protobuf',
+                                    ...$keyType->uses,
+                                    ...$valueType->uses,
                                 ],
                                 nullable: false,
-                                default: Literal::new($mapType = 'Protobuf\Map'),
-                                docType: "{$mapType}<{$keyType->resolvedType()}, {$valueType->resolvedType()}>",
+                                default: Literal::new('Protobuf\Map'),
+                                docType: "Protobuf\\Map<{$keyType->resolvedType()}, {$valueType->resolvedType()}>",
                                 isMap: true,
                             );
 
@@ -133,10 +204,7 @@ DOC,
 
                 $nullable = ($type->nullable || $field->optional) && !$repeated;
 
-                $phpType = $repeated ? 'array' : $type->phpType;
-                if ($nullable) {
-                    $phpType = "?{$phpType}";
-                }
+                $phpType = ($nullable ? '?' : '') . ($repeated ? 'array' : $type->phpType);
 
                 $reflectionType = $type->reflectionType;
                 if ($repeated) {
@@ -171,6 +239,34 @@ DOC,
                     $constructor->addComment($comment);
                 }
             }
+
+            foreach ($oneOfByIndex as $idx => $variants) {
+                if (!isset($message->oneofs[$idx])) {
+                    continue;
+                }
+
+                $oneOf = $message->oneofs[$idx];
+
+                $oneOfName = Naming::pascalCase($oneOf->name);
+
+                $constructor
+                    ->addPromotedParameter(Naming::camelCase($oneOf->name))
+                    ->setType(Naming::joinNamespace([
+                        $this->namespace,
+                        $message->path,
+                        $oneOfName,
+                    ]))
+                    ->setNullable()
+                    ->setDefaultValue(null)
+                    ->addAttribute(Reflection\OneOf::class, [
+                        array_map(
+                            static fn(FieldDescriptor $variant) => new Literal(
+                                $className . '\\' . $oneOfName . Naming::pascalCase($variant->name) . '::class',
+                            ),
+                            $variants,
+                        ),
+                    ]);
+            }
         }
 
         return $this->createFile(
@@ -179,24 +275,73 @@ DOC,
         );
     }
 
-    public function generateEnum(EnumDescriptor $enum): CodeGeneratorResponse\File
-    {
-        $namespace = $this->createPhpNamespace($enum->path);
+    /**
+     * @param list<FieldDescriptor> $variants
+     */
+    private function generateOneof(
+        MessageDescriptor $message,
+        OneOfDescriptor $oneof,
+        array $variants,
+    ): CodeGeneratorResponse\File {
+        $interfaceName = Naming::pascalCase($oneof->name);
 
-        $enumType = new EnumType(Naming::pascalCase($enum->name))
+        $interfaceType = new InterfaceType($interfaceName)
             ->addComment('@api')
-            ->addComment($enum->comment !== null ? "\n{$enum->comment}" : '')
-            ->setType('int')
-            ->setCases(array_map(
-                static fn(EnumCaseDescriptor $case) => new EnumCase($case->name)
-                    ->setValue($case->value)
-                    ->setComment((string) $case->comment),
-                $enum->cases,
-            ));
+            ->addComment('@phpstan-sealed (');
 
-        $namespace->add($enumType);
+        $interfaceType->addComment(implode(" |\n", array_map(
+            static function (FieldDescriptor $variant) use ($interfaceName): string {
+                $variantName = $interfaceName . Naming::pascalCase($variant->name);
 
-        return $this->createFile($namespace, $enum->path);
+                return "  {$variantName}";
+            },
+            $variants,
+        )));
+        $interfaceType->addComment(')');
+
+        $path = "{$message->path}.{$interfaceType->getName()}";
+
+        $namespace = $this->createPhpNamespace($path);
+
+        $namespace->add($interfaceType);
+
+        return $this->createFile(
+            $namespace,
+            $path,
+        );
+    }
+
+    private function generateOneofVariant(
+        MessageDescriptor $message,
+        OneOfDescriptor $oneof,
+        FieldDescriptor $variant,
+    ): CodeGeneratorResponse\File {
+        $interfaceName = Naming::pascalCase($oneof->name);
+
+        $descriptor = new MessageDescriptor(
+            name: $name = $interfaceName . Naming::pascalCase($variant->name),
+            path: "{$message->path}.{$name}",
+            fields: [
+                new FieldDescriptor(
+                    name: $variant->name,
+                    number: $variant->number,
+                    label: $variant->label,
+                    type: $variant->type,
+                    typeName: $variant->typeName,
+                    comment: $variant->comment,
+                    options: $variant->options,
+                    optional: $variant->optional,
+                ),
+            ],
+        );
+
+        return $this->generateMessage($descriptor, [
+            Naming::joinNamespace([
+                $this->namespace,
+                $message->path,
+                $interfaceName,
+            ]),
+        ]);
     }
 
     private function createFile(

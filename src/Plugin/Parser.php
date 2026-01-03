@@ -68,6 +68,10 @@ final readonly class Parser
         $messages = [];
 
         foreach ($descriptors as $idx => $descriptor) {
+            if ($descriptor->name === null) {
+                continue;
+            }
+
             $path = $descriptor->name;
             $messageComments = $comments->clone(\sprintf('%d.%d', Comments::MESSAGE_COMMENT_PATH, $idx));
 
@@ -76,12 +80,24 @@ final readonly class Parser
                 $messageComments = $comments->clone(\sprintf('%d.%d', Comments::MESSAGE_MESSAGE_COMMENT_PATH, $idx));
             }
 
+            $oneofs = [];
+
+            foreach ($descriptor->oneofs as $oneof) {
+                if ($oneof->name !== null) {
+                    $oneofs[] = new OneOfDescriptor(
+                        $oneof->name,
+                        $oneof->options,
+                    );
+                }
+            }
+
             $messages[] = new MessageDescriptor(
                 name: $descriptor->name,
                 path: $path,
                 fields: self::parseMessageFields($file, $descriptor->fields, $messageComments),
-                enums: self::parseEnums($descriptor->enumTypes, $messageComments, $descriptor->name),
-                messages: self::parseMessages($file, $descriptor->nestedTypes, $messageComments, $descriptor->name),
+                enums: self::parseEnums($descriptor->enumTypes, $messageComments, $path),
+                messages: self::parseMessages($file, $descriptor->nestedTypes, $messageComments, $path),
+                oneofs: $oneofs,
                 comment: $messageComments->extract(),
                 options: $descriptor->options,
             );
@@ -102,6 +118,10 @@ final readonly class Parser
         $fields = [];
 
         foreach ($descriptors as $idx => $descriptor) {
+            if ($descriptor->name === null || $descriptor->number === null) {
+                continue;
+            }
+
             $fields[] = new FieldDescriptor(
                 name: $descriptor->name,
                 number: $descriptor->number,
@@ -111,6 +131,7 @@ final readonly class Parser
                 comment: $comments->extract(\sprintf('%d.%d', Comments::MESSAGE_FIELD_COMMENT_PATH, $idx)),
                 options: $descriptor->options,
                 optional: ($file->syntax === 'proto2' && $descriptor->label === FieldDescriptorProto\Label::LABEL_OPTIONAL) || ($file->syntax === 'proto3' && $descriptor->proto3Optional === true),
+                oneOfIndex: $descriptor->oneofIndex,
             );
         }
 
@@ -129,6 +150,10 @@ final readonly class Parser
         $enums = [];
 
         foreach ($descriptors as $idx => $descriptor) {
+            if ($descriptor->name === null) {
+                continue;
+            }
+
             $path = $descriptor->name;
             $enumComments = $comments->clone(\sprintf('%d.%d', Comments::ENUM_COMMENT_PATH, $idx));
 
@@ -161,6 +186,10 @@ final readonly class Parser
         $cases = [];
 
         foreach ($descriptors as $idx => $descriptor) {
+            if ($descriptor->name === null || $descriptor->number === null) {
+                continue;
+            }
+
             $cases[] = new EnumCaseDescriptor(
                 $descriptor->name,
                 $descriptor->number,
@@ -183,13 +212,11 @@ final readonly class Parser
         $imports = [];
 
         foreach ($descriptor->file->publicDependencies as $index) {
-            $idx = (int) $index->value;
-
-            if (!isset($descriptor->file->dependencies[$idx])) {
+            if (!isset($descriptor->file->dependencies[$index])) {
                 continue;
             }
 
-            $dependency = $descriptor->file->dependencies[$idx];
+            $dependency = $descriptor->file->dependencies[$index];
 
             if (!isset($files[$dependency])) {
                 continue;
@@ -198,7 +225,7 @@ final readonly class Parser
             $file = $files[$dependency];
 
             foreach ($file->messages as $message) {
-                if (isNotMapEntry($message)) {
+                if (!isMapEntry($message)) {
                     $imports[] = new ImportDescriptor(
                         $message->name,
                         $message->path,

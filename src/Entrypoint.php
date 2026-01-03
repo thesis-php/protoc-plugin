@@ -6,6 +6,7 @@ namespace Thesis\Protoc;
 
 use Thesis\Protobuf;
 use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorRequest;
+use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorResponse;
 use Thesis\Protobuf\Reflection;
 
 /**
@@ -19,17 +20,29 @@ final readonly class Entrypoint
         private Reflection\Reflector $reflector,
     ) {}
 
-    public function run(ReadInput $input, WriteOutput $output): void
-    {
-        $request = $this->reflector->map(
-            $this->serializer->deserialize(
-                $this->reflector->type(CodeGeneratorRequest::class),
-                $input->read(),
-            ),
-            CodeGeneratorRequest::class,
-        );
+    public function run(
+        ReadInput $input,
+        WriteOutput $output,
+    ): void {
+        try {
+            $request = $this->reflector->map(
+                $this->serializer->deserialize(
+                    $this->reflector->type(CodeGeneratorRequest::class),
+                    $input->read(),
+                ),
+                CodeGeneratorRequest::class,
+            );
 
-        $response = $this->compiler->compile($request);
+            $response = $this->compiler->compile($request);
+        } catch (ProtocException $e) {
+            $response = new CodeGeneratorResponse(
+                error: $e->getMessage(),
+            );
+        } catch (\Throwable $e) {
+            $response = new CodeGeneratorResponse(
+                error: "Generate code error: {$e->getTraceAsString()}.",
+            );
+        }
 
         $buffer = $this->serializer->serialize(
             $this->reflector->message($response),

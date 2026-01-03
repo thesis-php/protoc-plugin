@@ -17,7 +17,7 @@ final readonly class NativeTypeDeclarationResolver implements TypeDeclarationRes
     #[\Override]
     public function supports(FieldDescriptor $field): bool
     {
-        return $field->typeName === null && !\in_array($field->type, [Type::TYPE_ENUM, Type::TYPE_MESSAGE, Type::TYPE_GROUP], true);
+        return $field->typeName === null && $field->type !== null && !\in_array($field->type, [Type::TYPE_ENUM, Type::TYPE_MESSAGE, Type::TYPE_GROUP], true);
     }
 
     #[\Override]
@@ -50,6 +50,7 @@ final readonly class NativeTypeDeclarationResolver implements TypeDeclarationRes
                 }),
                 uses: [Number::class],
                 default: Literal::new('Number', [0]),
+                docType: 'Number',
             ),
             Type::TYPE_INT32,
             Type::TYPE_UINT32,
@@ -80,7 +81,7 @@ final readonly class NativeTypeDeclarationResolver implements TypeDeclarationRes
                 }),
                 default: '',
             ),
-            default => throw new \RuntimeException("No suitable declaration found for type `{$field->type->name}`."),
+            default => throw new \RuntimeException("No suitable declaration found for type `{$field->type?->name}`."),
         };
     }
 }

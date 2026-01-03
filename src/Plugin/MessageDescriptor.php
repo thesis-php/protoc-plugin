@@ -15,6 +15,7 @@ final readonly class MessageDescriptor
      * @param list<FieldDescriptor> $fields
      * @param list<EnumDescriptor> $enums
      * @param list<self> $messages
+     * @param list<OneOfDescriptor> $oneofs
      */
     public function __construct(
         public string $name,
@@ -22,6 +23,7 @@ final readonly class MessageDescriptor
         public array $fields = [],
         public array $enums = [],
         public array $messages = [],
+        public array $oneofs = [],
         public ?Comment $comment = null,
         public ?MessageOptions $options = null,
     ) {}

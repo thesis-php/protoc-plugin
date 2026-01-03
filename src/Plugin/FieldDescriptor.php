@@ -16,11 +16,12 @@ final readonly class FieldDescriptor
     public function __construct(
         public string $name,
         public int $number,
-        public Label $label,
-        public Type $type,
+        public ?Label $label = null,
+        public ?Type $type = null,
         public ?string $typeName = null,
         public ?Comment $comment = null,
         public ?FieldOptions $options = null,
         public bool $optional = false,
+        public ?int $oneOfIndex = null,
     ) {}
 }

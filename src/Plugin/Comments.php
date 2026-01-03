@@ -30,15 +30,15 @@ final readonly class Comments
         $elements = [];
 
         foreach ($descriptor->sourceCodeInfo->locations ?? [] as $location) {
-            if ($location->leadingComments === '' && $location->trailingComments === '' && \count($location->leadingDetachedComments) === 0) {
+            if ($location->leadingComments === null && $location->trailingComments === null && \count($location->leadingDetachedComments) === 0) {
                 continue;
             }
 
             $key = implode('.', array_map(\strval(...), $location->path));
 
             $elements[$key] = new Comment(
-                leading: self::trim($location->leadingComments),
-                trailing: self::trim($location->trailingComments),
+                leading: self::trim($location->leadingComments ?? ''),
+                trailing: self::trim($location->trailingComments ?? ''),
                 detached: array_map(self::trim(...), $location->leadingDetachedComments),
             );
         }

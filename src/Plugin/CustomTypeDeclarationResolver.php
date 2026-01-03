@@ -28,15 +28,17 @@ final readonly class CustomTypeDeclarationResolver implements TypeDeclarationRes
     ): TypeDeclaration {
         \assert($field->typeName !== null);
 
-        $typeName = Naming::namespace($field->typeName);
+        $namespace = Naming::namespace($field->typeName);
+        $shortName = Naming::extract($namespace, -1);
 
         return new TypeDeclaration(
-            phpType: $typeName,
+            phpType: $namespace,
             reflectionType: Literal::new('Reflection\\' . ($field->type === Type::TYPE_MESSAGE ? 'ObjectT' : 'EnumT'), [
-                new Literal("{$namespace->simplifyName($typeName)}::class"),
+                new Literal("{$shortName}::class"),
             ]),
+            uses: [$namespace],
             nullable: true,
-            docType: $namespace->simplifyName($typeName),
+            docType: $shortName,
         );
     }
 }

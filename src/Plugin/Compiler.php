@@ -7,6 +7,8 @@ namespace Thesis\Protoc\Plugin;
 use BcMath\Number;
 use Thesis\Package;
 use Thesis\Protobuf\Compiler\Plugin;
+use Thesis\Protoc\Exception\CodeCannotBeGenerated;
+use Thesis\Protoc\ProtocException;
 
 /**
  * @api
@@ -26,21 +28,36 @@ final readonly class Compiler
         $this->version = Package\version(self::PACKAGE_NAME);
     }
 
+    /**
+     * @throws ProtocException
+     * @throws \Throwable
+     */
     public function compile(Plugin\CodeGeneratorRequest $request): Plugin\CodeGeneratorResponse
     {
         $options = CompilerOptions::fromRequest($request);
 
-        $files = [];
+        $files = $this->doGenerate($request, $options);
 
+        return new Plugin\CodeGeneratorResponse(
+            supportFeatures: new Number(
+                Plugin\CodeGeneratorResponse\Feature::FEATURE_PROTO3_OPTIONAL->value
+                | Plugin\CodeGeneratorResponse\Feature::FEATURE_SUPPORTS_EDITIONS->value,
+            ),
+            files: iterator_to_array($files, false),
+        );
+    }
+
+    /**
+     * @return iterable<Plugin\CodeGeneratorResponse\File>
+     * @throws ProtocException
+     * @throws \Throwable
+     */
+    private function doGenerate(
+        Plugin\CodeGeneratorRequest $request,
+        CompilerOptions $options,
+    ): iterable {
         foreach ($this->parser->parse($request) as $source => [$proto, $imports]) {
             $phpNamespace = self::determinePhpNamespace($proto, $options);
-            if ($phpNamespace === null) {
-                return new Plugin\CodeGeneratorResponse(
-                    error: 'Neither "package" nor "php_namespace" option was specified in the provided proto files, therefore I cannot determine the namespace under which the PHP files should be created.
-If you cannot modify the proto files, please pass the namespace via command-line arguments as follows:
-    --custom-plugin_out=php_namespace=App\\\Service\\\V1:path/to/generate',
-                );
-            }
 
             $generator = new Generator(
                 namespace: $phpNamespace,
@@ -52,43 +69,38 @@ If you cannot modify the proto files, please pass the namespace via command-line
                 package: $proto->package,
             );
 
-            $files = [
-                ...$files,
-                ...array_map($generator->generateEnum(...), $proto->enums),
-                ...array_map(
-                    $generator->generateEnum(...),
-                    array_merge(...array_map(static fn(MessageDescriptor $descriptor) => $descriptor->enums, $proto->messages)),
-                ),
-                ...array_map(
-                    $generator->generateMessage(...),
-                    array_filter($proto->messages, isNotMapEntry(...)),
-                ),
-                ...array_map(
-                    $generator->generateMessage(...),
-                    array_filter(
-                        array_merge(...array_map(static fn(MessageDescriptor $descriptor) => $descriptor->messages, $proto->messages)),
-                        isNotMapEntry(...),
-                    ),
-                ),
-            ];
-        }
+            yield from array_map($generator->generateEnum(...), $proto->enums);
 
-        return new Plugin\CodeGeneratorResponse(
-            supportFeatures: new Number(
-                Plugin\CodeGeneratorResponse\Feature::FEATURE_PROTO3_OPTIONAL->value
-                | Plugin\CodeGeneratorResponse\Feature::FEATURE_SUPPORTS_EDITIONS->value,
-            ),
-            files: $files,
-        );
+            foreach ($proto->messages as $descriptor) {
+                yield from $this->doGenerateMessages($generator, $descriptor);
+            }
+        }
     }
 
     /**
-     * @return ?non-empty-string
+     * @return iterable<Plugin\CodeGeneratorResponse\File>
+     */
+    private function doGenerateMessages(Generator $generator, MessageDescriptor $descriptor): iterable
+    {
+        if (!isMapEntry($descriptor)) {
+            yield from $generator->generateMessages($descriptor);
+        }
+
+        yield from array_map($generator->generateEnum(...), $descriptor->enums);
+
+        foreach ($descriptor->messages as $message) {
+            yield from $this->doGenerateMessages($generator, $message);
+        }
+    }
+
+    /**
+     * @return non-empty-string
+     * @throws CodeCannotBeGenerated
      */
     private static function determinePhpNamespace(
         FileDescriptor $descriptor,
         CompilerOptions $options,
-    ): ?string {
+    ): string {
         $phpNamespace = $descriptor->options?->phpNamespace;
         if ($phpNamespace !== null && $phpNamespace !== '') {
             return $phpNamespace;
@@ -104,6 +116,8 @@ If you cannot modify the proto files, please pass the namespace via command-line
             return $phpNamespace;
         }
 
-        return null;
+        throw new CodeCannotBeGenerated('neither "package" nor "php_namespace" option was specified in the provided proto files, therefore I cannot determine the namespace under which the PHP files should be created.
+If you cannot modify the proto files, please pass the namespace via command-line arguments as follows:
+    --custom-plugin_out=php_namespace=App\\\Service\\\V1:path/to/generated');
     }
 }

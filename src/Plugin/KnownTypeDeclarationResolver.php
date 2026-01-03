@@ -22,6 +22,7 @@ final readonly class KnownTypeDeclarationResolver implements TypeDeclarationReso
         '.google.protobuf.Empty' => Known\EmptyObject::class,
         '.google.protobuf.Struct' => Known\Struct::class,
         '.google.protobuf.Value' => Known\Value::class,
+        '.google.protobuf.NullValue' => Known\NullValue::class,
     ];
 
     /** @var array<string, TypeDeclaration> */
@@ -59,17 +60,20 @@ final readonly class KnownTypeDeclarationResolver implements TypeDeclarationReso
     }
 
     /**
-     * @param class-string $class
+     * @param class-string $namespace
      */
-    private static function generateKnownTypeDeclaration(string $class): TypeDeclaration
+    private static function generateKnownTypeDeclaration(string $namespace): TypeDeclaration
     {
+        $typeName = Naming::extract($namespace, -2);
+
         return new TypeDeclaration(
-            phpType: $class,
+            phpType: $namespace,
             reflectionType: Literal::new('Reflection\ObjectT', [
-                new Literal(implode('\\', \array_slice(explode('\\', $class), -2)) . '::class'),
+                new Literal("{$typeName}::class"),
             ]),
             uses: ['Thesis\Protobuf\Known'],
             nullable: true,
+            docType: $typeName,
         );
     }
 }
