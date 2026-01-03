@@ -22,7 +22,7 @@ final readonly class KnownTypeDeclarationResolver implements TypeDeclarationReso
         '.google.protobuf.Empty' => Known\EmptyObject::class,
         '.google.protobuf.Struct' => Known\Struct::class,
         '.google.protobuf.Value' => Known\Value::class,
-        '.google.protobuf.NullValue' => Known\NullValue::class,
+        '.google.protobuf.NullValue' => Known\NullValueKind::class,
     ];
 
     /** @var array<string, TypeDeclaration> */
