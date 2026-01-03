@@ -13,6 +13,7 @@ use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
 use Thesis\Protobuf\Compiler\FieldDescriptorProto\Label;
+use Thesis\Protobuf\Compiler\FieldDescriptorProto\Type;
 use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorResponse;
 use Thesis\Protobuf\Map;
 use Thesis\Protobuf\Reflection;
@@ -208,14 +209,25 @@ DOC,
                 $phpType = ($nullable ? '?' : '') . ($repeated ? 'array' : $type->phpType);
 
                 $reflectionType = $type->reflectionType;
+
                 if ($repeated) {
                     $listParameters = [$reflectionType];
 
+                    // In proto2 all repeated fields are non-packed by default unless explicitly marked with [packed = true].
                     if ($this->syntax === null) {
                         $listParameters[] = $field->options?->packed === true;
                     }
 
                     $reflectionType = Literal::new('Reflection\ListT', $listParameters);
+                }
+
+                $default = $type->default;
+
+                // In proto2 (and only there) scalar fields can have default values set.
+                if ($this->syntax === null && $field->defaultValue !== null && $field->type !== null) {
+                    $default = $this->parseDefaultValue($field->type, $field->defaultValue);
+                } elseif ($nullable) {
+                    $default = null;
                 }
 
                 $parameter
@@ -225,7 +237,7 @@ DOC,
                         $reflectionType,
                     ])
                     ->setNullable($nullable)
-                    ->setDefaultValue($nullable ? null : ($repeated ? [] : $type->default));
+                    ->setDefaultValue($repeated ? [] : $default);
 
                 if ($repeated || $field->comment !== null || $type->isMap) {
                     $docType = $type->resolvedType();
@@ -374,5 +386,31 @@ DOC,
         }
 
         return new PhpNamespace($namespace);
+    }
+
+    private function parseDefaultValue(
+        Type $type,
+        string $defaultValue,
+    ): mixed {
+        return match ($type) {
+            Type::TYPE_STRING,
+            Type::TYPE_BYTES => $defaultValue,
+            Type::TYPE_INT32,
+            Type::TYPE_SINT32,
+            Type::TYPE_UINT32,
+            Type::TYPE_FIXED32,
+            Type::TYPE_SFIXED32 => filter_var($defaultValue, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE) ?? 0,
+            Type::TYPE_INT64,
+            Type::TYPE_SINT64,
+            Type::TYPE_UINT64,
+            Type::TYPE_FIXED64,
+            Type::TYPE_SFIXED64 => Literal::new('Number', [
+                filter_var($defaultValue, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE) ?? 0,
+            ]),
+            Type::TYPE_BOOL => filter_var($defaultValue, FILTER_VALIDATE_BOOLEAN),
+            Type::TYPE_FLOAT,
+            Type::TYPE_DOUBLE => filter_var($defaultValue, FILTER_VALIDATE_FLOAT),
+            default => null,
+        };
     }
 }

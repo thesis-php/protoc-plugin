@@ -133,6 +133,7 @@ final readonly class Parser
                 options: $descriptor->options,
                 optional: ($file->syntax === null && $descriptor->label === FieldDescriptorProto\Label::LABEL_OPTIONAL) || ($file->syntax === 'proto3' && $descriptor->proto3Optional === true),
                 oneOfIndex: $descriptor->oneofIndex,
+                defaultValue: $descriptor->defaultValue,
             );
         }
 

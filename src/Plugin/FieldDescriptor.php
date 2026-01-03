@@ -23,5 +23,6 @@ final readonly class FieldDescriptor
         public ?FieldOptions $options = null,
         public bool $optional = false,
         public ?int $oneOfIndex = null,
+        public ?string $defaultValue = null,
     ) {}
 }

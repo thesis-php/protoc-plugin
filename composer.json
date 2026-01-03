@@ -20,6 +20,7 @@
     "require": {
         "php": "^8.4",
         "ext-bcmath": "*",
+        "ext-filter": "*",
         "amphp/byte-stream": "2.x-dev",
         "nette/php-generator": "^4.2@dev",
         "thesis/package-version": "0.1.x-dev",
