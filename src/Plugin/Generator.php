@@ -208,7 +208,9 @@ DOC,
 
                 $reflectionType = $type->reflectionType;
                 if ($repeated) {
-                    $reflectionType = Literal::new('Reflection\ListT', [$reflectionType]);
+                    $reflectionType = Literal::new('Reflection\ListT', [
+                        $reflectionType,
+                    ]);
                 }
 
                 $parameter
@@ -261,7 +263,7 @@ DOC,
                     ->addAttribute(Reflection\OneOf::class, [
                         array_map(
                             static fn(FieldDescriptor $variant) => new Literal(
-                                $className . '\\' . $oneOfName . Naming::pascalCase($variant->name) . '::class',
+                                \sprintf("{$className}\\{$oneOfName}%s::class", Naming::pascalCase($variant->name)),
                             ),
                             $variants,
                         ),
@@ -287,17 +289,12 @@ DOC,
 
         $interfaceType = new InterfaceType($interfaceName)
             ->addComment('@api')
-            ->addComment('@phpstan-sealed (');
-
-        $interfaceType->addComment(implode(" |\n", array_map(
-            static function (FieldDescriptor $variant) use ($interfaceName): string {
-                $variantName = $interfaceName . Naming::pascalCase($variant->name);
-
-                return "  {$variantName}";
-            },
-            $variants,
-        )));
-        $interfaceType->addComment(')');
+            ->addComment('@phpstan-sealed (')
+            ->addComment(implode(" |\n", array_map(
+                static fn(FieldDescriptor $variant) => \sprintf('  %s%s', $interfaceName, Naming::pascalCase($variant->name)),
+                $variants,
+            )))
+            ->addComment(')');
 
         $path = "{$message->path}.{$interfaceType->getName()}";
 
@@ -317,11 +314,13 @@ DOC,
         FieldDescriptor $variant,
     ): CodeGeneratorResponse\File {
         $interfaceName = Naming::pascalCase($oneof->name);
+        $className = \sprintf('%s%s', $interfaceName, Naming::pascalCase($variant->name));
 
         $descriptor = new MessageDescriptor(
-            name: $name = $interfaceName . Naming::pascalCase($variant->name),
-            path: "{$message->path}.{$name}",
+            name: $className,
+            path: "{$message->path}.{$className}",
             fields: [
+                // Remove oneof index.
                 new FieldDescriptor(
                     name: $variant->name,
                     number: $variant->number,
