@@ -2,29 +2,9 @@ syntax = "proto3";
 
 package thesis.api.v1;
 
-import "google/protobuf/timestamp.proto";
-
 option php_namespace = "Thesis\\Api\\V1";
 
-// A request message for adding new items.
-message AddItemRequest {
-    optional string title = 1; // The title of the item.
-    enum ItemType {
-        ITEM_TYPE_UNSPECIFIED = 0; // Comment on item type case.
-        ITEM_TYPE_TASK = 1;
-    }
-    ItemType type = 2;
-    google.protobuf.Timestamp ts = 3;
-    message Labels {
-        repeated string keys = 1; // Comment on keys
-    }
-    // Comment on Labels.
-    Labels labels = 4;
-    map<string, Value> values = 5; // Values comment
-}
-
-// Value comment
-message Value {
-    string key = 1;
-    string value = 2;
+message LoginRequest {
+    string user = 2;
+    string password = 3;
 }
