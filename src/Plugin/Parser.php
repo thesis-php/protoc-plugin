@@ -52,6 +52,7 @@ final readonly class Parser
             packageComments: $comments->extract(Comments::PACKAGE_COMMENT_PATH),
             syntaxComments: $comments->extract(Comments::SYNTAX_COMMENT_PATH),
             editionComments: $comments->extract(Comments::EDITION_COMMENT_PATH),
+            syntax: $descriptor->syntax,
         );
     }
 
@@ -130,7 +131,7 @@ final readonly class Parser
                 typeName: $descriptor->typeName,
                 comment: $comments->extract(\sprintf('%d.%d', Comments::MESSAGE_FIELD_COMMENT_PATH, $idx)),
                 options: $descriptor->options,
-                optional: ($file->syntax === 'proto2' && $descriptor->label === FieldDescriptorProto\Label::LABEL_OPTIONAL) || ($file->syntax === 'proto3' && $descriptor->proto3Optional === true),
+                optional: ($file->syntax === null && $descriptor->label === FieldDescriptorProto\Label::LABEL_OPTIONAL) || ($file->syntax === 'proto3' && $descriptor->proto3Optional === true),
                 oneOfIndex: $descriptor->oneofIndex,
             );
         }

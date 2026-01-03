@@ -67,6 +67,7 @@ final readonly class Compiler
                 protocVersion: (string) ($request->compilerVersion ?? 'unknown'),
                 source: $source,
                 package: $proto->package,
+                syntax: $proto->syntax,
             );
 
             yield from array_map($generator->generateEnum(...), $proto->enums);

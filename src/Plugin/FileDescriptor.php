@@ -25,5 +25,6 @@ final readonly class FileDescriptor
         public ?Comment $packageComments = null,
         public ?Comment $syntaxComments = null,
         public ?Comment $editionComments = null,
+        public ?string $syntax = null,
     ) {}
 }

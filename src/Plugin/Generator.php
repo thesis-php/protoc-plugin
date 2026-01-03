@@ -43,6 +43,7 @@ final readonly class Generator
         string $protocVersion,
         string $source,
         private ?string $package = null,
+        private ?string $syntax = null,
     ) {
         $this->printer = new Printer();
         $this->typeDeclarationResolver = new AggregateTypeDeclarationResolver([
@@ -208,9 +209,13 @@ DOC,
 
                 $reflectionType = $type->reflectionType;
                 if ($repeated) {
-                    $reflectionType = Literal::new('Reflection\ListT', [
-                        $reflectionType,
-                    ]);
+                    $listParameters = [$reflectionType];
+
+                    if ($this->syntax === null) {
+                        $listParameters[] = $field->options?->packed === true;
+                    }
+
+                    $reflectionType = Literal::new('Reflection\ListT', $listParameters);
                 }
 
                 $parameter
