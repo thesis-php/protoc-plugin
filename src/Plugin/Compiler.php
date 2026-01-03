@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin;
 
-use BcMath\Number;
-use Thesis\Package;
 use Thesis\Protobuf\Compiler\Plugin;
 use Thesis\Protoc\Exception\CodeCannotBeGenerated;
 use Thesis\Protoc\ProtocException;
@@ -15,17 +13,15 @@ use Thesis\Protoc\ProtocException;
  */
 final readonly class Compiler
 {
-    private const string PACKAGE_NAME = 'thesis/protoc-plugin';
+    public const string PLUGIN_NAME = 'thesis/protoc-plugin';
+    public const \BcMath\Number SUPPORTED_FEATURES = Internal\SUPPORTED_FEATURES;
+    public const string PLUGIN_VERSION = Internal\PLUGIN_VERSION;
 
     private Parser $parser;
-
-    /** @var non-empty-string */
-    private string $version;
 
     public function __construct()
     {
         $this->parser = new Parser();
-        $this->version = Package\version(self::PACKAGE_NAME);
     }
 
     /**
@@ -39,10 +35,7 @@ final readonly class Compiler
         $files = $this->doGenerate($request, $options);
 
         return new Plugin\CodeGeneratorResponse(
-            supportFeatures: new Number(
-                Plugin\CodeGeneratorResponse\Feature::FEATURE_PROTO3_OPTIONAL->value
-                | Plugin\CodeGeneratorResponse\Feature::FEATURE_SUPPORTS_EDITIONS->value,
-            ),
+            supportFeatures: self::SUPPORTED_FEATURES,
             files: iterator_to_array($files, false),
         );
     }
@@ -62,8 +55,7 @@ final readonly class Compiler
             $generator = new Generator(
                 namespace: $phpNamespace,
                 path: str_replace('\\', '/', $phpNamespace),
-                library: self::PACKAGE_NAME,
-                pluginVersion: $this->version,
+                pluginVersion: self::PLUGIN_VERSION,
                 protocVersion: (string) ($request->compilerVersion ?? 'unknown'),
                 source: $source,
                 package: $proto->package,

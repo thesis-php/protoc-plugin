@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+option go_package = "github.com/golang/protobuf/internal/testprotos/proto2_proto";
+
+package proto.api.v1;
+
+enum Foo {
+    FOO_UNSPECIFIED = 0;
+    FOO_BAR = 1;
+    FOO_BAZ = 2;
+}
