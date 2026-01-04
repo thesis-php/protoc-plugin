@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+option php_namespace = 'Thesis\\Api\\V1';
+option php_class_prefix = 'Kek';
+
+package test.api.v1;
+
+message TestRequest {}

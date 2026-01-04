@@ -109,7 +109,7 @@ DOC,
             ->addComment($enum->comment !== null ? "\n{$enum->comment}" : '')
             ->setType('int')
             ->setCases(array_map(
-                static fn(EnumCaseDescriptor $case) => new EnumCase($case->name)
+                static fn(EnumCaseDescriptor $case) => new EnumCase(Naming::secureEnumCase($case->name))
                     ->setValue($case->value)
                     ->setComment((string) $case->comment),
                 $enum->cases,
@@ -367,7 +367,7 @@ DOC,
             ->add($namespace);
 
         return new CodeGeneratorResponse\File(
-            name: \sprintf('%s/%s.php', $this->path, str_replace('.', '/', $path)),
+            name: \sprintf('%s/%s.php', $this->path, Naming::path($path)),
             content: $this->printer->printFile($file),
         );
     }
@@ -379,7 +379,10 @@ DOC,
         $paths = explode('.', $path);
         $typeNamespace = \array_slice($paths, 0, \count($paths) - 1);
         if (\count($typeNamespace) > 0) {
-            $namespace .= '\\' . implode('\\', $typeNamespace);
+            $namespace = Naming::joinNamespace([
+                $namespace,
+                ...$typeNamespace,
+            ]);
         }
 
         return new PhpNamespace($namespace);

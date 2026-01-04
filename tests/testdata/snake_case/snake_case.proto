@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package proto.api.v1;
+
+enum Foo {
+    FOO_UNSPECIFIED = 0;
+}
+
+message Test_Request {
+    message Nested_Message {
+        message Deep {
+            enum Deep_Enum {
+                DEEP_ENUM_UNSPECIFIED = 0;
+            }
+
+            oneof union {
+                string phone = 1;
+                string email = 2;
+            }
+            Deep_Enum deep_enum = 3;
+        }
+        Deep deep = 1;
+    }
+    Nested_Message nested = 1;
+    oneof x_field {
+        int32 number = 2;
+        Nested_Message col = 3;
+        Nested_Message.Deep.Deep_Enum deep_enum = 4;
+    }
+    Nested_Message.Deep nested_deep = 5;
+}
+
+message Another_Request {
+    Test_Request.Nested_Message nested = 1;
+    Test_Request.Nested_Message.Deep.Deep_Enum deep_enum = 2;
+}

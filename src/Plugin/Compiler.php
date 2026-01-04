@@ -101,7 +101,8 @@ final readonly class Compiler
 
         $package = $descriptor->package;
         if ($package !== null && $package !== '') {
-            return implode('\\', array_map(ucwords(...), explode('.', $package)));
+            /** @var non-empty-string */
+            return Naming::joinNamespace(explode('.', $package));
         }
 
         $phpNamespace = $options->phpNamespace();

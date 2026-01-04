@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package reserved_types;
+
+enum NotAllowed {
+    abstract = 0;
+    and = 1;
+    array = 2;
+    empty = 3;
+    class = 4;
+}
+
+enum string { ZERO1 = 0; }
+
+enum Trait { ZERO2 = 0; }
+
+message exit {}
+
+message INSTANCEOF {
+    Class.Case.Break break = 1;
+}
+
+message Class {
+    message Case {
+        message Break {
+            string name = 1;
+        }
+    }
+
+    Case.Break break = 1;
+}

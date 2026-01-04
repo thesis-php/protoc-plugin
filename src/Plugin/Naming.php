@@ -10,7 +10,7 @@ namespace Thesis\Protoc\Plugin;
 enum Naming
 {
     /** @var array<string, 1> */
-    private const array KEYWORDS = [
+    private const array CLASS_NAMES_RESERVED_WORDS = [
         'bool' => 1,
         'false' => 1,
         'float' => 1,
@@ -97,6 +97,11 @@ enum Naming
         'yield' => 1,
     ];
 
+    /** @var array<string, 1> */
+    private const array ENUM_CASE_RESERVED_WORDS = [
+        'class' => 1,
+    ];
+
     public static function camelCase(string $name): string
     {
         return lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $name))));
@@ -104,12 +109,17 @@ enum Naming
 
     public static function pascalCase(string $name): string
     {
-        return self::wrapKeyword(ucfirst(self::camelCase($name)));
+        return self::secure(ucfirst(self::camelCase($name)));
     }
 
     public static function namespace(string $name): string
     {
-        return self::wrapKeyword(str_replace(' ', '\\', ucwords(str_replace('.', ' ', $name))));
+        $name = implode('.', array_map(
+            self::pascalCase(...),
+            explode('.', $name),
+        ));
+
+        return self::secure(str_replace(' ', '\\', ucwords(str_replace('.', ' ', $name))));
     }
 
     /**
@@ -117,9 +127,25 @@ enum Naming
      */
     public static function joinNamespace(array $paths): string
     {
-        return implode('\\', array_map(
-            static fn(string $path) => str_replace('.', '\\', $path),
-            $paths,
+        return implode(
+            '\\',
+            array_map(
+                self::pascalCase(...),
+                array_merge(
+                    ...array_map(
+                        static fn(string $path) => explode('.', $path),
+                        $paths,
+                    ),
+                ),
+            ),
+        );
+    }
+
+    public static function path(string $path): string
+    {
+        return implode('/', array_map(
+            self::pascalCase(...),
+            explode('.', $path),
         ));
     }
 
@@ -128,8 +154,13 @@ enum Naming
         return implode('\\', \array_slice(explode('\\', $namespace), $levels));
     }
 
-    private static function wrapKeyword(string $name): string
+    public static function secure(string $name): string
     {
-        return isset(self::KEYWORDS[strtolower($name)]) ? "{$name}_" : $name;
+        return isset(self::CLASS_NAMES_RESERVED_WORDS[strtolower($name)]) ? "{$name}_" : $name;
+    }
+
+    public static function secureEnumCase(string $name): string
+    {
+        return isset(self::ENUM_CASE_RESERVED_WORDS[strtolower($name)]) ? "{$name}_" : $name;
     }
 }

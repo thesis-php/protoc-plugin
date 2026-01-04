@@ -1,7 +1,5 @@
 syntax = "proto2";
 
-option go_package = "github.com/golang/protobuf/internal/testprotos/proto2_proto";
-
 package proto.api.v1;
 
 import "google/protobuf/timestamp.proto";
@@ -76,30 +74,30 @@ message TestRequest {
     repeated sint64 sint64_repeated = 203;
     repeated sfixed32 sfixed32_repeated = 204;
     repeated sfixed64 sfixed64_repeated = 205;
-    repeated bool bool_repeated_packed = 50 [packed=true];
-    repeated int32 int32_repeated_packed = 51 [packed=true];
-    repeated int64 int64_repeated_packed = 52 [packed=true];
-    repeated fixed32 fixed32_repeated_packed = 53 [packed=true];
-    repeated fixed64 fixed64_repeated_packed = 54 [packed=true];
-    repeated uint32 uint32_repeated_packed = 55 [packed=true];
-    repeated uint64 uint64_repeated_packed = 56 [packed=true];
-    repeated float float_repeated_packed = 57 [packed=true];
-    repeated double double_repeated_packed = 58 [packed=true];
-    repeated sint32 sint32_repeated_packed = 502 [packed=true];
-    repeated sint64 sint64_repeated_packed = 503 [packed=true];
-    repeated sfixed32 sfixed32_repeated_packed = 504 [packed=true];
-    repeated sfixed64 sfixed64_repeated_packed = 505 [packed=true];
-    optional bool bool_defaulted = 40 [default=true];
-    optional int32 int32_defaulted = 41 [default=32];
-    optional int64 int64_defaulted = 42 [default=64];
-    optional fixed32 fixed32_defaulted = 43 [default=320];
-    optional fixed64 fixed64_defaulted = 44 [default=640];
-    optional uint32 uint32_defaulted = 45 [default=3200];
-    optional uint64 uint64_defaulted = 46 [default=6400];
-    optional float float_defaulted = 47 [default=314159.];
-    optional double double_defaulted = 48 [default=271828.];
-    optional string string_defaulted = 49 [default="hello, \"world!\"\n"];
-    optional bytes bytes_defaulted = 401 [default="Bignose"];
+    repeated bool bool_repeated_packed = 50 [packed = true];
+    repeated int32 int32_repeated_packed = 51 [packed = true];
+    repeated int64 int64_repeated_packed = 52 [packed = true];
+    repeated fixed32 fixed32_repeated_packed = 53 [packed = true];
+    repeated fixed64 fixed64_repeated_packed = 54 [packed = true];
+    repeated uint32 uint32_repeated_packed = 55 [packed = true];
+    repeated uint64 uint64_repeated_packed = 56 [packed = true];
+    repeated float float_repeated_packed = 57 [packed = true];
+    repeated double double_repeated_packed = 58 [packed = true];
+    repeated sint32 sint32_repeated_packed = 502 [packed = true];
+    repeated sint64 sint64_repeated_packed = 503 [packed = true];
+    repeated sfixed32 sfixed32_repeated_packed = 504 [packed = true];
+    repeated sfixed64 sfixed64_repeated_packed = 505 [packed = true];
+    optional bool bool_defaulted = 40 [default = true];
+    optional int32 int32_defaulted = 41 [default = 32];
+    optional int64 int64_defaulted = 42 [default = 64];
+    optional fixed32 fixed32_defaulted = 43 [default = 320];
+    optional fixed64 fixed64_defaulted = 44 [default = 640];
+    optional uint32 uint32_defaulted = 45 [default = 3200];
+    optional uint64 uint64_defaulted = 46 [default = 6400];
+    optional float float_defaulted = 47 [default = 314159.];
+    optional double double_defaulted = 48 [default = 271828.];
+    optional string string_defaulted = 49 [default = "hello, \"world!\"\n"];
+    optional bytes bytes_defaulted = 401 [default = "Bignose"];
     optional sint32 sint32_defaulted = 402 [default = -32];
     optional sint64 sint64_defaulted = 403 [default = -64];
     optional sfixed32 sfixed32_defaulted = 404 [default = -32];
@@ -115,6 +113,20 @@ message TestRequest {
         // Comment on nested message field.
         optional string name = 1;
         optional string group = 2;
+        message Deep {
+            enum DeepEnum {
+                DEEP_ENUM_UNSPECIFIED = 0;
+                DEEP_ENUM_FOO = 1;
+            }
+
+            required string name = 1;
+            oneof union {
+                string phone = 2;
+                string email = 3;
+            }
+            optional DeepEnum deep_enum = 4;
+        }
+        optional Deep deep = 3;
     }
     optional Nested nested = 412;
     oneof x_field {
@@ -123,7 +135,16 @@ message TestRequest {
         bytes data = 7;
         double temp_c = 8;
         Nested col = 9;
+        Nested.Deep.DeepEnum deep_enum = 4;
     }
+    optional Nested.Deep nested_deep = 413;
     // Maximum possible tag number.
     optional string last_field = 536870911;
+}
+
+message AnotherRequest {
+    optional TestRequest.Nested nested = 1;
+    optional TestRequest.Nested.Deep deep = 2;
+    optional TestRequest.Kind kind = 3;
+    optional TestRequest.Nested.Deep.DeepEnum deep_enum = 4;
 }

@@ -79,6 +79,7 @@ namespace Proto\Api\V1;
 use BcMath\Number;
 use Proto\Api\V1\TestRequest\Kind;
 use Proto\Api\V1\TestRequest\Nested;
+use Proto\Api\V1\TestRequest\Nested\Deep;
 use Thesis\Protobuf;
 use Thesis\Protobuf\Known;
 use Thesis\Protobuf\Reflection;
@@ -287,6 +288,8 @@ final readonly class TestRequest
         public ?Known\Any $knownAny = null,
         #[Reflection\Field(412, new Reflection\ObjectT(Nested::class))]
         public ?Nested $nested = null,
+        #[Reflection\Field(413, new Reflection\ObjectT(Deep::class))]
+        public ?Deep $nestedDeep = null,
         #[Reflection\Field(536870911, Reflection\StringT::T)]
         public ?string $lastField = null,
         #[Reflection\OneOf([
@@ -295,6 +298,7 @@ final readonly class TestRequest
             TestRequest\XFieldData::class,
             TestRequest\XFieldTempC::class,
             TestRequest\XFieldCol::class,
+            TestRequest\XFieldDeepEnum::class,
         ])]
         public ?TestRequest\XField $xField = null,
     ) {}
@@ -419,6 +423,30 @@ PHP,
                         ),
                     ),
                     new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/XFieldDeepEnum.php',
+                        content: self::phpContent(
+                            'proto2/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest;
+
+use Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum;
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class XFieldDeepEnum implements XField
+{
+    public function __construct(
+        #[Reflection\Field(4, new Reflection\EnumT(DeepEnum::class))]
+        public ?DeepEnum $deepEnum = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
                         name: 'Proto/Api/V1/TestRequest/XField.php',
                         content: self::phpContent(
                             'proto2/test.proto',
@@ -432,7 +460,8 @@ namespace Proto\Api\V1\TestRequest;
  *   XFieldName |
  *   XFieldData |
  *   XFieldTempC |
- *   XFieldCol
+ *   XFieldCol |
+ *   XFieldDeepEnum
  * )
  */
 interface XField
@@ -473,6 +502,7 @@ PHP,
                             <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
+use Proto\Api\V1\TestRequest\Nested\Deep;
 use Thesis\Protobuf\Reflection;
 
 /**
@@ -490,6 +520,663 @@ final readonly class Nested
         public ?string $name = null,
         #[Reflection\Field(2, Reflection\StringT::T)]
         public ?string $group = null,
+        #[Reflection\Field(3, new Reflection\ObjectT(Deep::class))]
+        public ?Deep $deep = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/Nested/Deep.php',
+                        content: self::phpContent(
+                            'proto2/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest\Nested;
+
+use Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum;
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class Deep
+{
+    public function __construct(
+        #[Reflection\Field(1, Reflection\StringT::T)]
+        public string $name = '',
+        #[Reflection\Field(4, new Reflection\EnumT(DeepEnum::class))]
+        public ?DeepEnum $deepEnum = null,
+        #[Reflection\OneOf([Deep\UnionPhone::class, Deep\UnionEmail::class])]
+        public ?Deep\Union $union = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/Nested/Deep/UnionPhone.php',
+                        content: self::phpContent(
+                            'proto2/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest\Nested\Deep;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class UnionPhone implements Union
+{
+    public function __construct(
+        #[Reflection\Field(2, Reflection\StringT::T)]
+        public ?string $phone = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/Nested/Deep/UnionEmail.php',
+                        content: self::phpContent(
+                            'proto2/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest\Nested\Deep;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class UnionEmail implements Union
+{
+    public function __construct(
+        #[Reflection\Field(3, Reflection\StringT::T)]
+        public ?string $email = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/Nested/Deep/Union.php',
+                        content: self::phpContent(
+                            'proto2/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest\Nested\Deep;
+
+/**
+ * @api
+ * @phpstan-sealed (
+ *   UnionPhone |
+ *   UnionEmail
+ * )
+ */
+interface Union
+{
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/Nested/Deep/DeepEnum.php',
+                        content: self::phpContent(
+                            'proto2/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest\Nested\Deep;
+
+/**
+ * @api
+ */
+enum DeepEnum: int
+{
+    case DEEP_ENUM_UNSPECIFIED = 0;
+    case DEEP_ENUM_FOO = 1;
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/AnotherRequest.php',
+                        content: self::phpContent(
+                            'proto2/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1;
+
+use Proto\Api\V1\TestRequest\Kind;
+use Proto\Api\V1\TestRequest\Nested;
+use Proto\Api\V1\TestRequest\Nested\Deep;
+use Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum;
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class AnotherRequest
+{
+    public function __construct(
+        #[Reflection\Field(1, new Reflection\ObjectT(Nested::class))]
+        public ?Nested $nested = null,
+        #[Reflection\Field(2, new Reflection\ObjectT(Deep::class))]
+        public ?Deep $deep = null,
+        #[Reflection\Field(3, new Reflection\EnumT(Kind::class))]
+        public ?Kind $kind = null,
+        #[Reflection\Field(4, new Reflection\EnumT(DeepEnum::class))]
+        public ?DeepEnum $deepEnum = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                ],
+            ),
+        ];
+
+        yield [
+            'php_namespace/php_namespace.txt',
+            new CodeGeneratorResponse(
+                supportFeatures: Compiler::SUPPORTED_FEATURES,
+                files: [
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Api/V1/TestRequest.php',
+                        content: self::phpContent(
+                            source: 'php_namespace/php_namespace.proto',
+                            content: <<<'PHP'
+namespace Thesis\Api\V1;
+
+/**
+ * @api
+ */
+final readonly class TestRequest
+{
+}
+
+PHP,
+                        ),
+                    ),
+                ],
+            ),
+        ];
+
+        yield [
+            'snake_case/snake_case.txt',
+            new CodeGeneratorResponse(
+                supportFeatures: Compiler::SUPPORTED_FEATURES,
+                files: [
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/Foo.php',
+                        content: self::phpContent(
+                            'snake_case/snake_case.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1;
+
+/**
+ * @api
+ */
+enum Foo: int
+{
+    case FOO_UNSPECIFIED = 0;
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest.php',
+                        content: self::phpContent(
+                            'snake_case/snake_case.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1;
+
+use Proto\Api\V1\TestRequest\NestedMessage;
+use Proto\Api\V1\TestRequest\NestedMessage\Deep;
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class TestRequest
+{
+    public function __construct(
+        #[Reflection\Field(1, new Reflection\ObjectT(NestedMessage::class))]
+        public ?NestedMessage $nested = null,
+        #[Reflection\Field(5, new Reflection\ObjectT(Deep::class))]
+        public ?Deep $nestedDeep = null,
+        #[Reflection\OneOf([TestRequest\XFieldNumber::class, TestRequest\XFieldCol::class, TestRequest\XFieldDeepEnum::class])]
+        public ?TestRequest\XField $xField = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/XFieldNumber.php',
+                        content: self::phpContent(
+                            'snake_case/snake_case.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class XFieldNumber implements XField
+{
+    public function __construct(
+        #[Reflection\Field(2, Reflection\Int32T::T)]
+        public int $number = 0,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/XFieldCol.php',
+                        content: self::phpContent(
+                            'snake_case/snake_case.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class XFieldCol implements XField
+{
+    public function __construct(
+        #[Reflection\Field(3, new Reflection\ObjectT(NestedMessage::class))]
+        public ?NestedMessage $col = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/XFieldDeepEnum.php',
+                        content: self::phpContent(
+                            'snake_case/snake_case.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest;
+
+use Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum;
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class XFieldDeepEnum implements XField
+{
+    public function __construct(
+        #[Reflection\Field(4, new Reflection\EnumT(DeepEnum::class))]
+        public ?DeepEnum $deepEnum = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/XField.php',
+                        content: self::phpContent(
+                            'snake_case/snake_case.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest;
+
+/**
+ * @api
+ * @phpstan-sealed (
+ *   XFieldNumber |
+ *   XFieldCol |
+ *   XFieldDeepEnum
+ * )
+ */
+interface XField
+{
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/NestedMessage.php',
+                        content: self::phpContent(
+                            'snake_case/snake_case.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest;
+
+use Proto\Api\V1\TestRequest\NestedMessage\Deep;
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class NestedMessage
+{
+    public function __construct(
+        #[Reflection\Field(1, new Reflection\ObjectT(Deep::class))]
+        public ?Deep $deep = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep.php',
+                        content: self::phpContent(
+                            'snake_case/snake_case.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest\NestedMessage;
+
+use Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum;
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class Deep
+{
+    public function __construct(
+        #[Reflection\Field(3, new Reflection\EnumT(DeepEnum::class))]
+        public ?DeepEnum $deepEnum = null,
+        #[Reflection\OneOf([Deep\UnionPhone::class, Deep\UnionEmail::class])]
+        public ?Deep\Union $union = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep/UnionPhone.php',
+                        content: self::phpContent(
+                            'snake_case/snake_case.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest\NestedMessage\Deep;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class UnionPhone implements Union
+{
+    public function __construct(
+        #[Reflection\Field(1, Reflection\StringT::T)]
+        public string $phone = '',
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep/UnionEmail.php',
+                        content: self::phpContent(
+                            'snake_case/snake_case.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest\NestedMessage\Deep;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class UnionEmail implements Union
+{
+    public function __construct(
+        #[Reflection\Field(2, Reflection\StringT::T)]
+        public string $email = '',
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep/Union.php',
+                        content: self::phpContent(
+                            'snake_case/snake_case.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest\NestedMessage\Deep;
+
+/**
+ * @api
+ * @phpstan-sealed (
+ *   UnionPhone |
+ *   UnionEmail
+ * )
+ */
+interface Union
+{
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep/DeepEnum.php',
+                        content: self::phpContent(
+                            'snake_case/snake_case.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest\NestedMessage\Deep;
+
+/**
+ * @api
+ */
+enum DeepEnum: int
+{
+    case DEEP_ENUM_UNSPECIFIED = 0;
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/AnotherRequest.php',
+                        content: self::phpContent(
+                            'snake_case/snake_case.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1;
+
+use Proto\Api\V1\TestRequest\NestedMessage;
+use Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum;
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class AnotherRequest
+{
+    public function __construct(
+        #[Reflection\Field(1, new Reflection\ObjectT(NestedMessage::class))]
+        public ?NestedMessage $nested = null,
+        #[Reflection\Field(2, new Reflection\EnumT(DeepEnum::class))]
+        public ?DeepEnum $deepEnum = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                ],
+            ),
+        ];
+
+        yield [
+            'reserved_names/reserved_names.txt',
+            new CodeGeneratorResponse(
+                supportFeatures: Compiler::SUPPORTED_FEATURES,
+                files: [
+                    new CodeGeneratorResponse\File(
+                        name: 'ReservedTypes/NotAllowed.php',
+                        content: self::phpContent(
+                            'reserved_names/reserved_names.proto',
+                            <<<'PHP'
+namespace ReservedTypes;
+
+/**
+ * @api
+ */
+enum NotAllowed: int
+{
+    case abstract = 0;
+    case and = 1;
+    case array = 2;
+    case empty = 3;
+    case class_ = 4;
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'ReservedTypes/String_.php',
+                        content: self::phpContent(
+                            'reserved_names/reserved_names.proto',
+                            <<<'PHP'
+namespace ReservedTypes;
+
+/**
+ * @api
+ */
+enum String_: int
+{
+    case ZERO1 = 0;
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'ReservedTypes/Trait_.php',
+                        content: self::phpContent(
+                            'reserved_names/reserved_names.proto',
+                            <<<'PHP'
+namespace ReservedTypes;
+
+/**
+ * @api
+ */
+enum Trait_: int
+{
+    case ZERO2 = 0;
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'ReservedTypes/Exit_.php',
+                        content: self::phpContent(
+                            'reserved_names/reserved_names.proto',
+                            <<<'PHP'
+namespace ReservedTypes;
+
+/**
+ * @api
+ */
+final readonly class Exit_
+{
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'ReservedTypes/INSTANCEOF_.php',
+                        content: self::phpContent(
+                            'reserved_names/reserved_names.proto',
+                            <<<'PHP'
+namespace ReservedTypes;
+
+use ReservedTypes\Class_\Case_\Break_;
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class INSTANCEOF_
+{
+    public function __construct(
+        #[Reflection\Field(1, new Reflection\ObjectT(Break_::class))]
+        public ?Break_ $break = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'ReservedTypes/Class_.php',
+                        content: self::phpContent(
+                            'reserved_names/reserved_names.proto',
+                            <<<'PHP'
+namespace ReservedTypes;
+
+use ReservedTypes\Class_\Case_\Break_;
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class Class_
+{
+    public function __construct(
+        #[Reflection\Field(1, new Reflection\ObjectT(Break_::class))]
+        public ?Break_ $break = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'ReservedTypes/Class_/Case_.php',
+                        content: self::phpContent(
+                            'reserved_names/reserved_names.proto',
+                            <<<'PHP'
+namespace ReservedTypes\Class_;
+
+/**
+ * @api
+ */
+final readonly class Case_
+{
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'ReservedTypes/Class_/Case_/Break_.php',
+                        content: self::phpContent(
+                            'reserved_names/reserved_names.proto',
+                            <<<'PHP'
+namespace ReservedTypes\Class_\Case_;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class Break_
+{
+    public function __construct(
+        #[Reflection\Field(1, Reflection\StringT::T)]
+        public string $name = '',
     ) {}
 }
 
