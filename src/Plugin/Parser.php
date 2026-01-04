@@ -132,6 +132,7 @@ final readonly class Parser
                 comment: $comments->extract(\sprintf('%d.%d', Comments::MESSAGE_FIELD_COMMENT_PATH, $idx)),
                 options: $descriptor->options,
                 optional: ($file->syntax === null && $descriptor->label === FieldDescriptorProto\Label::LABEL_OPTIONAL) || ($file->syntax === 'proto3' && $descriptor->proto3Optional === true),
+                proto3Optional: $descriptor->proto3Optional,
                 oneOfIndex: $descriptor->oneofIndex,
                 defaultValue: $descriptor->defaultValue,
             );

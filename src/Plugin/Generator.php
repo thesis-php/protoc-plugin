@@ -76,7 +76,7 @@ DOC,
         $oneofByIndex = [];
 
         foreach ($message->fields as $field) {
-            if ($field->oneOfIndex !== null && !$field->optional) {
+            if ($field->oneOfIndex !== null && $field->proto3Optional === null) {
                 if (isset($message->oneofs[$field->oneOfIndex])) {
                     $oneOf = $message->oneofs[$field->oneOfIndex];
 
@@ -146,7 +146,7 @@ DOC,
             $oneOfByIndex = [];
 
             foreach ($message->fields as $field) {
-                if ($field->oneOfIndex !== null && !$field->optional) {
+                if ($field->oneOfIndex !== null && $field->proto3Optional === null) {
                     $oneOfByIndex[$field->oneOfIndex][] = $field;
 
                     continue;
