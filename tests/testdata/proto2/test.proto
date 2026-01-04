@@ -4,8 +4,126 @@ option go_package = "github.com/golang/protobuf/internal/testprotos/proto2_proto
 
 package proto.api.v1;
 
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/any.proto";
+
+// Enum comment.
 enum Foo {
+    // Case comment.
     FOO_UNSPECIFIED = 0;
     FOO_BAR = 1;
     FOO_BAZ = 2;
+}
+
+// Comment on TestRequest message.
+message TestRequest {
+    // Nested enum comment.
+    enum Kind {
+        // Nested enum comment case.
+        KIND_UNSPECIFIED = 0;
+        VOID = 1;
+        STRING = 2;
+        BOOL = 3;
+    }
+
+    required Kind kind = 1; // base field comment.
+    // another field comment.
+    required bool bool_required = 10;
+    required int32 int32_required = 11;
+    required int64 int64_required = 12;
+    required fixed32 fixed32_required = 13;
+    required fixed64 fixed64_required = 14;
+    required uint32 uint32_required = 15;
+    required uint64 uint64_required = 16;
+    required float gloat_required = 17;
+    required double double_required = 18;
+    required string string_required = 19;
+    required bytes bytes_required = 101;
+    required sint32 sint32_required = 102;
+    required sint64 sint64_required = 103;
+    required sfixed32 sfixed32_required = 104;
+    required sfixed64 sfixed64_required = 105;
+    optional bool bool_optional = 30;
+    optional int32 int32_optional = 31;
+    optional int64 int64_optional = 32;
+    optional fixed32 fixed32_optional = 33;
+    optional fixed64 fixed64_optional = 34;
+    optional uint32 uint32_optional = 35;
+    optional uint64 uint64_optional = 36;
+    optional float float_optional = 37;
+    optional double double_optional = 38;
+    optional string string_optional = 39;
+    optional bytes bytes_optional = 301;
+    optional sint32 sint32_optional = 302;
+    optional sint64 sint64_optional = 303;
+    optional sfixed32 sfixed32_optional = 304;
+    optional sfixed64 sfixed64_optional = 305;
+    repeated bool bool_repeated = 20;
+    repeated int32 int32_repeated = 21;
+    repeated int64 int64_repeated = 22;
+    repeated fixed32 fixed32_repeated = 23;
+    repeated fixed64 fixed64_repeated = 24;
+    repeated uint32 uint32_repeated = 25;
+    repeated uint64 uint64_repeated = 26;
+    repeated float float_repeated = 27;
+    repeated double double_repeated = 28;
+    repeated string string_repeated = 29;
+    repeated bytes bytes_repeated = 201;
+    repeated sint32 sint32_repeated = 202;
+    repeated sint64 sint64_repeated = 203;
+    repeated sfixed32 sfixed32_repeated = 204;
+    repeated sfixed64 sfixed64_repeated = 205;
+    repeated bool bool_repeated_packed = 50 [packed=true];
+    repeated int32 int32_repeated_packed = 51 [packed=true];
+    repeated int64 int64_repeated_packed = 52 [packed=true];
+    repeated fixed32 fixed32_repeated_packed = 53 [packed=true];
+    repeated fixed64 fixed64_repeated_packed = 54 [packed=true];
+    repeated uint32 uint32_repeated_packed = 55 [packed=true];
+    repeated uint64 uint64_repeated_packed = 56 [packed=true];
+    repeated float float_repeated_packed = 57 [packed=true];
+    repeated double double_repeated_packed = 58 [packed=true];
+    repeated sint32 sint32_repeated_packed = 502 [packed=true];
+    repeated sint64 sint64_repeated_packed = 503 [packed=true];
+    repeated sfixed32 sfixed32_repeated_packed = 504 [packed=true];
+    repeated sfixed64 sfixed64_repeated_packed = 505 [packed=true];
+    optional bool bool_defaulted = 40 [default=true];
+    optional int32 int32_defaulted = 41 [default=32];
+    optional int64 int64_defaulted = 42 [default=64];
+    optional fixed32 fixed32_defaulted = 43 [default=320];
+    optional fixed64 fixed64_defaulted = 44 [default=640];
+    optional uint32 uint32_defaulted = 45 [default=3200];
+    optional uint64 uint64_defaulted = 46 [default=6400];
+    optional float float_defaulted = 47 [default=314159.];
+    optional double double_defaulted = 48 [default=271828.];
+    optional string string_defaulted = 49 [default="hello, \"world!\"\n"];
+    optional bytes bytes_defaulted = 401 [default="Bignose"];
+    optional sint32 sint32_defaulted = 402 [default = -32];
+    optional sint64 sint64_defaulted = 403 [default = -64];
+    optional sfixed32 sfixed32_defaulted = 404 [default = -32];
+    optional sfixed64 sfixed64_defaulted = 405 [default = -64];
+    map<string, string> map_string_string = 406;
+    optional google.protobuf.Timestamp known_timestamp = 407;
+    optional google.protobuf.Duration known_duration = 408;
+    optional google.protobuf.Struct known_struct = 409;
+    optional google.protobuf.Empty known_empty = 410;
+    optional google.protobuf.Any known_any = 411;
+    // Comment on nested message.
+    message Nested {
+        // Comment on nested message field.
+        optional string name = 1;
+        optional string group = 2;
+    }
+    optional Nested nested = 412;
+    oneof x_field {
+        int32 number = 5;
+        string name = 6;
+        bytes data = 7;
+        double temp_c = 8;
+        Nested col = 9;
+    }
+    // Maximum possible tag number.
+    optional string last_field = 536870911;
 }

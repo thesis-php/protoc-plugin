@@ -103,8 +103,11 @@ phpstan: var vendor ## Analyze code using PHPStan
 	$(RUN) phpstan analyze --memory-limit=1G $(ARGS)
 .PHONY: phpstan
 
-test: var vendor up ## Run tests using PHPUnit
-	$(RUN) vendor/bin/phpunit $(ARGS)
+generate-testdata:
+	$(RUN) ./tests/tools/generate.sh
+
+test: var vendor up generate-testdata ## Run tests using PHPUnit
+	$(RUN) vendor/bin/phpunit $(ARGS) --colors
 .PHONY: test
 
 infect: var vendor up ## Run mutation tests using Infection
@@ -138,7 +141,7 @@ executable:
 
 compile: executable
 	rm -rf compiled/*
-	protoc -I./protos/protos --plugin=protoc-gen-custom-plugin=./bin/compiler.php ./protos/protos/*.proto --custom-plugin_out=compiled
+	protoc -I./protos --plugin=protoc-gen-custom-plugin=./bin/compiler.php ./protos/*.proto --custom-plugin_out=compiled
 .PHONY: compile
 
 compile-ydb: executable
