@@ -1186,6 +1186,109 @@ PHP,
                 ],
             ),
         ];
+
+        yield [
+            'proto3/test.txt',
+            new CodeGeneratorResponse(
+                supportFeatures: Compiler::SUPPORTED_FEATURES,
+                files: [
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest.php',
+                        content: self::phpContent(
+                            'proto3/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class TestRequest
+{
+    public function __construct(
+        #[Reflection\Field(1, Reflection\StringT::T)]
+        public string $stringValue = '',
+        #[Reflection\Field(2, Reflection\StringT::T)]
+        public ?string $optionalStringValue = null,
+        #[Reflection\OneOf([TestRequest\ContactPhone::class, TestRequest\ContactEmail::class])]
+        public ?TestRequest\Contact $contact = null,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/ContactPhone.php',
+                        content: self::phpContent(
+                            'proto3/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class ContactPhone implements Contact
+{
+    public function __construct(
+        #[Reflection\Field(3, Reflection\StringT::T)]
+        public string $phone = '',
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/ContactEmail.php',
+                        content: self::phpContent(
+                            'proto3/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class ContactEmail implements Contact
+{
+    public function __construct(
+        #[Reflection\Field(4, Reflection\StringT::T)]
+        public string $email = '',
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/TestRequest/Contact.php',
+                        content: self::phpContent(
+                            'proto3/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1\TestRequest;
+
+/**
+ * @api
+ * @phpstan-sealed (
+ *   ContactPhone |
+ *   ContactEmail
+ * )
+ */
+interface Contact
+{
+}
+
+PHP,
+                        ),
+                    ),
+                ],
+            ),
+        ];
     }
 
     private static function phpContent(string $source, string $content): string

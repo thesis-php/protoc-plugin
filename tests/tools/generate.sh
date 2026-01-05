@@ -21,5 +21,5 @@ find "$ROOT" -type f -name '*.proto' | while read -r proto; do
     --plugin=protoc-gen-dump="$PLUGIN" \
     --dump_out=. \
     -I "$ROOT" \
-    "$proto"
+    "$proto" 2>&1 | grep -v "hasn't been updated to support optional fields" || true
 done

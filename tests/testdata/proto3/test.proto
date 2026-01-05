@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package proto.api.v1;
+
+message TestRequest {
+    string string_value = 1;
+    optional string optional_string_value = 2;
+    oneof contact {
+        string phone = 3;
+        string email = 4;
+    }
+}
