@@ -1,0 +1,11 @@
+{
+  "chmod": "0755",
+  "directories": [
+    "bin",
+    "src",
+    "vendor"
+  ],
+  "main": "bin/compiler.php",
+  "output": "protoc-gen-php",
+  "shebang": "#!/usr/bin/env php"
+}
