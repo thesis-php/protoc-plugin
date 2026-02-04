@@ -28,7 +28,6 @@
         "thesis/protobuf": "0.1.x-dev"
     },
     "require-dev": {
-        "bamarni/composer-bin-plugin": "dev-master",
         "phpunit/phpunit": "^12.4",
         "symfony/var-dumper": "^8.0"
     },
@@ -44,17 +43,7 @@
         }
     },
     "config": {
-        "allow-plugins": {
-            "bamarni/composer-bin-plugin": true
-        },
         "lock": false,
         "sort-packages": true
-    },
-    "extra": {
-        "bamarni-bin": {
-            "bin-links": false,
-            "forward-command": true,
-            "target-directory": "tools"
-        }
     }
 }

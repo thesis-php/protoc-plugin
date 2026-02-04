@@ -6,4 +6,3 @@
 /phpstan.neon
 /phpunit.xml
 /compiled
-/tools/*/vendor

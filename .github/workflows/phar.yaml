@@ -18,14 +18,15 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
+          tools: box
 
       - name: Install dependencies
         run: |
-          composer install --no-dev --optimize-autoloader
+          composer install
 
       - name: Build executable PHAR
         run: |
-          tools/box/vendor/bin/box compile
+          box compile
 
       - name: Push phar
         uses: softprops/action-gh-release@v1
