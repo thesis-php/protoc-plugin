@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package Thesis.Auth.V1;
+
+import "protos/auth.proto";
+
+service AuthService {
+    rpc Login(Auth.LoginRequest) returns (Auth.LoginResponse);
+}

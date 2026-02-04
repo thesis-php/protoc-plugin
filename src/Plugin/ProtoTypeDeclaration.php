@@ -9,7 +9,7 @@ use Nette\PhpGenerator\Literal;
 /**
  * @api
  */
-final readonly class TypeDeclaration
+final readonly class ProtoTypeDeclaration
 {
     /**
      * @param list<string> $uses

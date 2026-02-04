@@ -9,12 +9,10 @@ use Nette\PhpGenerator\PhpNamespace;
 /**
  * @api
  */
-interface TypeDeclarationResolver
+interface ProtoTypeDeclarationResolver
 {
-    public function supports(FieldDescriptor $field): bool;
-
-    public function resolve(
+    public function resolveProtoType(
         FieldDescriptor $field,
         PhpNamespace $namespace,
-    ): TypeDeclaration;
+    ): ?ProtoTypeDeclaration;
 }

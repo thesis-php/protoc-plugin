@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package Thesis.Queue.V1;
+
+import "protos/queue.proto";
+import "google/protobuf/empty.proto";
+
+service QueueService {
+    rpc Push(stream PushRequest.Message) returns (google.protobuf.Empty);
+    rpc Pull(PullRequest) returns (stream PullRequest.Message);
+}

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc;
 
+use BcMath\Number;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Thesis\Package;
 use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorRequest;
 use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorResponse;
 use Thesis\Protobuf\Reflection\Reflector;
@@ -44,7 +46,7 @@ final class CompilerTest extends TestCase
         yield [
             'proto2/test.txt',
             new CodeGeneratorResponse(
-                supportFeatures: Compiler::SUPPORTED_FEATURES,
+                supportFeatures: new Number(Compiler::SUPPORTED_FEATURES),
                 files: [
                     new CodeGeneratorResponse\File(
                         name: 'Proto/Api/V1/Foo.php',
@@ -77,9 +79,6 @@ PHP,
 namespace Proto\Api\V1;
 
 use BcMath\Number;
-use Proto\Api\V1\TestRequest\Kind;
-use Proto\Api\V1\TestRequest\Nested;
-use Proto\Api\V1\TestRequest\Nested\Deep;
 use Thesis\Protobuf;
 use Thesis\Protobuf\Known;
 use Thesis\Protobuf\Reflection;
@@ -92,7 +91,7 @@ use Thesis\Protobuf\Reflection;
 final readonly class TestRequest
 {
     /**
-     * @param ?Kind $kind base field comment.
+     * @param ?TestRequest\Kind $kind base field comment.
      * @param bool $boolRequired another field comment.
      * @param list<bool> $boolRepeated
      * @param list<int> $int32Repeated
@@ -126,8 +125,8 @@ final readonly class TestRequest
      * @param ?string $lastField Maximum possible tag number.
      */
     public function __construct(
-        #[Reflection\Field(1, new Reflection\EnumT(Kind::class))]
-        public ?Kind $kind = null,
+        #[Reflection\Field(1, new Reflection\EnumT(TestRequest\Kind::class))]
+        public ?TestRequest\Kind $kind = null,
         #[Reflection\Field(10, Reflection\BoolT::T)]
         public bool $boolRequired = false,
         #[Reflection\Field(11, Reflection\Int32T::T)]
@@ -286,10 +285,10 @@ final readonly class TestRequest
         public ?Known\EmptyObject $knownEmpty = null,
         #[Reflection\Field(411, new Reflection\ObjectT(Known\Any::class))]
         public ?Known\Any $knownAny = null,
-        #[Reflection\Field(412, new Reflection\ObjectT(Nested::class))]
-        public ?Nested $nested = null,
-        #[Reflection\Field(413, new Reflection\ObjectT(Deep::class))]
-        public ?Deep $nestedDeep = null,
+        #[Reflection\Field(412, new Reflection\ObjectT(TestRequest\Nested::class))]
+        public ?TestRequest\Nested $nested = null,
+        #[Reflection\Field(413, new Reflection\ObjectT(TestRequest\Nested\Deep::class))]
+        public ?TestRequest\Nested\Deep $nestedDeep = null,
         #[Reflection\Field(536870911, Reflection\StringT::T)]
         public ?string $lastField = null,
         #[Reflection\OneOf([
@@ -429,7 +428,6 @@ PHP,
                             <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
-use Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum;
 use Thesis\Protobuf\Reflection;
 
 /**
@@ -438,8 +436,8 @@ use Thesis\Protobuf\Reflection;
 final readonly class XFieldDeepEnum implements XField
 {
     public function __construct(
-        #[Reflection\Field(4, new Reflection\EnumT(DeepEnum::class))]
-        public ?DeepEnum $deepEnum = null,
+        #[Reflection\Field(4, new Reflection\EnumT(Nested\Deep\DeepEnum::class))]
+        public ?Nested\Deep\DeepEnum $deepEnum = null,
     ) {}
 }
 
@@ -464,9 +462,7 @@ namespace Proto\Api\V1\TestRequest;
  *   XFieldDeepEnum
  * )
  */
-interface XField
-{
-}
+interface XField {}
 
 PHP,
                         ),
@@ -502,7 +498,6 @@ PHP,
                             <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
-use Proto\Api\V1\TestRequest\Nested\Deep;
 use Thesis\Protobuf\Reflection;
 
 /**
@@ -520,8 +515,8 @@ final readonly class Nested
         public ?string $name = null,
         #[Reflection\Field(2, Reflection\StringT::T)]
         public ?string $group = null,
-        #[Reflection\Field(3, new Reflection\ObjectT(Deep::class))]
-        public ?Deep $deep = null,
+        #[Reflection\Field(3, new Reflection\ObjectT(Nested\Deep::class))]
+        public ?Nested\Deep $deep = null,
     ) {}
 }
 
@@ -535,7 +530,6 @@ PHP,
                             <<<'PHP'
 namespace Proto\Api\V1\TestRequest\Nested;
 
-use Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum;
 use Thesis\Protobuf\Reflection;
 
 /**
@@ -546,8 +540,8 @@ final readonly class Deep
     public function __construct(
         #[Reflection\Field(1, Reflection\StringT::T)]
         public string $name = '',
-        #[Reflection\Field(4, new Reflection\EnumT(DeepEnum::class))]
-        public ?DeepEnum $deepEnum = null,
+        #[Reflection\Field(4, new Reflection\EnumT(Deep\DeepEnum::class))]
+        public ?Deep\DeepEnum $deepEnum = null,
         #[Reflection\OneOf([Deep\UnionPhone::class, Deep\UnionEmail::class])]
         public ?Deep\Union $union = null,
     ) {}
@@ -616,9 +610,7 @@ namespace Proto\Api\V1\TestRequest\Nested\Deep;
  *   UnionEmail
  * )
  */
-interface Union
-{
-}
+interface Union {}
 
 PHP,
                         ),
@@ -649,10 +641,6 @@ PHP,
                             <<<'PHP'
 namespace Proto\Api\V1;
 
-use Proto\Api\V1\TestRequest\Kind;
-use Proto\Api\V1\TestRequest\Nested;
-use Proto\Api\V1\TestRequest\Nested\Deep;
-use Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum;
 use Thesis\Protobuf\Reflection;
 
 /**
@@ -661,14 +649,14 @@ use Thesis\Protobuf\Reflection;
 final readonly class AnotherRequest
 {
     public function __construct(
-        #[Reflection\Field(1, new Reflection\ObjectT(Nested::class))]
-        public ?Nested $nested = null,
-        #[Reflection\Field(2, new Reflection\ObjectT(Deep::class))]
-        public ?Deep $deep = null,
-        #[Reflection\Field(3, new Reflection\EnumT(Kind::class))]
-        public ?Kind $kind = null,
-        #[Reflection\Field(4, new Reflection\EnumT(DeepEnum::class))]
-        public ?DeepEnum $deepEnum = null,
+        #[Reflection\Field(1, new Reflection\ObjectT(TestRequest\Nested::class))]
+        public ?TestRequest\Nested $nested = null,
+        #[Reflection\Field(2, new Reflection\ObjectT(TestRequest\Nested\Deep::class))]
+        public ?TestRequest\Nested\Deep $deep = null,
+        #[Reflection\Field(3, new Reflection\EnumT(TestRequest\Kind::class))]
+        public ?TestRequest\Kind $kind = null,
+        #[Reflection\Field(4, new Reflection\EnumT(TestRequest\Nested\Deep\DeepEnum::class))]
+        public ?TestRequest\Nested\Deep\DeepEnum $deepEnum = null,
     ) {}
 }
 
@@ -682,7 +670,7 @@ PHP,
         yield [
             'php_namespace/php_namespace.txt',
             new CodeGeneratorResponse(
-                supportFeatures: Compiler::SUPPORTED_FEATURES,
+                supportFeatures: new Number(Compiler::SUPPORTED_FEATURES),
                 files: [
                     new CodeGeneratorResponse\File(
                         name: 'Thesis/Api/V1/TestRequest.php',
@@ -694,9 +682,7 @@ namespace Thesis\Api\V1;
 /**
  * @api
  */
-final readonly class TestRequest
-{
-}
+final readonly class TestRequest {}
 
 PHP,
                         ),
@@ -708,7 +694,7 @@ PHP,
         yield [
             'snake_case/snake_case.txt',
             new CodeGeneratorResponse(
-                supportFeatures: Compiler::SUPPORTED_FEATURES,
+                supportFeatures: new Number(Compiler::SUPPORTED_FEATURES),
                 files: [
                     new CodeGeneratorResponse\File(
                         name: 'Proto/Api/V1/Foo.php',
@@ -735,8 +721,6 @@ PHP,
                             <<<'PHP'
 namespace Proto\Api\V1;
 
-use Proto\Api\V1\TestRequest\NestedMessage;
-use Proto\Api\V1\TestRequest\NestedMessage\Deep;
 use Thesis\Protobuf\Reflection;
 
 /**
@@ -745,10 +729,10 @@ use Thesis\Protobuf\Reflection;
 final readonly class TestRequest
 {
     public function __construct(
-        #[Reflection\Field(1, new Reflection\ObjectT(NestedMessage::class))]
-        public ?NestedMessage $nested = null,
-        #[Reflection\Field(5, new Reflection\ObjectT(Deep::class))]
-        public ?Deep $nestedDeep = null,
+        #[Reflection\Field(1, new Reflection\ObjectT(TestRequest\NestedMessage::class))]
+        public ?TestRequest\NestedMessage $nested = null,
+        #[Reflection\Field(5, new Reflection\ObjectT(TestRequest\NestedMessage\Deep::class))]
+        public ?TestRequest\NestedMessage\Deep $nestedDeep = null,
         #[Reflection\OneOf([TestRequest\XFieldNumber::class, TestRequest\XFieldCol::class, TestRequest\XFieldDeepEnum::class])]
         public ?TestRequest\XField $xField = null,
     ) {}
@@ -810,7 +794,6 @@ PHP,
                             <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
-use Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum;
 use Thesis\Protobuf\Reflection;
 
 /**
@@ -819,8 +802,8 @@ use Thesis\Protobuf\Reflection;
 final readonly class XFieldDeepEnum implements XField
 {
     public function __construct(
-        #[Reflection\Field(4, new Reflection\EnumT(DeepEnum::class))]
-        public ?DeepEnum $deepEnum = null,
+        #[Reflection\Field(4, new Reflection\EnumT(NestedMessage\Deep\DeepEnum::class))]
+        public ?NestedMessage\Deep\DeepEnum $deepEnum = null,
     ) {}
 }
 
@@ -842,9 +825,7 @@ namespace Proto\Api\V1\TestRequest;
  *   XFieldDeepEnum
  * )
  */
-interface XField
-{
-}
+interface XField {}
 
 PHP,
                         ),
@@ -856,7 +837,6 @@ PHP,
                             <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
-use Proto\Api\V1\TestRequest\NestedMessage\Deep;
 use Thesis\Protobuf\Reflection;
 
 /**
@@ -865,8 +845,8 @@ use Thesis\Protobuf\Reflection;
 final readonly class NestedMessage
 {
     public function __construct(
-        #[Reflection\Field(1, new Reflection\ObjectT(Deep::class))]
-        public ?Deep $deep = null,
+        #[Reflection\Field(1, new Reflection\ObjectT(NestedMessage\Deep::class))]
+        public ?NestedMessage\Deep $deep = null,
     ) {}
 }
 
@@ -880,7 +860,6 @@ PHP,
                             <<<'PHP'
 namespace Proto\Api\V1\TestRequest\NestedMessage;
 
-use Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum;
 use Thesis\Protobuf\Reflection;
 
 /**
@@ -889,8 +868,8 @@ use Thesis\Protobuf\Reflection;
 final readonly class Deep
 {
     public function __construct(
-        #[Reflection\Field(3, new Reflection\EnumT(DeepEnum::class))]
-        public ?DeepEnum $deepEnum = null,
+        #[Reflection\Field(3, new Reflection\EnumT(Deep\DeepEnum::class))]
+        public ?Deep\DeepEnum $deepEnum = null,
         #[Reflection\OneOf([Deep\UnionPhone::class, Deep\UnionEmail::class])]
         public ?Deep\Union $union = null,
     ) {}
@@ -959,9 +938,7 @@ namespace Proto\Api\V1\TestRequest\NestedMessage\Deep;
  *   UnionEmail
  * )
  */
-interface Union
-{
-}
+interface Union {}
 
 PHP,
                         ),
@@ -991,8 +968,6 @@ PHP,
                             <<<'PHP'
 namespace Proto\Api\V1;
 
-use Proto\Api\V1\TestRequest\NestedMessage;
-use Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum;
 use Thesis\Protobuf\Reflection;
 
 /**
@@ -1001,10 +976,10 @@ use Thesis\Protobuf\Reflection;
 final readonly class AnotherRequest
 {
     public function __construct(
-        #[Reflection\Field(1, new Reflection\ObjectT(NestedMessage::class))]
-        public ?NestedMessage $nested = null,
-        #[Reflection\Field(2, new Reflection\EnumT(DeepEnum::class))]
-        public ?DeepEnum $deepEnum = null,
+        #[Reflection\Field(1, new Reflection\ObjectT(TestRequest\NestedMessage::class))]
+        public ?TestRequest\NestedMessage $nested = null,
+        #[Reflection\Field(2, new Reflection\EnumT(TestRequest\NestedMessage\Deep\DeepEnum::class))]
+        public ?TestRequest\NestedMessage\Deep\DeepEnum $deepEnum = null,
     ) {}
 }
 
@@ -1018,7 +993,7 @@ PHP,
         yield [
             'reserved_names/reserved_names.txt',
             new CodeGeneratorResponse(
-                supportFeatures: Compiler::SUPPORTED_FEATURES,
+                supportFeatures: new Number(Compiler::SUPPORTED_FEATURES),
                 files: [
                     new CodeGeneratorResponse\File(
                         name: 'ReservedTypes/NotAllowed.php',
@@ -1088,9 +1063,7 @@ namespace ReservedTypes;
 /**
  * @api
  */
-final readonly class Exit_
-{
-}
+final readonly class Exit_ {}
 
 PHP,
                         ),
@@ -1102,7 +1075,6 @@ PHP,
                             <<<'PHP'
 namespace ReservedTypes;
 
-use ReservedTypes\Class_\Case_\Break_;
 use Thesis\Protobuf\Reflection;
 
 /**
@@ -1111,8 +1083,8 @@ use Thesis\Protobuf\Reflection;
 final readonly class INSTANCEOF_
 {
     public function __construct(
-        #[Reflection\Field(1, new Reflection\ObjectT(Break_::class))]
-        public ?Break_ $break = null,
+        #[Reflection\Field(1, new Reflection\ObjectT(Class_\Case_\Break_::class))]
+        public ?Class_\Case_\Break_ $break = null,
     ) {}
 }
 
@@ -1126,7 +1098,6 @@ PHP,
                             <<<'PHP'
 namespace ReservedTypes;
 
-use ReservedTypes\Class_\Case_\Break_;
 use Thesis\Protobuf\Reflection;
 
 /**
@@ -1135,8 +1106,8 @@ use Thesis\Protobuf\Reflection;
 final readonly class Class_
 {
     public function __construct(
-        #[Reflection\Field(1, new Reflection\ObjectT(Break_::class))]
-        public ?Break_ $break = null,
+        #[Reflection\Field(1, new Reflection\ObjectT(Class_\Case_\Break_::class))]
+        public ?Class_\Case_\Break_ $break = null,
     ) {}
 }
 
@@ -1153,9 +1124,7 @@ namespace ReservedTypes\Class_;
 /**
  * @api
  */
-final readonly class Case_
-{
-}
+final readonly class Case_ {}
 
 PHP,
                         ),
@@ -1190,7 +1159,7 @@ PHP,
         yield [
             'proto3/test.txt',
             new CodeGeneratorResponse(
-                supportFeatures: Compiler::SUPPORTED_FEATURES,
+                supportFeatures: new Number(Compiler::SUPPORTED_FEATURES),
                 files: [
                     new CodeGeneratorResponse\File(
                         name: 'Proto/Api/V1/TestRequest.php',
@@ -1279,9 +1248,519 @@ namespace Proto\Api\V1\TestRequest;
  *   ContactEmail
  * )
  */
-interface Contact
+interface Contact {}
+
+PHP,
+                        ),
+                    ),
+                ],
+            ),
+        ];
+
+        yield [
+            'grpc/test.txt',
+            new CodeGeneratorResponse(
+                supportFeatures: new Number(Compiler::SUPPORTED_FEATURES),
+                files: [
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Auth/V1/AuthServiceClient.php',
+                        content: self::phpContent(
+                            'auth_v1.proto',
+                            <<<'PHP'
+namespace Thesis\Auth\V1;
+
+use Amp\Cancellation;
+use Amp\NullCancellation;
+use Thesis\Auth\LoginRequest;
+use Thesis\Auth\LoginResponse;
+use Thesis\Grpc\Client;
+use Thesis\Grpc\Metadata;
+
+/**
+ * @api
+ */
+final readonly class AuthServiceClient
 {
+    public function __construct(
+        private Client $client,
+    ) {}
+
+    public function login(
+        LoginRequest $request,
+        Metadata $md = new Metadata(),
+        Cancellation $cancellation = new NullCancellation(),
+    ): LoginResponse {
+        /** @var Client\Invoke<LoginRequest, LoginResponse> $invoke */
+        $invoke = new Client\Invoke(
+            method: '/Thesis.Auth.V1.AuthService/Login',
+            type: LoginResponse::class,
+        );
+
+        return $this->client->invoke(
+            request: $request,
+            invoke: $invoke,
+            md: $md,
+            cancellation: $cancellation,
+        );
+    }
 }
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Auth/V1/AuthServiceServer.php',
+                        content: self::phpContent(
+                            'auth_v1.proto',
+                            <<<'PHP'
+namespace Thesis\Auth\V1;
+
+use Amp\Cancellation;
+use Thesis\Auth\LoginRequest;
+use Thesis\Auth\LoginResponse;
+use Thesis\Grpc\Metadata;
+
+/**
+ * @api
+ */
+interface AuthServiceServer
+{
+    public function login(LoginRequest $request, Metadata $md, Cancellation $cancellation): LoginResponse;
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Auth/V1/AuthServiceServerRegistry.php',
+                        content: self::phpContent(
+                            'auth_v1.proto',
+                            <<<'PHP'
+namespace Thesis\Auth\V1;
+
+use Thesis\Auth\LoginRequest;
+use Thesis\Grpc\Server;
+
+/**
+ * @api
+ */
+final readonly class AuthServiceServerRegistry implements Server\ServiceRegistry
+{
+    public function __construct(
+        private AuthServiceServer $server,
+    ) {}
+
+    #[\Override]
+    public function services(): iterable
+    {
+        yield new Server\Service('Thesis.Auth.V1.AuthService', [
+            new Server\Rpc(
+                new Server\Handle('Login', LoginRequest::class),
+                new Server\UnaryHandler($this->server->login(...)),
+            ),
+        ]);
+    }
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Queue/V1/QueueServiceClient.php',
+                        content: self::phpContent(
+                            'queue_v1.proto',
+                            <<<'PHP'
+namespace Thesis\Queue\V1;
+
+use Amp\Cancellation;
+use Amp\NullCancellation;
+use Thesis\Grpc\Client;
+use Thesis\Grpc\Metadata;
+use Thesis\Protobuf\Known;
+use Thesis\Queue\Heartbeat;
+use Thesis\Queue\PullRequest;
+use Thesis\Queue\PushRequest;
+
+/**
+ * @api
+ */
+final readonly class QueueServiceClient
+{
+    public function __construct(
+        private Client $client,
+    ) {}
+
+    /**
+     * @return Client\ClientStreamChannel<PushRequest\Message, Known\EmptyObject>
+     */
+    public function push(
+        Metadata $md = new Metadata(),
+        Cancellation $cancellation = new NullCancellation(),
+    ): Client\ClientStreamChannel {
+        /** @var Client\Invoke<PushRequest\Message, Known\EmptyObject> $invoke */
+        $invoke = new Client\Invoke(
+            method: '/Thesis.Queue.V1.QueueService/Push',
+            type: Known\EmptyObject::class,
+        );
+
+        $stream = $this->client->createStream(
+            invoke: $invoke,
+            md: $md,
+            cancellation: $cancellation,
+        );
+
+        return new Client\ClientStreamChannel($stream);
+    }
+
+    /**
+     * @return Client\ServerStreamChannel<PullRequest, PullRequest\Message>
+     */
+    public function pull(
+        PullRequest $request,
+        Metadata $md = new Metadata(),
+        Cancellation $cancellation = new NullCancellation(),
+    ): Client\ServerStreamChannel {
+        /** @var Client\Invoke<PullRequest, PullRequest\Message> $invoke */
+        $invoke = new Client\Invoke(
+            method: '/Thesis.Queue.V1.QueueService/Pull',
+            type: PullRequest\Message::class,
+        );
+
+        $stream = $this->client->createStream(
+            invoke: $invoke,
+            md: $md,
+            cancellation: $cancellation,
+        );
+
+        $stream->send($request);
+        $stream->close();
+
+        return new Client\ServerStreamChannel($stream);
+    }
+
+    /**
+     * @return Client\BidirectionalStreamChannel<Heartbeat\FromClient\Ping, Heartbeat\FromServer\Ping>
+     */
+    public function heartbeat(
+        Metadata $md = new Metadata(),
+        Cancellation $cancellation = new NullCancellation(),
+    ): Client\BidirectionalStreamChannel {
+        /** @var Client\Invoke<Heartbeat\FromClient\Ping, Heartbeat\FromServer\Ping> $invoke */
+        $invoke = new Client\Invoke(
+            method: '/Thesis.Queue.V1.QueueService/Heartbeat',
+            type: Heartbeat\FromServer\Ping::class,
+        );
+
+        $stream = $this->client->createStream(
+            invoke: $invoke,
+            md: $md,
+            cancellation: $cancellation,
+        );
+
+        return new Client\BidirectionalStreamChannel($stream);
+    }
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Queue/V1/QueueServiceServer.php',
+                        content: self::phpContent(
+                            'queue_v1.proto',
+                            <<<'PHP'
+namespace Thesis\Queue\V1;
+
+use Amp\Cancellation;
+use Thesis\Grpc\Metadata;
+use Thesis\Grpc\Server;
+use Thesis\Protobuf\Known;
+use Thesis\Queue\Heartbeat;
+use Thesis\Queue\PullRequest;
+use Thesis\Queue\PushRequest;
+
+/**
+ * @api
+ */
+interface QueueServiceServer
+{
+    /**
+     * @param Server\ClientStreamChannel<PushRequest\Message, Known\EmptyObject> $stream
+     */
+    public function push(Server\ClientStreamChannel $stream, Metadata $md, Cancellation $cancellation): void;
+
+    /**
+     * @param Server\ServerStreamChannel<PullRequest, PullRequest\Message> $stream
+     */
+    public function pull(
+        PullRequest $request,
+        Server\ServerStreamChannel $stream,
+        Metadata $md,
+        Cancellation $cancellation,
+    ): void;
+
+    /**
+     * @param Server\BidirectionalStreamChannel<Heartbeat\FromClient\Ping, Heartbeat\FromServer\Ping> $stream
+     */
+    public function heartbeat(
+        Server\BidirectionalStreamChannel $stream,
+        Metadata $md,
+        Cancellation $cancellation,
+    ): void;
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Queue/V1/QueueServiceServerRegistry.php',
+                        content: self::phpContent(
+                            'queue_v1.proto',
+                            <<<'PHP'
+namespace Thesis\Queue\V1;
+
+use Thesis\Grpc\Server;
+use Thesis\Queue\Heartbeat;
+use Thesis\Queue\PullRequest;
+use Thesis\Queue\PushRequest;
+
+/**
+ * @api
+ */
+final readonly class QueueServiceServerRegistry implements Server\ServiceRegistry
+{
+    public function __construct(
+        private QueueServiceServer $server,
+    ) {}
+
+    #[\Override]
+    public function services(): iterable
+    {
+        yield new Server\Service('Thesis.Queue.V1.QueueService', [
+            new Server\Rpc(
+                new Server\Handle('Push', PushRequest\Message::class),
+                new Server\ClientStreamHandler($this->server->push(...)),
+            ),
+            new Server\Rpc(
+                new Server\Handle('Pull', PullRequest::class),
+                new Server\ServerStreamHandler($this->server->pull(...)),
+            ),
+            new Server\Rpc(
+                new Server\Handle('Heartbeat', Heartbeat\FromClient\Ping::class),
+                new Server\BidirectionalStreamHandler($this->server->heartbeat(...)),
+            ),
+        ]);
+    }
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Auth/LoginRequest.php',
+                        content: self::phpContent(
+                            'protos/auth.proto',
+                            <<<'PHP'
+namespace Thesis\Auth;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class LoginRequest
+{
+    public function __construct(
+        #[Reflection\Field(2, Reflection\StringT::T)]
+        public string $user = '',
+        #[Reflection\Field(3, Reflection\StringT::T)]
+        public string $password = '',
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Auth/LoginResponse.php',
+                        content: self::phpContent(
+                            'protos/auth.proto',
+                            <<<'PHP'
+namespace Thesis\Auth;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class LoginResponse
+{
+    public function __construct(
+        #[Reflection\Field(1, Reflection\StringT::T)]
+        public string $token = '',
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Queue/PushRequest.php',
+                        content: self::phpContent(
+                            'protos/queue.proto',
+                            <<<'PHP'
+namespace Thesis\Queue;
+
+/**
+ * @api
+ */
+final readonly class PushRequest {}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Queue/PushRequest/Message.php',
+                        content: self::phpContent(
+                            'protos/queue.proto',
+                            <<<'PHP'
+namespace Thesis\Queue\PushRequest;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class Message
+{
+    public function __construct(
+        #[Reflection\Field(1, Reflection\StringT::T)]
+        public string $content = '',
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Queue/PullRequest.php',
+                        content: self::phpContent(
+                            'protos/queue.proto',
+                            <<<'PHP'
+namespace Thesis\Queue;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class PullRequest
+{
+    public function __construct(
+        #[Reflection\Field(1, Reflection\Int32T::T)]
+        public int $qos = 0,
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Queue/PullRequest/Message.php',
+                        content: self::phpContent(
+                            'protos/queue.proto',
+                            <<<'PHP'
+namespace Thesis\Queue\PullRequest;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class Message
+{
+    public function __construct(
+        #[Reflection\Field(1, Reflection\StringT::T)]
+        public string $content = '',
+        #[Reflection\Field(2, Reflection\StringT::T)]
+        public string $id = '',
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Queue/Heartbeat.php',
+                        content: self::phpContent(
+                            'protos/queue.proto',
+                            <<<'PHP'
+namespace Thesis\Queue;
+
+/**
+ * @api
+ */
+final readonly class Heartbeat {}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Queue/Heartbeat/FromClient.php',
+                        content: self::phpContent(
+                            'protos/queue.proto',
+                            <<<'PHP'
+namespace Thesis\Queue\Heartbeat;
+
+/**
+ * @api
+ */
+final readonly class FromClient {}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Queue/Heartbeat/FromClient/Ping.php',
+                        content: self::phpContent(
+                            'protos/queue.proto',
+                            <<<'PHP'
+namespace Thesis\Queue\Heartbeat\FromClient;
+
+/**
+ * @api
+ */
+final readonly class Ping {}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Queue/Heartbeat/FromServer.php',
+                        content: self::phpContent(
+                            'protos/queue.proto',
+                            <<<'PHP'
+namespace Thesis\Queue\Heartbeat;
+
+/**
+ * @api
+ */
+final readonly class FromServer {}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Queue/Heartbeat/FromServer/Ping.php',
+                        content: self::phpContent(
+                            'protos/queue.proto',
+                            <<<'PHP'
+namespace Thesis\Queue\Heartbeat\FromServer;
+
+/**
+ * @api
+ */
+final readonly class Ping {}
 
 PHP,
                         ),
@@ -1309,7 +1788,7 @@ declare(strict_types=1);
 
 %s
 PHP,
-            Compiler::PLUGIN_VERSION,
+            Package\version('thesis/protoc-plugin'),
             $source,
             $content,
         );

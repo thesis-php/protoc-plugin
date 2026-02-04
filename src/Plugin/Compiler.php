@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin;
 
+use BcMath\Number;
+use Thesis\Package;
 use Thesis\Protobuf\Compiler\Plugin;
 use Thesis\Protoc\Exception\CodeCannotBeGenerated;
 use Thesis\Protoc\ProtocException;
@@ -13,9 +15,9 @@ use Thesis\Protoc\ProtocException;
  */
 final readonly class Compiler
 {
-    public const string PLUGIN_NAME = 'thesis/protoc-plugin';
-    public const \BcMath\Number SUPPORTED_FEATURES = Internal\SUPPORTED_FEATURES;
-    public const string PLUGIN_VERSION = Internal\PLUGIN_VERSION;
+    private const string PLUGIN_NAME = 'thesis/protoc-plugin';
+    public const int SUPPORTED_FEATURES = Plugin\CodeGeneratorResponse\Feature::FEATURE_PROTO3_OPTIONAL->value
+        | Plugin\CodeGeneratorResponse\Feature::FEATURE_SUPPORTS_EDITIONS->value;
 
     private Parser $parser;
 
@@ -35,7 +37,7 @@ final readonly class Compiler
         $files = $this->doGenerate($request, $options);
 
         return new Plugin\CodeGeneratorResponse(
-            supportFeatures: self::SUPPORTED_FEATURES,
+            supportFeatures: new Number(self::SUPPORTED_FEATURES),
             files: iterator_to_array($files, false),
         );
     }
@@ -49,18 +51,34 @@ final readonly class Compiler
         Plugin\CodeGeneratorRequest $request,
         CompilerOptions $options,
     ): iterable {
-        foreach ($this->parser->parse($request) as $source => [$proto, $imports]) {
+        $protos = $this->parser->parse($request);
+
+        foreach ($protos as $source => $proto) {
             $phpNamespace = self::determinePhpNamespace($proto, $options);
 
             $generator = new Generator(
                 namespace: $phpNamespace,
                 path: str_replace('\\', '/', $phpNamespace),
-                pluginVersion: self::PLUGIN_VERSION,
+                pluginVersion: Package\version(self::PLUGIN_NAME),
                 protocVersion: (string) ($request->compilerVersion ?? 'unknown'),
                 source: $source,
                 package: $proto->package,
                 syntax: $proto->syntax,
+                protos: $protos,
             );
+
+            $requireGrpcClient = $options->requireGrpcClient();
+            $requireGrpcServer = $options->requireGrpcServer();
+
+            foreach ($proto->services as $service) {
+                if ($requireGrpcClient) {
+                    yield from $generator->generateGrpcClient($service);
+                }
+
+                if ($requireGrpcServer) {
+                    yield from $generator->generateGrpcServer($service);
+                }
+            }
 
             yield from array_map($generator->generateEnum(...), $proto->enums);
 
@@ -75,7 +93,8 @@ final readonly class Compiler
      */
     private function doGenerateMessages(Generator $generator, MessageDescriptor $descriptor): iterable
     {
-        if (!isMapEntry($descriptor)) {
+
+        if (!($descriptor->options?->mapEntry === true)) {
             yield from $generator->generateMessages($descriptor);
         }
 

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package Thesis.Auth;
+
+message LoginRequest {
+    string user = 2;
+    string password = 3;
+}
+
+message LoginResponse {
+    string token = 1;
+}

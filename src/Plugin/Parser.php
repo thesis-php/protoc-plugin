@@ -9,7 +9,9 @@ use Thesis\Protobuf\Compiler\EnumDescriptorProto;
 use Thesis\Protobuf\Compiler\EnumValueDescriptorProto;
 use Thesis\Protobuf\Compiler\FieldDescriptorProto;
 use Thesis\Protobuf\Compiler\FileDescriptorProto;
+use Thesis\Protobuf\Compiler\MethodDescriptorProto;
 use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorRequest;
+use Thesis\Protobuf\Compiler\ServiceDescriptorProto;
 
 /**
  * @api
@@ -17,7 +19,7 @@ use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorRequest;
 final readonly class Parser
 {
     /**
-     * @return array<string, array{FileDescriptor, list<ImportDescriptor>}>
+     * @return array<string, FileDescriptor>
      */
     public function parse(CodeGeneratorRequest $request): array
     {
@@ -29,8 +31,7 @@ final readonly class Parser
         $files = [];
         foreach ($request->filesToGenerate as $file) {
             if (isset($protos[$file])) {
-                $descriptor = $protos[$file];
-                $files[$file] = [$descriptor, self::parseImports($descriptor, $protos)];
+                $files[$file] = $protos[$file];
             }
         }
 
@@ -47,6 +48,7 @@ final readonly class Parser
             file: $descriptor,
             messages: self::parseMessages($descriptor, $descriptor->messages, $comments),
             enums: self::parseEnums($descriptor->enums, $comments),
+            services: self::parseServices($descriptor->services, $comments),
             package: $descriptor->package,
             options: $descriptor->options,
             packageComments: $comments->extract(Comments::PACKAGE_COMMENT_PATH),
@@ -205,45 +207,56 @@ final readonly class Parser
     }
 
     /**
-     * @param array<string, FileDescriptor> $files
-     * @return list<ImportDescriptor>
+     * @param list<ServiceDescriptorProto> $descriptors
+     * @return list<ServiceDescriptor>
      */
-    private static function parseImports(
-        FileDescriptor $descriptor,
-        array $files,
-    ): array {
-        $imports = [];
+    private static function parseServices(array $descriptors, CommentExtractor $comments): array
+    {
+        $services = [];
 
-        foreach ($descriptor->file->publicDependencies as $index) {
-            if (!isset($descriptor->file->dependencies[$index])) {
+        foreach ($descriptors as $idx => $descriptor) {
+            if ($descriptor->name === null) {
                 continue;
             }
 
-            $dependency = $descriptor->file->dependencies[$index];
+            $commentPath = \sprintf('%d.%d', Comments::SERVICE_COMMENT_PATH, $idx);
 
-            if (!isset($files[$dependency])) {
-                continue;
-            }
-
-            $file = $files[$dependency];
-
-            foreach ($file->messages as $message) {
-                if (!isMapEntry($message)) {
-                    $imports[] = new ImportDescriptor(
-                        $message->name,
-                        $message->path,
-                    );
-                }
-            }
-
-            foreach ($file->enums as $enum) {
-                $imports[] = new ImportDescriptor(
-                    $enum->name,
-                    $enum->path,
-                );
-            }
+            $services[] = new ServiceDescriptor(
+                $name = $descriptor->name,
+                $name,
+                self::parseServiceMethods($descriptor->methods, $comments->clone($commentPath)),
+                $comments->extract($commentPath),
+            );
         }
 
-        return $imports;
+        return $services;
+    }
+
+    /**
+     * @param list<MethodDescriptorProto> $descriptors
+     * @return list<ServiceMethodDescriptor>
+     */
+    private static function parseServiceMethods(
+        array $descriptors,
+        CommentExtractor $comments,
+    ): array {
+        $methods = [];
+
+        foreach ($descriptors as $idx => $descriptor) {
+            if ($descriptor->inputType === null || $descriptor->outputType === null || $descriptor->name === null) {
+                continue;
+            }
+
+            $methods[] = new ServiceMethodDescriptor(
+                name: $descriptor->name,
+                inType: $descriptor->inputType,
+                outType: $descriptor->outputType,
+                clientStreaming: $descriptor->clientStreaming,
+                serverStreaming: $descriptor->serverStreaming,
+                comment: $comments->extract(\sprintf('%d.%d', Comments::SERVICE_METHOD_COMMENT_PATH, $idx)),
+            );
+        }
+
+        return $methods;
     }
 }

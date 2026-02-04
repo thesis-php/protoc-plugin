@@ -141,12 +141,7 @@ executable:
 
 compile: executable
 	rm -rf compiled/*
-	protoc -I./protos --plugin=protoc-gen-custom-plugin=./bin/compiler.php ./protos/*.proto --custom-plugin_out=compiled
-.PHONY: compile
-
-compile-ydb: executable
-	rm -rf compiled/*
-	protoc -I./ydb-api-protos -I./ydb-api-protos/protos -I./ydb-api-protos/protos/annotations -I/usr/include --custom-plugin_out=compiled --plugin=protoc-gen-custom-plugin=./bin/compiler.php ./ydb-api-protos/*.proto ./ydb-api-protos/protos/*.proto ./ydb-api-protos/protos/annotations/*.proto
+	protoc -I./protos -I./protos/protos --plugin=protoc-gen-custom-plugin=./bin/compiler.php ./protos/*.proto ./protos/protos/*.proto --custom-plugin_out=grpc=server,grpc=client:compiled
 .PHONY: compile
 
 # -----------------------

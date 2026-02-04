@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package Thesis.Queue;
+
+message PushRequest {
+    message Message {
+        string content = 1;
+    }
+}
+
+message PullRequest {
+    message Message {
+        string content = 1;
+        string id = 2;
+    }
+
+    int32 qos = 1;
+}
