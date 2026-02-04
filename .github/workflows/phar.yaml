@@ -1,10 +1,9 @@
 name: Build Phar
 
 on:
-  workflow_dispatch: ~
   push:
-    branches: [main, '*.*.x']
-  pull_request: ~
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -30,5 +29,6 @@ jobs:
 
       - name: Push phar
         uses: softprops/action-gh-release@v1
+        if: github.ref_type == 'tag'
         with:
           files: protoc-gen-php
