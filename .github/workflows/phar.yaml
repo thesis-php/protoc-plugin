@@ -2,8 +2,9 @@ name: Build Phar
 
 on:
   push:
-    tags:
-      - 'v*'
+    tags: ['*']
+  release:
+    types: [created]
 
 jobs:
   build:
