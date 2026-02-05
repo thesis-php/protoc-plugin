@@ -12,6 +12,7 @@ use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorRequest;
 final readonly class CompilerOptions
 {
     private const string OPTION_PHP_NAMESPACE = 'php_namespace';
+    private const string OPTION_PHP_NAMESPACE_PRIORITY = 'namespace_priority';
     private const string OPTION_GRPC = 'grpc';
     private const string GRPC_OPTION_CLIENT = 'client';
     private const string GRPC_OPTION_SERVER = 'server';
@@ -46,6 +47,11 @@ final readonly class CompilerOptions
         return $this->doGetString(self::OPTION_PHP_NAMESPACE);
     }
 
+    public function namespacePriority(): string
+    {
+        return implode(',', $this->doGetArray(self::OPTION_PHP_NAMESPACE_PRIORITY));
+    }
+
     public function requireGrpcClient(): bool
     {
         return $this->contains(self::OPTION_GRPC, self::GRPC_OPTION_CLIENT, self::GRPC_OPTIONS);
@@ -77,5 +83,14 @@ final readonly class CompilerOptions
         $values = $this->options[$name] ?? [];
 
         return $values[0] ?? null;
+    }
+
+    /**
+     * @param self::OPTION_* $name
+     * @return list<string>
+     */
+    private function doGetArray(string $name): array
+    {
+        return $this->options[$name] ?? [];
     }
 }

@@ -8,6 +8,7 @@ use BcMath\Number;
 use Thesis\Package;
 use Thesis\Protobuf\Compiler\Plugin;
 use Thesis\Protoc\Exception\CodeCannotBeGenerated;
+use Thesis\Protoc\Plugin\Internal\NamespacePriorityLookup;
 use Thesis\Protoc\ProtocException;
 
 /**
@@ -113,20 +114,30 @@ final readonly class Compiler
         FileDescriptor $descriptor,
         CompilerOptions $options,
     ): string {
+        $prioritizer = NamespacePriorityLookup::fromString($options->namespacePriority());
+
+        $lookups = [];
+
         $phpNamespace = $descriptor->options?->phpNamespace;
         if ($phpNamespace !== null && $phpNamespace !== '') {
-            return $phpNamespace;
+            $lookups[NamespacePriorityLookup::NAMESPACE_LOOKUP_PHP_NAMESPACE] = $phpNamespace;
         }
 
         $package = $descriptor->package;
         if ($package !== null && $package !== '') {
-            /** @var non-empty-string */
-            return Naming::joinNamespace(explode('.', $package));
+            $lookups[NamespacePriorityLookup::NAMESPACE_LOOKUP_PACKAGE] = Naming::joinNamespace(explode('.', $package));
         }
 
         $phpNamespace = $options->phpNamespace();
         if ($phpNamespace !== null && $phpNamespace !== '') {
-            return $phpNamespace;
+            $lookups[NamespacePriorityLookup::NAMESPACE_LOOKUP_PARAMETER] = $phpNamespace;
+        }
+
+        foreach ($prioritizer->sort as $key) {
+            $ns = $lookups[$key] ?? null;
+            if ($ns !== null && $ns !== '') {
+                return $ns;
+            }
         }
 
         throw new CodeCannotBeGenerated('neither "package" nor "php_namespace" option was specified in the provided proto files, therefore I cannot determine the namespace under which the PHP files should be created.
