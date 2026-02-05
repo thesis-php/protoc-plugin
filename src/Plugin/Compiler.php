@@ -94,7 +94,6 @@ final readonly class Compiler
      */
     private function doGenerateMessages(Generator $generator, MessageDescriptor $descriptor): iterable
     {
-
         if (!($descriptor->options?->mapEntry === true)) {
             yield from $generator->generateMessages($descriptor);
         }
