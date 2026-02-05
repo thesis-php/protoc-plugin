@@ -13,6 +13,7 @@ final readonly class CompilerOptions
 {
     private const string OPTION_PHP_NAMESPACE = 'php_namespace';
     private const string OPTION_PHP_NAMESPACE_PRIORITY = 'namespace_priority';
+    private const string OPTION_SRC_PATH = 'src_path';
     private const string OPTION_GRPC = 'grpc';
     private const string GRPC_OPTION_CLIENT = 'client';
     private const string GRPC_OPTION_SERVER = 'server';
@@ -50,6 +51,11 @@ final readonly class CompilerOptions
     public function namespacePriority(): string
     {
         return implode(',', $this->doGetArray(self::OPTION_PHP_NAMESPACE_PRIORITY));
+    }
+
+    public function srcPath(): ?string
+    {
+        return $this->doGetString(self::OPTION_SRC_PATH);
     }
 
     public function requireGrpcClient(): bool

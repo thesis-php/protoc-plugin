@@ -37,9 +37,6 @@ final readonly class Generator
     private GrpcTypeDeclarationResolver $grpcTypes;
 
     /**
-     * @param non-empty-string $namespace
-     * @param non-empty-string $path
-     * @param non-empty-string $pluginVersion
      * @param array<string, FileDescriptor> $protos
      */
     public function __construct(

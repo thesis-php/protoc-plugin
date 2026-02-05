@@ -59,7 +59,7 @@ final readonly class Compiler
 
             $generator = new Generator(
                 namespace: $phpNamespace,
-                path: str_replace('\\', '/', $phpNamespace),
+                path: $options->srcPath() ?? str_replace('\\', '/', $phpNamespace),
                 pluginVersion: Package\version(self::PLUGIN_NAME),
                 protocVersion: (string) ($request->compilerVersion ?? 'unknown'),
                 source: $source,
