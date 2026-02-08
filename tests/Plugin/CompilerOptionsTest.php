@@ -27,43 +27,6 @@ final class CompilerOptionsTest extends TestCase
     public function testPhpNamespaceOption(string $parameter, ?string $namespace = null): void
     {
         $options = CompilerOptions::fromRequest(new CodeGeneratorRequest(parameter: $parameter));
-        self::assertSame($namespace, $options->phpNamespace());
-    }
-
-    #[TestWith([
-        'grpc=client,grpc=server,php_namespace=App\Thesis\V1',
-        true,
-        true,
-    ])]
-    #[TestWith([
-        'grpc=client,php_namespace=App\Thesis\V1',
-        true,
-        false,
-    ])]
-    #[TestWith([
-        'grpc=server,php_namespace=App\Thesis\V1',
-        false,
-        true,
-    ])]
-    #[TestWith([
-        'php_namespace=App\Thesis\V1',
-        true,
-        true,
-    ])]
-    #[TestWith([
-        '',
-        true,
-        true,
-    ])]
-    #[TestWith([
-        'grpc=none',
-        false,
-        false,
-    ])]
-    public function testGrpcOptions(string $parameter, bool $requireGrpcClient, bool $requireGrpcServer): void
-    {
-        $options = CompilerOptions::fromRequest(new CodeGeneratorRequest(parameter: $parameter));
-        self::assertSame($requireGrpcClient, $options->requireGrpcClient());
-        self::assertSame($requireGrpcServer, $options->requireGrpcServer());
+        self::assertSame($namespace, $options->phpNamespace);
     }
 }

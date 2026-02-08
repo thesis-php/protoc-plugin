@@ -12,15 +12,10 @@ use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorRequest;
 final readonly class CompilerOptions
 {
     private const string OPTION_PHP_NAMESPACE = 'php_namespace';
-    private const string OPTION_PHP_NAMESPACE_PRIORITY = 'namespace_priority';
     private const string OPTION_SRC_PATH = 'src_path';
     private const string OPTION_GRPC = 'grpc';
     private const string GRPC_OPTION_CLIENT = 'client';
     private const string GRPC_OPTION_SERVER = 'server';
-    private const array GRPC_OPTIONS = [
-        self::GRPC_OPTION_CLIENT,
-        self::GRPC_OPTION_SERVER,
-    ];
 
     public static function fromRequest(CodeGeneratorRequest $request): self
     {
@@ -33,70 +28,47 @@ final readonly class CompilerOptions
             }
         }
 
-        return new self($parameters);
-    }
+        $grpc = $parameters[self::OPTION_GRPC] ?? [
+            self::GRPC_OPTION_CLIENT,
+            self::GRPC_OPTION_SERVER,
+        ];
 
-    /**
-     * @param array<string, list<string>> $options
-     */
-    private function __construct(
-        private array $options,
-    ) {}
+        $requireGrpcClient = array_any($grpc, static fn(string $target) => $target === self::GRPC_OPTION_CLIENT);
+        $requireGrpcServer = array_any($grpc, static fn(string $target) => $target === self::GRPC_OPTION_SERVER);
 
-    public function phpNamespace(): ?string
-    {
-        return $this->doGetString(self::OPTION_PHP_NAMESPACE);
-    }
-
-    public function namespacePriority(): string
-    {
-        return implode(',', $this->doGetArray(self::OPTION_PHP_NAMESPACE_PRIORITY));
-    }
-
-    public function srcPath(): ?string
-    {
-        return $this->doGetString(self::OPTION_SRC_PATH);
-    }
-
-    public function requireGrpcClient(): bool
-    {
-        return $this->contains(self::OPTION_GRPC, self::GRPC_OPTION_CLIENT, self::GRPC_OPTIONS);
-    }
-
-    public function requireGrpcServer(): bool
-    {
-        return $this->contains(self::OPTION_GRPC, self::GRPC_OPTION_SERVER, self::GRPC_OPTIONS);
-    }
-
-    /**
-     * @param self::OPTION_* $name
-     * @param non-empty-string $value
-     * @param list<string> $defaults
-     */
-    public function contains(string $name, string $value, array $defaults = []): bool
-    {
-        return array_any(
-            $this->options[$name] ?? $defaults,
-            static fn(string $it) => $it === $value,
+        return new self(
+            requireGrpcClient: $requireGrpcClient,
+            requireGrpcServer: $requireGrpcServer,
+            phpNamespace: self::doGetString($parameters, self::OPTION_PHP_NAMESPACE),
+            srcPath: self::doGetString($parameters, self::OPTION_SRC_PATH),
         );
     }
 
     /**
-     * @param self::OPTION_* $name
+     * @param ?non-empty-string $phpNamespace
+     * @param ?non-empty-string $srcPath
      */
-    private function doGetString(string $name): ?string
-    {
-        $values = $this->options[$name] ?? [];
-
-        return $values[0] ?? null;
-    }
+    private function __construct(
+        public bool $requireGrpcClient,
+        public bool $requireGrpcServer,
+        public ?string $phpNamespace = null,
+        public ?string $srcPath = null,
+    ) {}
 
     /**
+     * @param array<string, list<string>> $parameters
      * @param self::OPTION_* $name
-     * @return list<string>
+     * @return ?non-empty-string
      */
-    private function doGetArray(string $name): array
+    private static function doGetString(array $parameters, string $name): ?string
     {
-        return $this->options[$name] ?? [];
+        $values = $parameters[$name] ?? [];
+        $value = $values[0] ?? null;
+
+        if ($value !== null && $value !== '') {
+            return $value;
+        }
+
+        return null;
     }
 }
