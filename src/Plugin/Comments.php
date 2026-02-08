@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin;
 
-use Thesis\Protobuf\Compiler\FileDescriptorProto;
+use Google\Protobuf\FileDescriptorProto;
 
 /**
  * @api
@@ -29,7 +29,7 @@ final readonly class Comments
     {
         $elements = [];
 
-        foreach ($descriptor->sourceCodeInfo->locations ?? [] as $location) {
+        foreach ($descriptor->sourceCodeInfo->location ?? [] as $location) {
             if ($location->leadingComments === null && $location->trailingComments === null && \count($location->leadingDetachedComments) === 0) {
                 continue;
             }

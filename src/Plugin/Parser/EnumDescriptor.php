@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Parser;
 
-use Thesis\Protobuf\Compiler\EnumOptions;
+use Google\Protobuf\EnumOptions;
 use Thesis\Protoc\Plugin\Comment;
 
 /**

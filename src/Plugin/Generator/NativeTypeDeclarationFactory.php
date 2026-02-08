@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Generator;
 
+use Google\Protobuf\FieldDescriptorProto\Type;
 use Nette\PhpGenerator\Literal;
-use Thesis\Protobuf\Compiler\FieldDescriptorProto\Type;
 use Thesis\Protoc\Plugin\Parser;
 
 /**

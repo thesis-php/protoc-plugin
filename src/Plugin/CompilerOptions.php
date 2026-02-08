@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin;
 
-use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorRequest;
+use Google\Protobuf\Compiler\CodeGeneratorRequest;
 
 /**
  * @api

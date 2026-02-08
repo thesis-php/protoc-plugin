@@ -4,17 +4,24 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin;
 
-use Thesis\Protobuf\Compiler;
+use Google\Protobuf\Compiler\CodeGeneratorRequest;
+use Google\Protobuf\DescriptorProto;
+use Google\Protobuf\EnumDescriptorProto;
+use Google\Protobuf\EnumValueDescriptorProto;
+use Google\Protobuf\FieldDescriptorProto;
+use Google\Protobuf\FileDescriptorProto;
+use Google\Protobuf\MethodDescriptorProto;
+use Google\Protobuf\ServiceDescriptorProto;
 
 /**
  * @api
  */
 final readonly class Parser
 {
-    public function parse(Compiler\Plugin\CodeGeneratorRequest $request): Parser\Request
+    public function parse(CodeGeneratorRequest $request): Parser\Request
     {
         $protos = [];
-        foreach ($request->protoFiles as $descriptor) {
+        foreach ($request->protoFile as $descriptor) {
             if ($descriptor->name === null || $descriptor->name === '') {
                 continue;
             }
@@ -28,7 +35,7 @@ final readonly class Parser
     /**
      * @param non-empty-string $name
      */
-    private static function parseFileDescriptor(Compiler\FileDescriptorProto $descriptor, string $name): Parser\FileDescriptor
+    private static function parseFileDescriptor(FileDescriptorProto $descriptor, string $name): Parser\FileDescriptor
     {
         $comments = new CommentExtractor(
             Comments::fromDescriptor($descriptor),
@@ -37,10 +44,10 @@ final readonly class Parser
         return new Parser\FileDescriptor(
             name: $name,
             file: $descriptor,
-            messages: self::parseMessages($descriptor, $descriptor->messages, $comments),
-            enums: self::parseEnums($descriptor->enums, $comments),
-            services: self::parseServices($descriptor->services, $comments),
-            dependencies: $descriptor->dependencies,
+            messages: self::parseMessages($descriptor, $descriptor->messageType, $comments),
+            enums: self::parseEnums($descriptor->enumType, $comments),
+            services: self::parseServices($descriptor->service, $comments),
+            dependencies: $descriptor->dependency,
             package: $descriptor->package,
             options: $descriptor->options,
             packageComments: $comments->extract(Comments::PACKAGE_COMMENT_PATH),
@@ -51,11 +58,11 @@ final readonly class Parser
     }
 
     /**
-     * @param list<Compiler\DescriptorProto> $descriptors
+     * @param list<DescriptorProto> $descriptors
      * @return list<Parser\MessageDescriptor>
      */
     public static function parseMessages(
-        Compiler\FileDescriptorProto $file,
+        FileDescriptorProto $file,
         array $descriptors,
         CommentExtractor $comments,
         ?string $parent = null,
@@ -77,7 +84,7 @@ final readonly class Parser
 
             $oneofs = [];
 
-            foreach ($descriptor->oneofs as $oneof) {
+            foreach ($descriptor->oneofDecl as $oneof) {
                 if ($oneof->name !== null) {
                     $oneofs[] = new Parser\OneOfDescriptor(
                         $oneof->name,
@@ -89,9 +96,9 @@ final readonly class Parser
             $messages[] = new Parser\MessageDescriptor(
                 name: $descriptor->name,
                 path: $path,
-                fields: self::parseMessageFields($descriptor, $file, $descriptor->fields, $messageComments),
-                enums: self::parseEnums($descriptor->enumTypes, $messageComments, $path),
-                messages: self::parseMessages($file, $descriptor->nestedTypes, $messageComments, $path),
+                fields: self::parseMessageFields($descriptor, $file, $descriptor->field, $messageComments),
+                enums: self::parseEnums($descriptor->enumType, $messageComments, $path),
+                messages: self::parseMessages($file, $descriptor->nestedType, $messageComments, $path),
                 oneofs: $oneofs,
                 comment: $messageComments->extract(),
                 options: $descriptor->options,
@@ -102,12 +109,12 @@ final readonly class Parser
     }
 
     /**
-     * @param list<Compiler\FieldDescriptorProto> $descriptors
+     * @param list<FieldDescriptorProto> $descriptors
      * @return list<Parser\FieldDescriptor>
      */
     private static function parseMessageFields(
-        Compiler\DescriptorProto $message,
-        Compiler\FileDescriptorProto $file,
+        DescriptorProto $message,
+        FileDescriptorProto $file,
         array $descriptors,
         CommentExtractor $comments,
     ): array {
@@ -120,19 +127,19 @@ final readonly class Parser
 
             $map = null;
 
-            $maybeMap = $descriptor->label === Compiler\FieldDescriptorProto\Label::LABEL_REPEATED
-                && $descriptor->type === Compiler\FieldDescriptorProto\Type::TYPE_MESSAGE;
+            $maybeMap = $descriptor->label === FieldDescriptorProto\Label::LABEL_REPEATED
+                && $descriptor->type === FieldDescriptorProto\Type::TYPE_MESSAGE;
 
             if ($maybeMap) {
-                foreach ($message->nestedTypes as $nestedType) {
+                foreach ($message->nestedType as $nestedType) {
                     $typename = ($file->package !== null ? ".{$file->package}." : '.') . "{$message->name}.{$nestedType->name}";
 
                     if ($typename === $descriptor->typeName && $nestedType->options?->mapEntry === true) {
-                        \assert(\count($nestedType->fields) === 2, 'Each MapEntry must have exactly 2 fields.');
+                        \assert(\count($nestedType->field) === 2, 'Each MapEntry must have exactly 2 fields.');
 
                         $map = new Parser\MapDescriptor(
-                            self::createFieldDescriptor($nestedType->fields[0], $file),
-                            self::createFieldDescriptor($nestedType->fields[1], $file),
+                            self::createFieldDescriptor($nestedType->field[0], $file),
+                            self::createFieldDescriptor($nestedType->field[1], $file),
                         );
 
                         break;
@@ -152,7 +159,7 @@ final readonly class Parser
     }
 
     /**
-     * @param list<Compiler\EnumDescriptorProto> $descriptors
+     * @param list<EnumDescriptorProto> $descriptors
      * @return list<Parser\EnumDescriptor>
      */
     private static function parseEnums(
@@ -179,7 +186,7 @@ final readonly class Parser
                 $descriptor->name,
                 $path,
                 self::parseEnumCases(
-                    $descriptor->values,
+                    $descriptor->value,
                     $enumComments,
                 ),
                 $enumComments->extract(),
@@ -191,7 +198,7 @@ final readonly class Parser
     }
 
     /**
-     * @param list<Compiler\EnumValueDescriptorProto> $descriptors
+     * @param list<EnumValueDescriptorProto> $descriptors
      * @return list<Parser\EnumCaseDescriptor>
      */
     private static function parseEnumCases(array $descriptors, CommentExtractor $comments): array
@@ -215,7 +222,7 @@ final readonly class Parser
     }
 
     /**
-     * @param list<Compiler\ServiceDescriptorProto> $descriptors
+     * @param list<ServiceDescriptorProto> $descriptors
      * @return list<Parser\ServiceDescriptor>
      */
     private static function parseServices(array $descriptors, CommentExtractor $comments): array
@@ -232,7 +239,7 @@ final readonly class Parser
             $services[] = new Parser\ServiceDescriptor(
                 $name = $descriptor->name,
                 $name,
-                self::parseServiceMethods($descriptor->methods, $comments->clone($commentPath)),
+                self::parseServiceMethods($descriptor->method, $comments->clone($commentPath)),
                 $comments->extract($commentPath),
             );
         }
@@ -241,7 +248,7 @@ final readonly class Parser
     }
 
     /**
-     * @param list<Compiler\MethodDescriptorProto> $descriptors
+     * @param list<MethodDescriptorProto> $descriptors
      * @return list<Parser\ServiceMethodDescriptor>
      */
     private static function parseServiceMethods(
@@ -259,8 +266,8 @@ final readonly class Parser
                 name: $descriptor->name,
                 inType: $descriptor->inputType,
                 outType: $descriptor->outputType,
-                clientStreaming: $descriptor->clientStreaming,
-                serverStreaming: $descriptor->serverStreaming,
+                clientStreaming: $descriptor->clientStreaming ?? false,
+                serverStreaming: $descriptor->serverStreaming ?? false,
                 comment: $comments->extract(\sprintf('%d.%d', Comments::SERVICE_METHOD_COMMENT_PATH, $idx)),
             );
         }
@@ -269,8 +276,8 @@ final readonly class Parser
     }
 
     private static function createFieldDescriptor(
-        Compiler\FieldDescriptorProto $descriptor,
-        Compiler\FileDescriptorProto $file,
+        FieldDescriptorProto $descriptor,
+        FileDescriptorProto $file,
         ?Comment $comment = null,
         ?Parser\MapDescriptor $map = null,
     ): Parser\FieldDescriptor {
@@ -285,7 +292,7 @@ final readonly class Parser
             typeName: $descriptor->typeName,
             comment: $comment,
             options: $descriptor->options,
-            optional: ($file->syntax === null && $descriptor->label === Compiler\FieldDescriptorProto\Label::LABEL_OPTIONAL) || ($file->syntax === 'proto3' && $descriptor->proto3Optional === true),
+            optional: ($file->syntax === null && $descriptor->label === FieldDescriptorProto\Label::LABEL_OPTIONAL) || ($file->syntax === 'proto3' && $descriptor->proto3Optional === true),
             proto3Optional: $descriptor->proto3Optional,
             oneOfIndex: $descriptor->oneofIndex,
             defaultValue: $descriptor->defaultValue,

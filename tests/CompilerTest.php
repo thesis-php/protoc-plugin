@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Thesis\Protoc;
 
 use BcMath\Number;
+use Google\Protobuf\Compiler\CodeGeneratorRequest;
+use Google\Protobuf\Compiler\CodeGeneratorResponse;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Thesis\Package;
-use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorRequest;
-use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorResponse;
 use Thesis\Protobuf\Reflection\Reflector;
 use Thesis\Protobuf\Serializer;
 use Thesis\Protoc\Plugin\Compiler;
@@ -46,8 +46,8 @@ final class CompilerTest extends TestCase
         yield [
             'proto2/test.txt',
             new CodeGeneratorResponse(
-                supportFeatures: new Number(Compiler::SUPPORTED_FEATURES),
-                files: [
+                supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
+                file: [
                     new CodeGeneratorResponse\File(
                         name: 'Proto/Api/V1/Foo.php',
                         content: self::phpContent(
@@ -668,8 +668,8 @@ PHP,
         yield [
             'php_namespace/php_namespace.txt',
             new CodeGeneratorResponse(
-                supportFeatures: new Number(Compiler::SUPPORTED_FEATURES),
-                files: [
+                supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
+                file: [
                     new CodeGeneratorResponse\File(
                         name: 'Thesis/Api/V1/TestRequest.php',
                         content: self::phpContent(
@@ -692,8 +692,8 @@ PHP,
         yield [
             'snake_case/snake_case.txt',
             new CodeGeneratorResponse(
-                supportFeatures: new Number(Compiler::SUPPORTED_FEATURES),
-                files: [
+                supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
+                file: [
                     new CodeGeneratorResponse\File(
                         name: 'Proto/Api/V1/Foo.php',
                         content: self::phpContent(
@@ -998,8 +998,8 @@ PHP,
         yield [
             'reserved_names/reserved_names.txt',
             new CodeGeneratorResponse(
-                supportFeatures: new Number(Compiler::SUPPORTED_FEATURES),
-                files: [
+                supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
+                file: [
                     new CodeGeneratorResponse\File(
                         name: 'ReservedTypes/NotAllowed.php',
                         content: self::phpContent(
@@ -1164,8 +1164,8 @@ PHP,
         yield [
             'proto3/test.txt',
             new CodeGeneratorResponse(
-                supportFeatures: new Number(Compiler::SUPPORTED_FEATURES),
-                files: [
+                supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
+                file: [
                     new CodeGeneratorResponse\File(
                         name: 'Proto/Api/V1/TestRequest.php',
                         content: self::phpContent(
@@ -1265,8 +1265,8 @@ PHP,
         yield [
             'grpc/test.txt',
             new CodeGeneratorResponse(
-                supportFeatures: new Number(Compiler::SUPPORTED_FEATURES),
-                files: [
+                supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
+                file: [
                     new CodeGeneratorResponse\File(
                         name: 'Thesis/Auth/V1/AuthServiceClient.php',
                         content: self::phpContent(

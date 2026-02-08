@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Parser;
 
-use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorRequest;
+use Google\Protobuf\Compiler\CodeGeneratorRequest;
 
 /**
  * @api
@@ -23,7 +23,7 @@ final readonly class Request implements \IteratorAggregate
     #[\Override]
     public function getIterator(): \Traversable
     {
-        foreach ($this->request->filesToGenerate as $file) {
+        foreach ($this->request->fileToGenerate as $file) {
             if (isset($this->descriptors[$file])) {
                 yield $file => $this->descriptors[$file];
             }

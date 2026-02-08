@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc;
 
+use Google\Protobuf\Compiler\CodeGeneratorRequest;
+use Google\Protobuf\Compiler\CodeGeneratorResponse;
 use Thesis\Protobuf;
-use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorRequest;
-use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorResponse;
 use Thesis\Protobuf\Reflection;
 
 /**

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin;
 
+use Google\Protobuf\Compiler\CodeGeneratorRequest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
-use Thesis\Protobuf\Compiler\Plugin\CodeGeneratorRequest;
 
 #[CoversClass(CompilerOptions::class)]
 final class CompilerOptionsTest extends TestCase

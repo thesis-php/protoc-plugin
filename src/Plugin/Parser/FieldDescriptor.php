@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Parser;
 
-use Thesis\Protobuf\Compiler\FieldDescriptorProto\Label;
-use Thesis\Protobuf\Compiler\FieldDescriptorProto\Type;
-use Thesis\Protobuf\Compiler\FieldOptions;
+use Google\Protobuf\FieldDescriptorProto\Label;
+use Google\Protobuf\FieldDescriptorProto\Type;
+use Google\Protobuf\FieldOptions;
 use Thesis\Protoc\Plugin\Comment;
 
 /**

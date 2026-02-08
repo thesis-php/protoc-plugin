@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Generator;
 
+use Google\Protobuf\FieldDescriptorProto;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\EnumCase;
 use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\PhpNamespace;
-use Thesis\Protobuf\Compiler\FieldDescriptorProto;
 use Thesis\Protoc\Plugin\Dependency;
 use Thesis\Protoc\Plugin\Naming;
 use Thesis\Protoc\Plugin\Parser;

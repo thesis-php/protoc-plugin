@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Thesis\Protoc\Plugin;
 
 use BcMath\Number;
+use Google\Protobuf\Compiler\CodeGeneratorRequest;
+use Google\Protobuf\Compiler\CodeGeneratorResponse;
 use Thesis\Package;
-use Thesis\Protobuf\Compiler\Plugin;
 use Thesis\Protoc\Exception\CodeCannotBeGenerated;
 use Thesis\Protoc\Plugin\Parser\FileDescriptor;
 use Thesis\Protoc\Plugin\Parser\MessageDescriptor;
@@ -18,8 +19,8 @@ use Thesis\Protoc\ProtocException;
 final readonly class Compiler
 {
     private const string PLUGIN_NAME = 'thesis/protoc-plugin';
-    public const int SUPPORTED_FEATURES = Plugin\CodeGeneratorResponse\Feature::FEATURE_PROTO3_OPTIONAL->value
-        | Plugin\CodeGeneratorResponse\Feature::FEATURE_SUPPORTS_EDITIONS->value;
+    public const int SUPPORTED_FEATURES = CodeGeneratorResponse\Feature::FEATURE_PROTO3_OPTIONAL->value
+        | CodeGeneratorResponse\Feature::FEATURE_SUPPORTS_EDITIONS->value;
 
     private Parser $parser;
 
@@ -32,25 +33,25 @@ final readonly class Compiler
      * @throws ProtocException
      * @throws \Throwable
      */
-    public function compile(Plugin\CodeGeneratorRequest $request): Plugin\CodeGeneratorResponse
+    public function compile(CodeGeneratorRequest $request): CodeGeneratorResponse
     {
         $options = CompilerOptions::fromRequest($request);
 
         $files = $this->doGenerate($request, $options);
 
-        return new Plugin\CodeGeneratorResponse(
-            supportFeatures: new Number(self::SUPPORTED_FEATURES),
-            files: iterator_to_array($files, false),
+        return new CodeGeneratorResponse(
+            supportedFeatures: new Number(self::SUPPORTED_FEATURES),
+            file: iterator_to_array($files, false),
         );
     }
 
     /**
-     * @return iterable<Plugin\CodeGeneratorResponse\File>
+     * @return iterable<CodeGeneratorResponse\File>
      * @throws ProtocException
      * @throws \Throwable
      */
     private function doGenerate(
-        Plugin\CodeGeneratorRequest $request,
+        CodeGeneratorRequest $request,
         CompilerOptions $options,
     ): iterable {
         $request = $this->parser->parse($request);
@@ -88,7 +89,7 @@ final readonly class Compiler
     }
 
     /**
-     * @return iterable<Plugin\CodeGeneratorResponse\File>
+     * @return iterable<CodeGeneratorResponse\File>
      */
     private function doGenerateMessages(Generator $generator, MessageDescriptor $descriptor): iterable
     {
