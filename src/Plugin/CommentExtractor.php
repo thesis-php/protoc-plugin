@@ -21,7 +21,7 @@ final readonly class CommentExtractor
     {
         $ref = '';
         if ($this->path !== null) {
-            $ref = "{$this->path}";
+            $ref = $this->path;
         }
 
         if ($path !== null) {

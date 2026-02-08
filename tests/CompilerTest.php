@@ -78,9 +78,7 @@ PHP,
                             <<<'PHP'
 namespace Proto\Api\V1;
 
-use BcMath\Number;
 use Thesis\Protobuf;
-use Thesis\Protobuf\Known;
 use Thesis\Protobuf\Reflection;
 
 /**
@@ -91,56 +89,56 @@ use Thesis\Protobuf\Reflection;
 final readonly class TestRequest
 {
     /**
-     * @param ?TestRequest\Kind $kind base field comment.
+     * @param ?\Proto\Api\V1\TestRequest\Kind $kind base field comment.
      * @param bool $boolRequired another field comment.
      * @param list<bool> $boolRepeated
      * @param list<int> $int32Repeated
-     * @param list<Number> $int64Repeated
+     * @param list<\BcMath\Number> $int64Repeated
      * @param list<int> $fixed32Repeated
-     * @param list<Number> $fixed64Repeated
+     * @param list<\BcMath\Number> $fixed64Repeated
      * @param list<int> $uint32Repeated
-     * @param list<Number> $uint64Repeated
+     * @param list<\BcMath\Number> $uint64Repeated
      * @param list<float> $floatRepeated
      * @param list<float> $doubleRepeated
      * @param list<string> $stringRepeated
      * @param list<string> $bytesRepeated
      * @param list<int> $sint32Repeated
-     * @param list<Number> $sint64Repeated
+     * @param list<\BcMath\Number> $sint64Repeated
      * @param list<int> $sfixed32Repeated
-     * @param list<Number> $sfixed64Repeated
+     * @param list<\BcMath\Number> $sfixed64Repeated
      * @param list<bool> $boolRepeatedPacked
      * @param list<int> $int32RepeatedPacked
-     * @param list<Number> $int64RepeatedPacked
+     * @param list<\BcMath\Number> $int64RepeatedPacked
      * @param list<int> $fixed32RepeatedPacked
-     * @param list<Number> $fixed64RepeatedPacked
+     * @param list<\BcMath\Number> $fixed64RepeatedPacked
      * @param list<int> $uint32RepeatedPacked
-     * @param list<Number> $uint64RepeatedPacked
+     * @param list<\BcMath\Number> $uint64RepeatedPacked
      * @param list<float> $floatRepeatedPacked
      * @param list<float> $doubleRepeatedPacked
      * @param list<int> $sint32RepeatedPacked
-     * @param list<Number> $sint64RepeatedPacked
+     * @param list<\BcMath\Number> $sint64RepeatedPacked
      * @param list<int> $sfixed32RepeatedPacked
-     * @param list<Number> $sfixed64RepeatedPacked
+     * @param list<\BcMath\Number> $sfixed64RepeatedPacked
      * @param Protobuf\Map<string, string> $mapStringString
      * @param ?string $lastField Maximum possible tag number.
      */
     public function __construct(
-        #[Reflection\Field(1, new Reflection\EnumT(TestRequest\Kind::class))]
-        public ?TestRequest\Kind $kind = null,
+        #[Reflection\Field(1, new Reflection\EnumT(\Proto\Api\V1\TestRequest\Kind::class))]
+        public ?\Proto\Api\V1\TestRequest\Kind $kind = null,
         #[Reflection\Field(10, Reflection\BoolT::T)]
         public bool $boolRequired = false,
         #[Reflection\Field(11, Reflection\Int32T::T)]
         public int $int32Required = 0,
         #[Reflection\Field(12, Reflection\Int64T::T)]
-        public Number $int64Required = new Number(0),
+        public \BcMath\Number $int64Required = new \BcMath\Number(0),
         #[Reflection\Field(13, Reflection\Fixed32T::T)]
         public int $fixed32Required = 0,
         #[Reflection\Field(14, Reflection\Fixed64T::T)]
-        public Number $fixed64Required = new Number(0),
+        public \BcMath\Number $fixed64Required = new \BcMath\Number(0),
         #[Reflection\Field(15, Reflection\Uint32T::T)]
         public int $uint32Required = 0,
         #[Reflection\Field(16, Reflection\Uint64T::T)]
-        public Number $uint64Required = new Number(0),
+        public \BcMath\Number $uint64Required = new \BcMath\Number(0),
         #[Reflection\Field(17, Reflection\FloatT::T)]
         public float $gloatRequired = 0,
         #[Reflection\Field(18, Reflection\DoubleT::T)]
@@ -152,25 +150,25 @@ final readonly class TestRequest
         #[Reflection\Field(102, Reflection\SInt32T::T)]
         public int $sint32Required = 0,
         #[Reflection\Field(103, Reflection\SInt64T::T)]
-        public Number $sint64Required = new Number(0),
+        public \BcMath\Number $sint64Required = new \BcMath\Number(0),
         #[Reflection\Field(104, Reflection\SFixed32T::T)]
         public int $sfixed32Required = 0,
         #[Reflection\Field(105, Reflection\SFixed64T::T)]
-        public Number $sfixed64Required = new Number(0),
+        public \BcMath\Number $sfixed64Required = new \BcMath\Number(0),
         #[Reflection\Field(30, Reflection\BoolT::T)]
         public ?bool $boolOptional = null,
         #[Reflection\Field(31, Reflection\Int32T::T)]
         public ?int $int32Optional = null,
         #[Reflection\Field(32, Reflection\Int64T::T)]
-        public ?Number $int64Optional = null,
+        public ?\BcMath\Number $int64Optional = null,
         #[Reflection\Field(33, Reflection\Fixed32T::T)]
         public ?int $fixed32Optional = null,
         #[Reflection\Field(34, Reflection\Fixed64T::T)]
-        public ?Number $fixed64Optional = null,
+        public ?\BcMath\Number $fixed64Optional = null,
         #[Reflection\Field(35, Reflection\Uint32T::T)]
         public ?int $uint32Optional = null,
         #[Reflection\Field(36, Reflection\Uint64T::T)]
-        public ?Number $uint64Optional = null,
+        public ?\BcMath\Number $uint64Optional = null,
         #[Reflection\Field(37, Reflection\FloatT::T)]
         public ?float $floatOptional = null,
         #[Reflection\Field(38, Reflection\DoubleT::T)]
@@ -182,11 +180,11 @@ final readonly class TestRequest
         #[Reflection\Field(302, Reflection\SInt32T::T)]
         public ?int $sint32Optional = null,
         #[Reflection\Field(303, Reflection\SInt64T::T)]
-        public ?Number $sint64Optional = null,
+        public ?\BcMath\Number $sint64Optional = null,
         #[Reflection\Field(304, Reflection\SFixed32T::T)]
         public ?int $sfixed32Optional = null,
         #[Reflection\Field(305, Reflection\SFixed64T::T)]
-        public ?Number $sfixed64Optional = null,
+        public ?\BcMath\Number $sfixed64Optional = null,
         #[Reflection\Field(20, new Reflection\ListT(Reflection\BoolT::T, false))]
         public array $boolRepeated = [],
         #[Reflection\Field(21, new Reflection\ListT(Reflection\Int32T::T, false))]
@@ -248,15 +246,15 @@ final readonly class TestRequest
         #[Reflection\Field(41, Reflection\Int32T::T)]
         public ?int $int32Defaulted = 32,
         #[Reflection\Field(42, Reflection\Int64T::T)]
-        public ?Number $int64Defaulted = new Number(64),
+        public ?\BcMath\Number $int64Defaulted = new \BcMath\Number(64),
         #[Reflection\Field(43, Reflection\Fixed32T::T)]
         public ?int $fixed32Defaulted = 320,
         #[Reflection\Field(44, Reflection\Fixed64T::T)]
-        public ?Number $fixed64Defaulted = new Number(640),
+        public ?\BcMath\Number $fixed64Defaulted = new \BcMath\Number(640),
         #[Reflection\Field(45, Reflection\Uint32T::T)]
         public ?int $uint32Defaulted = 3200,
         #[Reflection\Field(46, Reflection\Uint64T::T)]
-        public ?Number $uint64Defaulted = new Number(6400),
+        public ?\BcMath\Number $uint64Defaulted = new \BcMath\Number(6400),
         #[Reflection\Field(47, Reflection\FloatT::T)]
         public ?float $floatDefaulted = 314159.0,
         #[Reflection\Field(48, Reflection\DoubleT::T)]
@@ -268,38 +266,38 @@ final readonly class TestRequest
         #[Reflection\Field(402, Reflection\SInt32T::T)]
         public ?int $sint32Defaulted = -32,
         #[Reflection\Field(403, Reflection\SInt64T::T)]
-        public ?Number $sint64Defaulted = new Number(-64),
+        public ?\BcMath\Number $sint64Defaulted = new \BcMath\Number(-64),
         #[Reflection\Field(404, Reflection\SFixed32T::T)]
         public ?int $sfixed32Defaulted = -32,
         #[Reflection\Field(405, Reflection\SFixed64T::T)]
-        public ?Number $sfixed64Defaulted = new Number(-64),
+        public ?\BcMath\Number $sfixed64Defaulted = new \BcMath\Number(-64),
         #[Reflection\Field(406, new Reflection\MapT(Reflection\StringT::T, Reflection\StringT::T))]
         public Protobuf\Map $mapStringString = new Protobuf\Map(),
-        #[Reflection\Field(407, new Reflection\ObjectT(Known\Timestamp::class))]
-        public ?Known\Timestamp $knownTimestamp = null,
-        #[Reflection\Field(408, new Reflection\ObjectT(Known\Duration::class))]
-        public ?Known\Duration $knownDuration = null,
-        #[Reflection\Field(409, new Reflection\ObjectT(Known\Struct::class))]
-        public ?Known\Struct $knownStruct = null,
-        #[Reflection\Field(410, new Reflection\ObjectT(Known\EmptyObject::class))]
-        public ?Known\EmptyObject $knownEmpty = null,
-        #[Reflection\Field(411, new Reflection\ObjectT(Known\Any::class))]
-        public ?Known\Any $knownAny = null,
-        #[Reflection\Field(412, new Reflection\ObjectT(TestRequest\Nested::class))]
-        public ?TestRequest\Nested $nested = null,
-        #[Reflection\Field(413, new Reflection\ObjectT(TestRequest\Nested\Deep::class))]
-        public ?TestRequest\Nested\Deep $nestedDeep = null,
+        #[Reflection\Field(407, new Reflection\ObjectT(\Google\Protobuf\Timestamp::class))]
+        public ?\Google\Protobuf\Timestamp $knownTimestamp = null,
+        #[Reflection\Field(408, new Reflection\ObjectT(\Google\Protobuf\Duration::class))]
+        public ?\Google\Protobuf\Duration $knownDuration = null,
+        #[Reflection\Field(409, new Reflection\ObjectT(\Google\Protobuf\Struct::class))]
+        public ?\Google\Protobuf\Struct $knownStruct = null,
+        #[Reflection\Field(410, new Reflection\ObjectT(\Google\Protobuf\Empty_::class))]
+        public ?\Google\Protobuf\Empty_ $knownEmpty = null,
+        #[Reflection\Field(411, new Reflection\ObjectT(\Google\Protobuf\Any::class))]
+        public ?\Google\Protobuf\Any $knownAny = null,
+        #[Reflection\Field(412, new Reflection\ObjectT(\Proto\Api\V1\TestRequest\Nested::class))]
+        public ?\Proto\Api\V1\TestRequest\Nested $nested = null,
+        #[Reflection\Field(413, new Reflection\ObjectT(\Proto\Api\V1\TestRequest\Nested\Deep::class))]
+        public ?\Proto\Api\V1\TestRequest\Nested\Deep $nestedDeep = null,
         #[Reflection\Field(536870911, Reflection\StringT::T)]
         public ?string $lastField = null,
         #[Reflection\OneOf([
-            TestRequest\XFieldNumber::class,
-            TestRequest\XFieldName::class,
-            TestRequest\XFieldData::class,
-            TestRequest\XFieldTempC::class,
-            TestRequest\XFieldCol::class,
-            TestRequest\XFieldDeepEnum::class,
+            \Proto\Api\V1\TestRequest\XFieldNumber::class,
+            \Proto\Api\V1\TestRequest\XFieldName::class,
+            \Proto\Api\V1\TestRequest\XFieldData::class,
+            \Proto\Api\V1\TestRequest\XFieldTempC::class,
+            \Proto\Api\V1\TestRequest\XFieldCol::class,
+            \Proto\Api\V1\TestRequest\XFieldDeepEnum::class,
         ])]
-        public ?TestRequest\XField $xField = null,
+        public ?\Proto\Api\V1\TestRequest\XField $xField = null,
     ) {}
 }
 
@@ -318,7 +316,7 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class XFieldNumber implements XField
+final readonly class XFieldNumber implements \Proto\Api\V1\TestRequest\XField
 {
     public function __construct(
         #[Reflection\Field(5, Reflection\Int32T::T)]
@@ -341,7 +339,7 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class XFieldName implements XField
+final readonly class XFieldName implements \Proto\Api\V1\TestRequest\XField
 {
     public function __construct(
         #[Reflection\Field(6, Reflection\StringT::T)]
@@ -364,7 +362,7 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class XFieldData implements XField
+final readonly class XFieldData implements \Proto\Api\V1\TestRequest\XField
 {
     public function __construct(
         #[Reflection\Field(7, Reflection\BytesT::T)]
@@ -387,7 +385,7 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class XFieldTempC implements XField
+final readonly class XFieldTempC implements \Proto\Api\V1\TestRequest\XField
 {
     public function __construct(
         #[Reflection\Field(8, Reflection\DoubleT::T)]
@@ -410,11 +408,11 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class XFieldCol implements XField
+final readonly class XFieldCol implements \Proto\Api\V1\TestRequest\XField
 {
     public function __construct(
-        #[Reflection\Field(9, new Reflection\ObjectT(Nested::class))]
-        public ?Nested $col = null,
+        #[Reflection\Field(9, new Reflection\ObjectT(\Proto\Api\V1\TestRequest\Nested::class))]
+        public ?\Proto\Api\V1\TestRequest\Nested $col = null,
     ) {}
 }
 
@@ -433,11 +431,11 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class XFieldDeepEnum implements XField
+final readonly class XFieldDeepEnum implements \Proto\Api\V1\TestRequest\XField
 {
     public function __construct(
-        #[Reflection\Field(4, new Reflection\EnumT(Nested\Deep\DeepEnum::class))]
-        public ?Nested\Deep\DeepEnum $deepEnum = null,
+        #[Reflection\Field(4, new Reflection\EnumT(\Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum::class))]
+        public ?\Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum $deepEnum = null,
     ) {}
 }
 
@@ -515,8 +513,8 @@ final readonly class Nested
         public ?string $name = null,
         #[Reflection\Field(2, Reflection\StringT::T)]
         public ?string $group = null,
-        #[Reflection\Field(3, new Reflection\ObjectT(Nested\Deep::class))]
-        public ?Nested\Deep $deep = null,
+        #[Reflection\Field(3, new Reflection\ObjectT(\Proto\Api\V1\TestRequest\Nested\Deep::class))]
+        public ?\Proto\Api\V1\TestRequest\Nested\Deep $deep = null,
     ) {}
 }
 
@@ -540,10 +538,10 @@ final readonly class Deep
     public function __construct(
         #[Reflection\Field(1, Reflection\StringT::T)]
         public string $name = '',
-        #[Reflection\Field(4, new Reflection\EnumT(Deep\DeepEnum::class))]
-        public ?Deep\DeepEnum $deepEnum = null,
-        #[Reflection\OneOf([Deep\UnionPhone::class, Deep\UnionEmail::class])]
-        public ?Deep\Union $union = null,
+        #[Reflection\Field(4, new Reflection\EnumT(\Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum::class))]
+        public ?\Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum $deepEnum = null,
+        #[Reflection\OneOf([\Proto\Api\V1\TestRequest\Nested\Deep\UnionPhone::class, \Proto\Api\V1\TestRequest\Nested\Deep\UnionEmail::class])]
+        public ?\Proto\Api\V1\TestRequest\Nested\Deep\Union $union = null,
     ) {}
 }
 
@@ -562,7 +560,7 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class UnionPhone implements Union
+final readonly class UnionPhone implements \Proto\Api\V1\TestRequest\Nested\Deep\Union
 {
     public function __construct(
         #[Reflection\Field(2, Reflection\StringT::T)]
@@ -585,7 +583,7 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class UnionEmail implements Union
+final readonly class UnionEmail implements \Proto\Api\V1\TestRequest\Nested\Deep\Union
 {
     public function __construct(
         #[Reflection\Field(3, Reflection\StringT::T)]
@@ -649,14 +647,14 @@ use Thesis\Protobuf\Reflection;
 final readonly class AnotherRequest
 {
     public function __construct(
-        #[Reflection\Field(1, new Reflection\ObjectT(TestRequest\Nested::class))]
-        public ?TestRequest\Nested $nested = null,
-        #[Reflection\Field(2, new Reflection\ObjectT(TestRequest\Nested\Deep::class))]
-        public ?TestRequest\Nested\Deep $deep = null,
-        #[Reflection\Field(3, new Reflection\EnumT(TestRequest\Kind::class))]
-        public ?TestRequest\Kind $kind = null,
-        #[Reflection\Field(4, new Reflection\EnumT(TestRequest\Nested\Deep\DeepEnum::class))]
-        public ?TestRequest\Nested\Deep\DeepEnum $deepEnum = null,
+        #[Reflection\Field(1, new Reflection\ObjectT(\Proto\Api\V1\TestRequest\Nested::class))]
+        public ?\Proto\Api\V1\TestRequest\Nested $nested = null,
+        #[Reflection\Field(2, new Reflection\ObjectT(\Proto\Api\V1\TestRequest\Nested\Deep::class))]
+        public ?\Proto\Api\V1\TestRequest\Nested\Deep $deep = null,
+        #[Reflection\Field(3, new Reflection\EnumT(\Proto\Api\V1\TestRequest\Kind::class))]
+        public ?\Proto\Api\V1\TestRequest\Kind $kind = null,
+        #[Reflection\Field(4, new Reflection\EnumT(\Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum::class))]
+        public ?\Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum $deepEnum = null,
     ) {}
 }
 
@@ -729,12 +727,16 @@ use Thesis\Protobuf\Reflection;
 final readonly class TestRequest
 {
     public function __construct(
-        #[Reflection\Field(1, new Reflection\ObjectT(TestRequest\NestedMessage::class))]
-        public ?TestRequest\NestedMessage $nested = null,
-        #[Reflection\Field(5, new Reflection\ObjectT(TestRequest\NestedMessage\Deep::class))]
-        public ?TestRequest\NestedMessage\Deep $nestedDeep = null,
-        #[Reflection\OneOf([TestRequest\XFieldNumber::class, TestRequest\XFieldCol::class, TestRequest\XFieldDeepEnum::class])]
-        public ?TestRequest\XField $xField = null,
+        #[Reflection\Field(1, new Reflection\ObjectT(\Proto\Api\V1\TestRequest\NestedMessage::class))]
+        public ?\Proto\Api\V1\TestRequest\NestedMessage $nested = null,
+        #[Reflection\Field(5, new Reflection\ObjectT(\Proto\Api\V1\TestRequest\NestedMessage\Deep::class))]
+        public ?\Proto\Api\V1\TestRequest\NestedMessage\Deep $nestedDeep = null,
+        #[Reflection\OneOf([
+            \Proto\Api\V1\TestRequest\XFieldNumber::class,
+            \Proto\Api\V1\TestRequest\XFieldCol::class,
+            \Proto\Api\V1\TestRequest\XFieldDeepEnum::class,
+        ])]
+        public ?\Proto\Api\V1\TestRequest\XField $xField = null,
     ) {}
 }
 
@@ -753,7 +755,7 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class XFieldNumber implements XField
+final readonly class XFieldNumber implements \Proto\Api\V1\TestRequest\XField
 {
     public function __construct(
         #[Reflection\Field(2, Reflection\Int32T::T)]
@@ -776,11 +778,11 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class XFieldCol implements XField
+final readonly class XFieldCol implements \Proto\Api\V1\TestRequest\XField
 {
     public function __construct(
-        #[Reflection\Field(3, new Reflection\ObjectT(NestedMessage::class))]
-        public ?NestedMessage $col = null,
+        #[Reflection\Field(3, new Reflection\ObjectT(\Proto\Api\V1\TestRequest\NestedMessage::class))]
+        public ?\Proto\Api\V1\TestRequest\NestedMessage $col = null,
     ) {}
 }
 
@@ -799,11 +801,11 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class XFieldDeepEnum implements XField
+final readonly class XFieldDeepEnum implements \Proto\Api\V1\TestRequest\XField
 {
     public function __construct(
-        #[Reflection\Field(4, new Reflection\EnumT(NestedMessage\Deep\DeepEnum::class))]
-        public ?NestedMessage\Deep\DeepEnum $deepEnum = null,
+        #[Reflection\Field(4, new Reflection\EnumT(\Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum::class))]
+        public ?\Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum $deepEnum = null,
     ) {}
 }
 
@@ -845,8 +847,8 @@ use Thesis\Protobuf\Reflection;
 final readonly class NestedMessage
 {
     public function __construct(
-        #[Reflection\Field(1, new Reflection\ObjectT(NestedMessage\Deep::class))]
-        public ?NestedMessage\Deep $deep = null,
+        #[Reflection\Field(1, new Reflection\ObjectT(\Proto\Api\V1\TestRequest\NestedMessage\Deep::class))]
+        public ?\Proto\Api\V1\TestRequest\NestedMessage\Deep $deep = null,
     ) {}
 }
 
@@ -868,10 +870,13 @@ use Thesis\Protobuf\Reflection;
 final readonly class Deep
 {
     public function __construct(
-        #[Reflection\Field(3, new Reflection\EnumT(Deep\DeepEnum::class))]
-        public ?Deep\DeepEnum $deepEnum = null,
-        #[Reflection\OneOf([Deep\UnionPhone::class, Deep\UnionEmail::class])]
-        public ?Deep\Union $union = null,
+        #[Reflection\Field(3, new Reflection\EnumT(\Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum::class))]
+        public ?\Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum $deepEnum = null,
+        #[Reflection\OneOf([
+            \Proto\Api\V1\TestRequest\NestedMessage\Deep\UnionPhone::class,
+            \Proto\Api\V1\TestRequest\NestedMessage\Deep\UnionEmail::class,
+        ])]
+        public ?\Proto\Api\V1\TestRequest\NestedMessage\Deep\Union $union = null,
     ) {}
 }
 
@@ -890,7 +895,7 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class UnionPhone implements Union
+final readonly class UnionPhone implements \Proto\Api\V1\TestRequest\NestedMessage\Deep\Union
 {
     public function __construct(
         #[Reflection\Field(1, Reflection\StringT::T)]
@@ -913,7 +918,7 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class UnionEmail implements Union
+final readonly class UnionEmail implements \Proto\Api\V1\TestRequest\NestedMessage\Deep\Union
 {
     public function __construct(
         #[Reflection\Field(2, Reflection\StringT::T)]
@@ -976,10 +981,10 @@ use Thesis\Protobuf\Reflection;
 final readonly class AnotherRequest
 {
     public function __construct(
-        #[Reflection\Field(1, new Reflection\ObjectT(TestRequest\NestedMessage::class))]
-        public ?TestRequest\NestedMessage $nested = null,
-        #[Reflection\Field(2, new Reflection\EnumT(TestRequest\NestedMessage\Deep\DeepEnum::class))]
-        public ?TestRequest\NestedMessage\Deep\DeepEnum $deepEnum = null,
+        #[Reflection\Field(1, new Reflection\ObjectT(\Proto\Api\V1\TestRequest\NestedMessage::class))]
+        public ?\Proto\Api\V1\TestRequest\NestedMessage $nested = null,
+        #[Reflection\Field(2, new Reflection\EnumT(\Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum::class))]
+        public ?\Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum $deepEnum = null,
     ) {}
 }
 
@@ -1083,8 +1088,8 @@ use Thesis\Protobuf\Reflection;
 final readonly class INSTANCEOF_
 {
     public function __construct(
-        #[Reflection\Field(1, new Reflection\ObjectT(Class_\Case_\Break_::class))]
-        public ?Class_\Case_\Break_ $break = null,
+        #[Reflection\Field(1, new Reflection\ObjectT(\ReservedTypes\Class_\Case_\Break_::class))]
+        public ?\ReservedTypes\Class_\Case_\Break_ $break = null,
     ) {}
 }
 
@@ -1106,8 +1111,8 @@ use Thesis\Protobuf\Reflection;
 final readonly class Class_
 {
     public function __construct(
-        #[Reflection\Field(1, new Reflection\ObjectT(Class_\Case_\Break_::class))]
-        public ?Class_\Case_\Break_ $break = null,
+        #[Reflection\Field(1, new Reflection\ObjectT(\ReservedTypes\Class_\Case_\Break_::class))]
+        public ?\ReservedTypes\Class_\Case_\Break_ $break = null,
     ) {}
 }
 
@@ -1180,8 +1185,8 @@ final readonly class TestRequest
         public string $stringValue = '',
         #[Reflection\Field(2, Reflection\StringT::T)]
         public ?string $optionalStringValue = null,
-        #[Reflection\OneOf([TestRequest\ContactPhone::class, TestRequest\ContactEmail::class])]
-        public ?TestRequest\Contact $contact = null,
+        #[Reflection\OneOf([\Proto\Api\V1\TestRequest\ContactPhone::class, \Proto\Api\V1\TestRequest\ContactEmail::class])]
+        public ?\Proto\Api\V1\TestRequest\Contact $contact = null,
     ) {}
 }
 
@@ -1200,7 +1205,7 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class ContactPhone implements Contact
+final readonly class ContactPhone implements \Proto\Api\V1\TestRequest\Contact
 {
     public function __construct(
         #[Reflection\Field(3, Reflection\StringT::T)]
@@ -1223,7 +1228,7 @@ use Thesis\Protobuf\Reflection;
 /**
  * @api
  */
-final readonly class ContactEmail implements Contact
+final readonly class ContactEmail implements \Proto\Api\V1\TestRequest\Contact
 {
     public function __construct(
         #[Reflection\Field(4, Reflection\StringT::T)]
@@ -1271,8 +1276,6 @@ namespace Thesis\Auth\V1;
 
 use Amp\Cancellation;
 use Amp\NullCancellation;
-use Thesis\Auth\LoginRequest;
-use Thesis\Auth\LoginResponse;
 use Thesis\Grpc\Client;
 use Thesis\Grpc\Metadata;
 
@@ -1286,14 +1289,14 @@ final readonly class AuthServiceClient
     ) {}
 
     public function login(
-        LoginRequest $request,
+        \Thesis\Auth\LoginRequest $request,
         Metadata $md = new Metadata(),
         Cancellation $cancellation = new NullCancellation(),
-    ): LoginResponse {
-        /** @var Client\Invoke<LoginRequest, LoginResponse> $invoke */
+    ): \Thesis\Auth\LoginResponse {
+        /** @var Client\Invoke<\Thesis\Auth\LoginRequest, \Thesis\Auth\LoginResponse> $invoke */
         $invoke = new Client\Invoke(
             method: '/Thesis.Auth.V1.AuthService/Login',
-            type: LoginResponse::class,
+            type: \Thesis\Auth\LoginResponse::class,
         );
 
         return $this->client->invoke(
@@ -1316,8 +1319,6 @@ PHP,
 namespace Thesis\Auth\V1;
 
 use Amp\Cancellation;
-use Thesis\Auth\LoginRequest;
-use Thesis\Auth\LoginResponse;
 use Thesis\Grpc\Metadata;
 
 /**
@@ -1325,7 +1326,11 @@ use Thesis\Grpc\Metadata;
  */
 interface AuthServiceServer
 {
-    public function login(LoginRequest $request, Metadata $md, Cancellation $cancellation): LoginResponse;
+    public function login(
+        \Thesis\Auth\LoginRequest $request,
+        Metadata $md,
+        Cancellation $cancellation,
+    ): \Thesis\Auth\LoginResponse;
 }
 
 PHP,
@@ -1338,7 +1343,7 @@ PHP,
                             <<<'PHP'
 namespace Thesis\Auth\V1;
 
-use Thesis\Auth\LoginRequest;
+use Override;
 use Thesis\Grpc\Server;
 
 /**
@@ -1347,15 +1352,15 @@ use Thesis\Grpc\Server;
 final readonly class AuthServiceServerRegistry implements Server\ServiceRegistry
 {
     public function __construct(
-        private AuthServiceServer $server,
+        private \Thesis\Auth\V1\AuthServiceServer $server,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function services(): iterable
     {
         yield new Server\Service('Thesis.Auth.V1.AuthService', [
             new Server\Rpc(
-                new Server\Handle('Login', LoginRequest::class),
+                new Server\Handle('Login', \Thesis\Auth\LoginRequest::class),
                 new Server\UnaryHandler($this->server->login(...)),
             ),
         ]);
@@ -1376,10 +1381,6 @@ use Amp\Cancellation;
 use Amp\NullCancellation;
 use Thesis\Grpc\Client;
 use Thesis\Grpc\Metadata;
-use Thesis\Protobuf\Known;
-use Thesis\Queue\Heartbeat;
-use Thesis\Queue\PullRequest;
-use Thesis\Queue\PushRequest;
 
 /**
  * @api
@@ -1391,16 +1392,16 @@ final readonly class QueueServiceClient
     ) {}
 
     /**
-     * @return Client\ClientStreamChannel<PushRequest\Message, Known\EmptyObject>
+     * @return Client\ClientStreamChannel<\Thesis\Queue\PushRequest\Message, \Google\Protobuf\Empty_>
      */
     public function push(
         Metadata $md = new Metadata(),
         Cancellation $cancellation = new NullCancellation(),
     ): Client\ClientStreamChannel {
-        /** @var Client\Invoke<PushRequest\Message, Known\EmptyObject> $invoke */
+        /** @var Client\Invoke<\Thesis\Queue\PushRequest\Message, \Google\Protobuf\Empty_> $invoke */
         $invoke = new Client\Invoke(
             method: '/Thesis.Queue.V1.QueueService/Push',
-            type: Known\EmptyObject::class,
+            type: \Google\Protobuf\Empty_::class,
         );
 
         $stream = $this->client->createStream(
@@ -1413,17 +1414,17 @@ final readonly class QueueServiceClient
     }
 
     /**
-     * @return Client\ServerStreamChannel<PullRequest, PullRequest\Message>
+     * @return Client\ServerStreamChannel<\Thesis\Queue\PullRequest, \Thesis\Queue\PullRequest\Message>
      */
     public function pull(
-        PullRequest $request,
+        \Thesis\Queue\PullRequest $request,
         Metadata $md = new Metadata(),
         Cancellation $cancellation = new NullCancellation(),
     ): Client\ServerStreamChannel {
-        /** @var Client\Invoke<PullRequest, PullRequest\Message> $invoke */
+        /** @var Client\Invoke<\Thesis\Queue\PullRequest, \Thesis\Queue\PullRequest\Message> $invoke */
         $invoke = new Client\Invoke(
             method: '/Thesis.Queue.V1.QueueService/Pull',
-            type: PullRequest\Message::class,
+            type: \Thesis\Queue\PullRequest\Message::class,
         );
 
         $stream = $this->client->createStream(
@@ -1439,16 +1440,16 @@ final readonly class QueueServiceClient
     }
 
     /**
-     * @return Client\BidirectionalStreamChannel<Heartbeat\FromClient\Ping, Heartbeat\FromServer\Ping>
+     * @return Client\BidirectionalStreamChannel<\Thesis\Queue\Heartbeat\FromClient\Ping, \Thesis\Queue\Heartbeat\FromServer\Ping>
      */
     public function heartbeat(
         Metadata $md = new Metadata(),
         Cancellation $cancellation = new NullCancellation(),
     ): Client\BidirectionalStreamChannel {
-        /** @var Client\Invoke<Heartbeat\FromClient\Ping, Heartbeat\FromServer\Ping> $invoke */
+        /** @var Client\Invoke<\Thesis\Queue\Heartbeat\FromClient\Ping, \Thesis\Queue\Heartbeat\FromServer\Ping> $invoke */
         $invoke = new Client\Invoke(
             method: '/Thesis.Queue.V1.QueueService/Heartbeat',
-            type: Heartbeat\FromServer\Ping::class,
+            type: \Thesis\Queue\Heartbeat\FromServer\Ping::class,
         );
 
         $stream = $this->client->createStream(
@@ -1474,10 +1475,6 @@ namespace Thesis\Queue\V1;
 use Amp\Cancellation;
 use Thesis\Grpc\Metadata;
 use Thesis\Grpc\Server;
-use Thesis\Protobuf\Known;
-use Thesis\Queue\Heartbeat;
-use Thesis\Queue\PullRequest;
-use Thesis\Queue\PushRequest;
 
 /**
  * @api
@@ -1485,22 +1482,22 @@ use Thesis\Queue\PushRequest;
 interface QueueServiceServer
 {
     /**
-     * @param Server\ClientStreamChannel<PushRequest\Message, Known\EmptyObject> $stream
+     * @param Server\ClientStreamChannel<\Thesis\Queue\PushRequest\Message, \Google\Protobuf\Empty_> $stream
      */
     public function push(Server\ClientStreamChannel $stream, Metadata $md, Cancellation $cancellation): void;
 
     /**
-     * @param Server\ServerStreamChannel<PullRequest, PullRequest\Message> $stream
+     * @param Server\ServerStreamChannel<\Thesis\Queue\PullRequest, \Thesis\Queue\PullRequest\Message> $stream
      */
     public function pull(
-        PullRequest $request,
+        \Thesis\Queue\PullRequest $request,
         Server\ServerStreamChannel $stream,
         Metadata $md,
         Cancellation $cancellation,
     ): void;
 
     /**
-     * @param Server\BidirectionalStreamChannel<Heartbeat\FromClient\Ping, Heartbeat\FromServer\Ping> $stream
+     * @param Server\BidirectionalStreamChannel<\Thesis\Queue\Heartbeat\FromClient\Ping, \Thesis\Queue\Heartbeat\FromServer\Ping> $stream
      */
     public function heartbeat(
         Server\BidirectionalStreamChannel $stream,
@@ -1519,10 +1516,8 @@ PHP,
                             <<<'PHP'
 namespace Thesis\Queue\V1;
 
+use Override;
 use Thesis\Grpc\Server;
-use Thesis\Queue\Heartbeat;
-use Thesis\Queue\PullRequest;
-use Thesis\Queue\PushRequest;
 
 /**
  * @api
@@ -1530,23 +1525,23 @@ use Thesis\Queue\PushRequest;
 final readonly class QueueServiceServerRegistry implements Server\ServiceRegistry
 {
     public function __construct(
-        private QueueServiceServer $server,
+        private \Thesis\Queue\V1\QueueServiceServer $server,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function services(): iterable
     {
         yield new Server\Service('Thesis.Queue.V1.QueueService', [
             new Server\Rpc(
-                new Server\Handle('Push', PushRequest\Message::class),
+                new Server\Handle('Push', \Thesis\Queue\PushRequest\Message::class),
                 new Server\ClientStreamHandler($this->server->push(...)),
             ),
             new Server\Rpc(
-                new Server\Handle('Pull', PullRequest::class),
+                new Server\Handle('Pull', \Thesis\Queue\PullRequest::class),
                 new Server\ServerStreamHandler($this->server->pull(...)),
             ),
             new Server\Rpc(
-                new Server\Handle('Heartbeat', Heartbeat\FromClient\Ping::class),
+                new Server\Handle('Heartbeat', \Thesis\Queue\Heartbeat\FromClient\Ping::class),
                 new Server\BidirectionalStreamHandler($this->server->heartbeat(...)),
             ),
         ]);
