@@ -149,11 +149,6 @@ enum Naming
         ));
     }
 
-    public static function extract(string $namespace, int $levels): string
-    {
-        return implode('\\', \array_slice(explode('\\', $namespace), $levels));
-    }
-
     public static function secure(string $name): string
     {
         return isset(self::CLASS_NAMES_RESERVED_WORDS[strtolower($name)]) ? "{$name}_" : $name;

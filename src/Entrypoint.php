@@ -40,7 +40,7 @@ final readonly class Entrypoint
             );
         } catch (\Throwable $e) {
             $response = new CodeGeneratorResponse(
-                error: "Generate code error: {$e->getTraceAsString()}.",
+                error: "Generate code error: {$e->getMessage()}\n{$e->getTraceAsString()}",
             );
         }
 

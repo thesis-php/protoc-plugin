@@ -12,4 +12,5 @@ return Rector\Config\RectorConfig::configure()
     ->withPhpSets()
     ->withSkip([
         Rector\Php80\Rector\Class_\StringableForToStringRector::class,
+        Rector\Php55\Rector\String_\StringClassNameToClassConstantRector::class,
     ]);

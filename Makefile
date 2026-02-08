@@ -139,10 +139,10 @@ check: fixer-check rector-check composer-validate composer-normalize-check deps-
 executable:
 	chmod +x bin/compiler.php
 
-compile: executable
+generate: executable
 	rm -rf compiled/*
-	protoc -I./protos -I./protos/protos --plugin=protoc-gen-custom-plugin=./bin/compiler.php ./protos/*.proto ./protos/protos/*.proto --custom-plugin_out=grpc=server,grpc=client:compiled
-.PHONY: compile
+	protoc -I./protos --plugin=protoc-gen-custom-plugin=./bin/compiler.php ./protos/*.proto --custom-plugin_out=compiled
+.PHONY: generate
 
 # -----------------------
 

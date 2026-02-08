@@ -16,3 +16,13 @@ message PullRequest {
 
     int32 qos = 1;
 }
+
+message Heartbeat {
+    message FromServer {
+        message Ping {}
+    }
+
+    message FromClient {
+        message Ping {}
+    }
+}

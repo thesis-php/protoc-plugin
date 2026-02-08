@@ -57,13 +57,6 @@ final class NamingTest extends TestCase
         self::assertSame($expected, Naming::path($actual));
     }
 
-    #[TestWith(['Test\Api\V1\TestRequest', -1, 'TestRequest'])]
-    #[TestWith(['Test\Api\V1\TestRequest', -2, 'V1\TestRequest'])]
-    public function testExtract(string $actual, int $levels, string $expected): void
-    {
-        self::assertSame($expected, Naming::extract($actual, $levels));
-    }
-
     #[TestWith(['TestRequest', 'TestRequest'])]
     #[TestWith(['Class', 'Class_'])]
     public function testSecure(string $actual, string $expected): void
