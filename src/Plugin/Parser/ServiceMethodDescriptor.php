@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Thesis\Protoc\Plugin;
+namespace Thesis\Protoc\Plugin\Parser;
+
+use Thesis\Protoc\Plugin\Comment;
 
 /**
  * @api

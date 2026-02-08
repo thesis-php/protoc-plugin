@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Thesis\Protoc\Plugin;
+namespace Thesis\Protoc\Plugin\Parser;
 
 use Thesis\Protobuf\Compiler\FileDescriptorProto;
 use Thesis\Protobuf\Compiler\FileOptions;
+use Thesis\Protoc\Plugin\Comment;
 
 /**
  * @api
@@ -13,15 +14,19 @@ use Thesis\Protobuf\Compiler\FileOptions;
 final readonly class FileDescriptor
 {
     /**
+     * @param non-empty-string $name
      * @param list<MessageDescriptor> $messages
      * @param list<EnumDescriptor> $enums
      * @param list<ServiceDescriptor> $services
+     * @param list<string> $dependencies
      */
     public function __construct(
+        public string $name,
         public FileDescriptorProto $file,
         public array $messages = [],
         public array $enums = [],
         public array $services = [],
+        public array $dependencies = [],
         public ?string $package = null,
         public ?FileOptions $options = null,
         public ?Comment $packageComments = null,

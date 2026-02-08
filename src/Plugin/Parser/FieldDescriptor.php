@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Thesis\Protoc\Plugin;
+namespace Thesis\Protoc\Plugin\Parser;
 
 use Thesis\Protobuf\Compiler\FieldDescriptorProto\Label;
 use Thesis\Protobuf\Compiler\FieldDescriptorProto\Type;
 use Thesis\Protobuf\Compiler\FieldOptions;
+use Thesis\Protoc\Plugin\Comment;
 
 /**
  * @api
@@ -25,5 +26,6 @@ final readonly class FieldDescriptor
         public ?bool $proto3Optional = null,
         public ?int $oneOfIndex = null,
         public ?string $defaultValue = null,
+        public ?MapDescriptor $map = null,
     ) {}
 }
