@@ -96,7 +96,7 @@ final readonly class Parser
             $messages[] = new Parser\MessageDescriptor(
                 name: $descriptor->name,
                 path: $path,
-                fields: self::parseMessageFields($descriptor, $file, $descriptor->field, $messageComments),
+                fields: self::parseMessageFields($descriptor, $file, $descriptor->field, $messageComments, $path),
                 enums: self::parseEnums($descriptor->enumType, $messageComments, $path),
                 messages: self::parseMessages($file, $descriptor->nestedType, $messageComments, $path),
                 oneofs: $oneofs,
@@ -117,6 +117,7 @@ final readonly class Parser
         FileDescriptorProto $file,
         array $descriptors,
         CommentExtractor $comments,
+        string $path,
     ): array {
         $fields = [];
 
@@ -132,7 +133,7 @@ final readonly class Parser
 
             if ($maybeMap) {
                 foreach ($message->nestedType as $nestedType) {
-                    $typename = ($file->package !== null ? ".{$file->package}." : '.') . "{$message->name}.{$nestedType->name}";
+                    $typename = ($file->package !== null ? ".{$file->package}." : '.') . "{$path}.{$nestedType->name}";
 
                     if ($typename === $descriptor->typeName && $nestedType->options?->mapEntry === true) {
                         \assert(\count($nestedType->field) === 2, 'Each MapEntry must have exactly 2 fields.');
