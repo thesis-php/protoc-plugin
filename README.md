@@ -11,6 +11,14 @@ For this reason, we have written this plugin, which — in addition to addressin
 - [Plugin options](#plugin-options)
   - [src_path](#src_path)
   - [grpc](#grpc)
+- [Generated code guide](#generated-code-guide)
+    - [numbers](#numbers)
+    - [repeated](#repeated)
+    - [maps](#maps)
+    - [oneof](#oneof)
+    - [precedence](#precedence)
+    - [grpc client](#grpc-client)
+    - [grpc server](#grpc-server)
 - [Generated libraries](#generated-libraries)
 - [Feature matrix](#feature-matrix)
 
@@ -129,6 +137,336 @@ protoc \
 ```
 
 To generate only the server code, use `grpc=server`. By default, and when passing `grpc=client,server`, both the client and server will be generated.
+
+### Generated code guide
+
+As mentioned above, the plugin generates simple DTOs without setters, getters, or inheritance. All metadata for protobuf serialization is stored in attribute `Thesis\Protobuf\Reflection\*`, and the generated DTOs only have a constructor with promoted properties.
+
+#### numbers
+
+To avoid issues with integer overflow when using `int64/uint64` types, `\BcMath\Number` will be used.
+For other numeric scalars, the `int` and `float` types will be used respectively.
+
+#### repeated
+
+When using `proto2`, it will be explicitly specified whether lists are packed. This is necessary because in `proto2` only lists with the corresponding option explicitly set could be packed.
+Meanwhile, in `proto3`, this rule is applied implicitly, but only for types for which it was also possible in `proto2`.
+In other words, for a list of `int32` in `proto2` code will be generated with an attribute like this:
+```php
+final readonly class Request
+{
+    /**
+     * @param list<int> $ids
+     */
+    public function __construct(
+        #[Reflection\Field(1, new Reflection\ListT(Reflection\Int32T::T, true))]
+        public array $ids = [],
+    ) {}
+}
+```
+
+Note the second argument of the `ListT` attribute: it will be set according to the `[packed = bool]` option.
+For `proto3` this argument will be omitted. Also note that lists will always have `[]` as their default value, because in protobuf all values are optional.
+
+#### maps
+
+Since maps can have `int64/uint64` types as keys, for which we use `\BcMath\Number`, we cannot use the native `array` type, as its keys cannot be objects.
+A typical solution to this problem is a list of pairs, where the key is the result of applying a hash function, which ensures fast lookup in such a `map` similar to a regular `array`.
+
+Therefore, for all fields of type `map<K, V>`, regardless of the key type, the `\Thesis\Protobuf\Map<K, V>` type will be used for consistency.
+It implements `\ArrayAccess`, `\Countable`, and `\IteratorAggregate` to smooth over the inconvenience of not being able to use a regular `array`.
+
+```php
+use Thesis\Protobuf;
+use Thesis\Protobuf\Reflection;
+
+final readonly class Request
+{
+    /**
+     * @param Protobuf\Map<string, string> $options
+     */
+    public function __construct(
+        #[Reflection\Field(1, new Reflection\MapT(Reflection\StringT::T, Reflection\StringT::T))]
+        public Protobuf\Map $options = new Protobuf\Map(),
+    ) {}
+}
+```
+
+Such fields will never be nullable (especially since maps in protobuf cannot be `required` or `optional`) and will have an empty `Map` object as its default value.
+This will simplify interaction with this type.
+
+#### oneof
+
+Since `oneof` in protobuf can contain variants with the same data types, we cannot use a native union.
+For this reason, an object is created for each variant, each of which implements a sealed interface (enabled through static analysis).
+
+Consider the following protobuf schema:
+```protobuf
+syntax = "proto3";
+
+package thesis.api;
+
+message Request {
+    oneof contact {
+        string phone = 1;
+        string email = 2;
+        int64 chat_id = 3;
+    }
+}
+```
+
+First of all, an `Request` object will be generated:
+```php
+namespace Thesis\Api\Request;
+
+final readonly class Request
+{
+    public function __construct(
+        #[Reflection\OneOf([
+            \Thesis\Api\Request\ContactPhone::class,
+            \Thesis\Api\Request\ContactEmail::class,
+            \Thesis\Api\Request\ContactChatId::class,
+        ])]
+        public ?\Thesis\Api\Request\Contact $contact = null,
+    ) {}
+}
+```
+
+Then, an interface `Contact` will be generated:
+```php
+namespace Thesis\Api\Request;
+
+/**
+ * @api
+ * @phpstan-sealed (
+ *   ContactPhone |
+ *   ContactEmail |
+ *   ContactChatId
+ * )
+ */
+interface Contact {}
+```
+
+Note the namespace: this interface and all its implementations will be generated in a namespace nested relative to the object, just like all nested types of this message.
+
+And for each variant, the following objects will be generated:
+
+```php
+namespace Thesis\Api\Request;
+
+/**
+ * @api
+ */
+final readonly class ContactChatId implements \Thesis\Api\Request\Contact
+{
+    public function __construct(
+        #[Reflection\Field(3, Reflection\Int64T::T)]
+        public \BcMath\Number $chatId = new \BcMath\Number(0),
+    ) {}
+}
+
+/**
+ * @api
+ */
+final readonly class ContactEmail implements \Thesis\Api\Request\Contact
+{
+    public function __construct(
+        #[Reflection\Field(2, Reflection\StringT::T)]
+        public string $email = '',
+    ) {}
+}
+
+/**
+ * @api
+ */
+final readonly class ContactPhone implements \Thesis\Api\Request\Contact
+{
+    public function __construct(
+        #[Reflection\Field(1, Reflection\StringT::T)]
+        public string $phone = '',
+    ) {}
+}
+```
+
+#### precedence
+
+By default, all fields with scalar data types will have corresponding default values (0 for numbers, false for booleans, and so on).
+If proto2 is used and the field is marked as `optional`, scalar types will become nullable, with null as the default value.
+The same applies to `optional` in proto3. Lists and maps, however, will always be non-nullable (especially since they cannot be `required` or `optional`) but will have empty default values.
+Meanwhile, all objects will always be nullable, regardless of `required`/`optional` labels, which allows the serializer to quickly skip such fields and avoid writing unnecessary data.
+
+#### grpc client
+
+Our plugin supports generating all types of communication between client and server, including client-side, server-side, and bidirectional streaming.
+
+Consider the following service:
+```protobuf
+syntax = "proto3";
+
+package thesis.api.v1;
+
+import "google/protobuf/empty.proto";
+
+message Message {}
+
+message Heartbeat {}
+
+message Queue {}
+
+service QueueService {
+    rpc State(google.protobuf.Empty) returns (Queue);
+    rpc Push(stream Message) returns (google.protobuf.Empty);
+    rpc Pull(google.protobuf.Empty) returns (stream Message);
+    rpc Heartbeats(stream Heartbeat) returns (stream Heartbeat);
+}
+```
+
+A client of the following code will be generated (method bodies are intentionally omitted for simplicity):
+```php
+namespace Thesis\Api\V1;
+
+use Amp\Cancellation;
+use Amp\NullCancellation;
+use Thesis\Grpc\Client;
+use Thesis\Grpc\Metadata;
+
+/**
+ * @api
+ */
+final readonly class QueueServiceClient
+{
+    public function __construct(
+        private Client $client,
+    ) {}
+
+    public function state(
+        \Google\Protobuf\Empty_ $request,
+        Metadata $md = new Metadata(),
+        Cancellation $cancellation = new NullCancellation(),
+    ): \Thesis\Api\V1\Queue {}
+
+    /**
+     * @return Client\ClientStreamChannel<\Thesis\Api\V1\Message, \Google\Protobuf\Empty_>
+     */
+    public function push(
+        Metadata $md = new Metadata(),
+        Cancellation $cancellation = new NullCancellation(),
+    ): Client\ClientStreamChannel {}
+
+    /**
+     * @return Client\ServerStreamChannel<\Google\Protobuf\Empty_, \Thesis\Api\V1\Message>
+     */
+    public function pull(
+        \Google\Protobuf\Empty_ $request,
+        Metadata $md = new Metadata(),
+        Cancellation $cancellation = new NullCancellation(),
+    ): Client\ServerStreamChannel {}
+
+    /**
+     * @return Client\BidirectionalStreamChannel<\Thesis\Api\V1\Heartbeat, \Thesis\Api\V1\Heartbeat>
+     */
+    public function heartbeats(
+        Metadata $md = new Metadata(),
+        Cancellation $cancellation = new NullCancellation(),
+    ): Client\BidirectionalStreamChannel {}
+}
+```
+
+See the [thesis/grpc](https://github.com/thesis-php/grpc) for details of how to use streams and `Metadata`.
+
+To use `gRPC` after generation you should install `thesis/grpc` and `amphp/amp` packages, if you haven't done so already.
+
+#### grpc server
+
+When generating the server, two types will be generated: first, the server interface itself, which you need to implement,
+and second, a registrar class that registers your implementation with the `gRPC` server, adapting the interface methods through intermediate handlers.
+
+Let's take a look at the server interface:
+```php
+
+namespace Thesis\Api\V1;
+
+use Amp\Cancellation;
+use Thesis\Grpc\Metadata;
+use Thesis\Grpc\Server;
+
+/**
+ * @api
+ */
+interface QueueServiceServer
+{
+    public function state(
+        \Google\Protobuf\Empty_ $request,
+        Metadata $md,
+        Cancellation $cancellation,
+    ): \Thesis\Api\V1\Queue;
+
+    /**
+     * @param Server\ClientStreamChannel<\Thesis\Api\V1\Message, \Google\Protobuf\Empty_> $stream
+     */
+    public function push(Server\ClientStreamChannel $stream, Metadata $md, Cancellation $cancellation): void;
+
+    /**
+     * @param Server\ServerStreamChannel<\Google\Protobuf\Empty_, \Thesis\Api\V1\Message> $stream
+     */
+    public function pull(
+        \Google\Protobuf\Empty_ $request,
+        Server\ServerStreamChannel $stream,
+        Metadata $md,
+        Cancellation $cancellation,
+    ): void;
+
+    /**
+     * @param Server\BidirectionalStreamChannel<\Thesis\Api\V1\Heartbeat, \Thesis\Api\V1\Heartbeat> $stream
+     */
+    public function heartbeats(
+        Server\BidirectionalStreamChannel $stream,
+        Metadata $md,
+        Cancellation $cancellation,
+    ): void;
+}
+```
+
+And at the registrar class:
+```php
+namespace Thesis\Api\V1;
+
+use Override;
+use Thesis\Grpc\Server;
+
+/**
+ * @api
+ */
+final readonly class QueueServiceServerRegistry implements Server\ServiceRegistry
+{
+    public function __construct(
+        private \Thesis\Api\V1\QueueServiceServer $server,
+    ) {}
+
+    #[Override]
+    public function services(): iterable
+    {
+        yield new Server\Service('thesis.api.v1.QueueService', [
+            new Server\Rpc(
+                new Server\Handle('State', \Google\Protobuf\Empty_::class),
+                new Server\UnaryHandler($this->server->state(...)),
+            ),
+            new Server\Rpc(
+                new Server\Handle('Push', \Thesis\Api\V1\Message::class),
+                new Server\ClientStreamHandler($this->server->push(...)),
+            ),
+            new Server\Rpc(
+                new Server\Handle('Pull', \Google\Protobuf\Empty_::class),
+                new Server\ServerStreamHandler($this->server->pull(...)),
+            ),
+            new Server\Rpc(
+                new Server\Handle('Heartbeats', \Thesis\Api\V1\Heartbeat::class),
+                new Server\BidirectionalStreamHandler($this->server->heartbeats(...)),
+            ),
+        ]);
+    }
+}
+```
 
 ### Generated libraries
 
