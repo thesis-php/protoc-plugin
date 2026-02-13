@@ -288,7 +288,7 @@ final readonly class ContactPhone implements \Thesis\Api\Request\Contact
 }
 ```
 
-#### precedence
+#### presence
 
 By default, all fields with scalar data types will have corresponding default values (0 for numbers, false for booleans, and so on).
 If proto2 is used and the field is marked as `optional`, scalar types will become nullable, with null as the default value.
