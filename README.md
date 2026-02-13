@@ -146,19 +146,21 @@ To avoid having to generate these types each time, it is recommended to use libr
 [`thesis/protobuf-compiler-types`](https://github.com/thesis-php/protobuf-compiler-types) — types used for communication between protoc and its plugins.
 
 ### Feature matrix
-|          Feature          | Supported? |
-|:-------------------------:|------------|
-|         `proto3`          | Yes        |
-|         `proto2`          | Yes        |
-| `proto2 scalar defaults`  | Yes        |
-|  `proto2 enum defaults`   | No         |
-|     `proto3 optional`     | Yes        |
-|       `extensions`        | No         |
-|         `groups`          | No         |
-|      `nested types`       | Yes        |
-|     `packed repeated`     | Yes        |
-|          `oneof`          | Yes        |
-|          `grpc`           | Yes        |
-|    `client streaming`     | Yes        |
-|    `server streaming`     | Yes        |
-| `bidirectional streaming` | Yes        |
+- [x] `proto2`
+- [x] `proto3`
+- [x] `proto2 scalar defaults`
+- [ ] `proto2 enum defaults`
+- [x] `proto3 optional`
+- [ ] `extensions`
+- [ ] `groups`
+- [x] `nested types`
+- [x] `packed repeated`
+- [x] `oneof`
+- [x] `grpc`
+- [x] `client streaming`
+- [x] `server streaming`
+- [x] `bidirectional streaming`
+- [x] `option php_namespace`
+- [ ] `option php_class_prefix`
+- [ ] `option php_metadata_namespace`
+- [x] `comments`
