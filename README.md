@@ -12,6 +12,7 @@ For this reason, we have written this plugin, which — in addition to addressin
   - [src_path](#src_path)
   - [grpc](#grpc)
 - [Generated libraries](#generated-libraries)
+- [Feature matrix](#feature-matrix)
 
 ### Usage
 
@@ -134,7 +135,7 @@ To generate only the server code, use `grpc=server`. By default, and when passin
 The protobuf ecosystem has many well-defined types for various tasks, including the so-called [well-known types](https://protobuf.dev/reference/protobuf/google.protobuf/), which include `Timestamp`, `Duration`, `Empty`, and many others.
 To avoid having to generate these types each time, it is recommended to use libraries where this code has already been generated.
 
-[`thesis/protobuf-known-types`](https://github.com/thesis-php/protobuf-known-types) — generated well-known types;
+[`thesis/protobuf-known-types`](https://github.com/thesis-php/protobuf-known-types) — generated well-known types.
 
 [`thesis/google-types`](https://github.com/thesis-php/google-types) — generated types from the `google/type` package, which include, for example, `Money`, `Color`, `PhoneNumber`, and many others.
 
@@ -143,3 +144,21 @@ To avoid having to generate these types each time, it is recommended to use libr
 [`thesis/protobuf-descriptor-types`](https://github.com/thesis-php/protobuf-descriptor-types) — types used by the plugin itself and for implementing so-called server reflection.
 
 [`thesis/protobuf-compiler-types`](https://github.com/thesis-php/protobuf-compiler-types) — types used for communication between protoc and its plugins.
+
+### Feature matrix
+|          Feature          | Supported? |
+|:-------------------------:|------------|
+|         `proto3`          | Yes        |
+|         `proto2`          | Yes        |
+| `proto2 scalar defaults`  | Yes        |
+|  `proto2 enum defaults`   | No         |
+|     `proto3 optional`     | Yes        |
+|       `extensions`        | No         |
+|         `groups`          | No         |
+|      `nested types`       | Yes        |
+|     `packed repeated`     | Yes        |
+|          `oneof`          | Yes        |
+|          `grpc`           | Yes        |
+|    `client streaming`     | Yes        |
+|    `server streaming`     | Yes        |
+| `bidirectional streaming` | Yes        |
