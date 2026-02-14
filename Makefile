@@ -106,7 +106,7 @@ phpstan: var vendor ## Analyze code using PHPStan
 generate-testdata:
 	$(RUN) ./tests/tools/generate.sh
 
-test: var vendor up generate-testdata ## Run tests using PHPUnit
+test: var vendor generate-testdata ## Run tests using PHPUnit
 	$(RUN) vendor/bin/phpunit $(ARGS) --colors
 .PHONY: test
 

@@ -9,7 +9,7 @@ if [[ ! -x "$PLUGIN" ]]; then
   exit 1
 fi
 
-find "$ROOT" -type f -name '*.proto' | while read -r proto; do
+find "$ROOT" -type f -name '*.proto' -not -path "*/grpc/*" | while read -r proto; do
   dir="$(dirname "$proto")"
   base="$(basename "$proto" .proto)"
   out="$dir/$base.txt"
