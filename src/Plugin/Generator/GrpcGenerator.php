@@ -4,17 +4,12 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Generator;
 
-use Amp\Cancellation;
-use Amp\NullCancellation;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Parameter;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PromotedParameter;
-use Thesis\Grpc\Client;
-use Thesis\Grpc\Metadata;
-use Thesis\Grpc\Server;
 use Thesis\Protoc\Plugin\Dependency;
 use Thesis\Protoc\Plugin\Naming;
 use Thesis\Protoc\Plugin\Parser;
@@ -48,10 +43,10 @@ final readonly class GrpcGenerator
             return $namespace;
         }
 
-        $namespace->addUse(Cancellation::class);
-        $namespace->addUse(NullCancellation::class);
-        $namespace->addUse(Client::class);
-        $namespace->addUse(Metadata::class);
+        $namespace->addUse('Amp\Cancellation');
+        $namespace->addUse('Amp\NullCancellation');
+        $namespace->addUse('Thesis\Grpc\Client');
+        $namespace->addUse('Thesis\Grpc\Metadata');
 
         $constructor = $classType->addMethod('__construct');
         $constructor
@@ -207,8 +202,8 @@ PHP,
             return $namespace;
         }
 
-        $namespace->addUse(Cancellation::class);
-        $namespace->addUse(Metadata::class);
+        $namespace->addUse('Amp\Cancellation');
+        $namespace->addUse('Thesis\Grpc\Metadata');
 
         $useStreaming = array_any(
             $service->methods,
@@ -216,7 +211,7 @@ PHP,
         );
 
         if ($useStreaming) {
-            $namespace->addUse(Server::class);
+            $namespace->addUse('Thesis\Grpc\Server');
         }
 
         foreach ($service->methods as $method) {
@@ -289,7 +284,7 @@ PHP,
 
         $namespace->add($classType);
 
-        $namespace->addUse(Server::class);
+        $namespace->addUse('Thesis\Grpc\Server');
 
         $handlers = [];
 
