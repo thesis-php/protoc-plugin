@@ -102,6 +102,16 @@ enum Naming
         'class' => 1,
     ];
 
+    public static function descriptorName(string $file): string
+    {
+        $info = pathinfo($file);
+        $dir = $info['dirname'] ?? '.';
+        $filename = $info['filename'];
+        $name = Naming::pascalCase(($dir !== '.' ? (str_replace('/', ' ', $dir) . ' ') : '') . $filename);
+
+        return "{$name}DescriptorRegistry";
+    }
+
     public static function camelCase(string $name): string
     {
         return lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $name))));

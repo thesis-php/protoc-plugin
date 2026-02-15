@@ -6,8 +6,6 @@ namespace Thesis\Protoc;
 
 use Google\Protobuf\Compiler\CodeGeneratorRequest;
 use Google\Protobuf\Compiler\CodeGeneratorResponse;
-use Thesis\Protobuf;
-use Thesis\Protobuf\Reflection;
 
 /**
  * @api
@@ -16,8 +14,7 @@ final readonly class Entrypoint
 {
     public function __construct(
         private Plugin\Compiler $compiler,
-        private Protobuf\Serializer $serializer,
-        private Reflection\Reflector $reflector,
+        private ProtobufEncoder $protobuf,
     ) {}
 
     public function run(
@@ -25,11 +22,8 @@ final readonly class Entrypoint
         WriteOutput $output,
     ): void {
         try {
-            $request = $this->reflector->map(
-                $this->serializer->deserialize(
-                    $this->reflector->type(CodeGeneratorRequest::class),
-                    $input->read(),
-                ),
+            $request = $this->protobuf->decode(
+                $input->read(),
                 CodeGeneratorRequest::class,
             );
 
@@ -44,9 +38,7 @@ final readonly class Entrypoint
             );
         }
 
-        $buffer = $this->serializer->serialize(
-            $this->reflector->message($response),
-        );
+        $buffer = $this->protobuf->encode($response);
 
         if ($buffer !== '') {
             $output->write($buffer);

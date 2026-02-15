@@ -11,8 +11,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Thesis\Package;
-use Thesis\Protobuf\Reflection\Reflector;
-use Thesis\Protobuf\Serializer;
 use Thesis\Protoc\Plugin\Compiler;
 
 #[CoversClass(Compiler::class)]
@@ -27,15 +25,11 @@ final class CompilerTest extends TestCase
         $bytes = hex2bin($hex);
         self::assertIsString($bytes);
 
-        $serializer = new Serializer();
-        $reflector = Reflector::build();
+        $protobuf = ProtobufEncoder::default();
 
-        $request = $reflector->map(
-            $serializer->deserialize($reflector->type(CodeGeneratorRequest::class), $bytes),
-            CodeGeneratorRequest::class,
-        );
+        $request = $protobuf->decode($bytes, CodeGeneratorRequest::class);
 
-        self::assertEquals($response, new Compiler()->compile($request));
+        self::assertEquals($response, new Compiler($protobuf)->compile($request));
     }
 
     /**
@@ -661,6 +655,52 @@ final readonly class AnotherRequest
 PHP,
                         ),
                     ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/Proto2TestDescriptorRegistry.php',
+                        content: self::phpContent(
+                            'proto2/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1;
+
+use Override;
+use Thesis\Protobuf\Pool;
+
+/**
+ * @api
+ */
+final readonly class Proto2TestDescriptorRegistry implements Pool\Registrar
+{
+    private const string DESCRIPTOR_BUFFER = 'ChFwcm90bzIvdGVzdC5wcm90bxIMcHJvdG8uYXBpLnYxGh9nb29nbGUvcHJvdG9idWYvdGltZXN0YW1wLnByb3RvGh5nb29nbGUvcHJvdG9idWYvZHVyYXRpb24ucHJvdG8aHGdvb2dsZS9wcm90b2J1Zi9zdHJ1Y3QucHJvdG8aG2dvb2dsZS9wcm90b2J1Zi9lbXB0eS5wcm90bxoZZ29vZ2xlL3Byb3RvYnVmL2FueS5wcm90byLHJAoLVGVzdFJlcXVlc3QSMgoEa2luZBgBIAIoDjIeLnByb3RvLmFwaS52MS5UZXN0UmVxdWVzdC5LaW5kUgRraW5kEiMKDWJvb2xfcmVxdWlyZWQYCiACKAhSDGJvb2xSZXF1aXJlZBIlCg5pbnQzMl9yZXF1aXJlZBgLIAIoBVINaW50MzJSZXF1aXJlZBIlCg5pbnQ2NF9yZXF1aXJlZBgMIAIoA1INaW50NjRSZXF1aXJlZBIpChBmaXhlZDMyX3JlcXVpcmVkGA0gAigHUg9maXhlZDMyUmVxdWlyZWQSKQoQZml4ZWQ2NF9yZXF1aXJlZBgOIAIoBlIPZml4ZWQ2NFJlcXVpcmVkEicKD3VpbnQzMl9yZXF1aXJlZBgPIAIoDVIOdWludDMyUmVxdWlyZWQSJwoPdWludDY0X3JlcXVpcmVkGBAgAigEUg51aW50NjRSZXF1aXJlZBIlCg5nbG9hdF9yZXF1aXJlZBgRIAIoAlINZ2xvYXRSZXF1aXJlZBInCg9kb3VibGVfcmVxdWlyZWQYEiACKAFSDmRvdWJsZVJlcXVpcmVkEicKD3N0cmluZ19yZXF1aXJlZBgTIAIoCVIOc3RyaW5nUmVxdWlyZWQSJQoOYnl0ZXNfcmVxdWlyZWQYZSACKAxSDWJ5dGVzUmVxdWlyZWQSJwoPc2ludDMyX3JlcXVpcmVkGGYgAigRUg5zaW50MzJSZXF1aXJlZBInCg9zaW50NjRfcmVxdWlyZWQYZyACKBJSDnNpbnQ2NFJlcXVpcmVkEisKEXNmaXhlZDMyX3JlcXVpcmVkGGggAigPUhBzZml4ZWQzMlJlcXVpcmVkEisKEXNmaXhlZDY0X3JlcXVpcmVkGGkgAigQUhBzZml4ZWQ2NFJlcXVpcmVkEiMKDWJvb2xfb3B0aW9uYWwYHiABKAhSDGJvb2xPcHRpb25hbBIlCg5pbnQzMl9vcHRpb25hbBgfIAEoBVINaW50MzJPcHRpb25hbBIlCg5pbnQ2NF9vcHRpb25hbBggIAEoA1INaW50NjRPcHRpb25hbBIpChBmaXhlZDMyX29wdGlvbmFsGCEgASgHUg9maXhlZDMyT3B0aW9uYWwSKQoQZml4ZWQ2NF9vcHRpb25hbBgiIAEoBlIPZml4ZWQ2NE9wdGlvbmFsEicKD3VpbnQzMl9vcHRpb25hbBgjIAEoDVIOdWludDMyT3B0aW9uYWwSJwoPdWludDY0X29wdGlvbmFsGCQgASgEUg51aW50NjRPcHRpb25hbBIlCg5mbG9hdF9vcHRpb25hbBglIAEoAlINZmxvYXRPcHRpb25hbBInCg9kb3VibGVfb3B0aW9uYWwYJiABKAFSDmRvdWJsZU9wdGlvbmFsEicKD3N0cmluZ19vcHRpb25hbBgnIAEoCVIOc3RyaW5nT3B0aW9uYWwSJgoOYnl0ZXNfb3B0aW9uYWwYrQIgASgMUg1ieXRlc09wdGlvbmFsEigKD3NpbnQzMl9vcHRpb25hbBiuAiABKBFSDnNpbnQzMk9wdGlvbmFsEigKD3NpbnQ2NF9vcHRpb25hbBivAiABKBJSDnNpbnQ2NE9wdGlvbmFsEiwKEXNmaXhlZDMyX29wdGlvbmFsGLACIAEoD1IQc2ZpeGVkMzJPcHRpb25hbBIsChFzZml4ZWQ2NF9vcHRpb25hbBixAiABKBBSEHNmaXhlZDY0T3B0aW9uYWwSIwoNYm9vbF9yZXBlYXRlZBgUIAMoCFIMYm9vbFJlcGVhdGVkEiUKDmludDMyX3JlcGVhdGVkGBUgAygFUg1pbnQzMlJlcGVhdGVkEiUKDmludDY0X3JlcGVhdGVkGBYgAygDUg1pbnQ2NFJlcGVhdGVkEikKEGZpeGVkMzJfcmVwZWF0ZWQYFyADKAdSD2ZpeGVkMzJSZXBlYXRlZBIpChBmaXhlZDY0X3JlcGVhdGVkGBggAygGUg9maXhlZDY0UmVwZWF0ZWQSJwoPdWludDMyX3JlcGVhdGVkGBkgAygNUg51aW50MzJSZXBlYXRlZBInCg91aW50NjRfcmVwZWF0ZWQYGiADKARSDnVpbnQ2NFJlcGVhdGVkEiUKDmZsb2F0X3JlcGVhdGVkGBsgAygCUg1mbG9hdFJlcGVhdGVkEicKD2RvdWJsZV9yZXBlYXRlZBgcIAMoAVIOZG91YmxlUmVwZWF0ZWQSJwoPc3RyaW5nX3JlcGVhdGVkGB0gAygJUg5zdHJpbmdSZXBlYXRlZBImCg5ieXRlc19yZXBlYXRlZBjJASADKAxSDWJ5dGVzUmVwZWF0ZWQSKAoPc2ludDMyX3JlcGVhdGVkGMoBIAMoEVIOc2ludDMyUmVwZWF0ZWQSKAoPc2ludDY0X3JlcGVhdGVkGMsBIAMoElIOc2ludDY0UmVwZWF0ZWQSLAoRc2ZpeGVkMzJfcmVwZWF0ZWQYzAEgAygPUhBzZml4ZWQzMlJlcGVhdGVkEiwKEXNmaXhlZDY0X3JlcGVhdGVkGM0BIAMoEFIQc2ZpeGVkNjRSZXBlYXRlZBI0ChRib29sX3JlcGVhdGVkX3BhY2tlZBgyIAMoCFISYm9vbFJlcGVhdGVkUGFja2VkQgIQARI2ChVpbnQzMl9yZXBlYXRlZF9wYWNrZWQYMyADKAVSE2ludDMyUmVwZWF0ZWRQYWNrZWRCAhABEjYKFWludDY0X3JlcGVhdGVkX3BhY2tlZBg0IAMoA1ITaW50NjRSZXBlYXRlZFBhY2tlZEICEAESOgoXZml4ZWQzMl9yZXBlYXRlZF9wYWNrZWQYNSADKAdSFWZpeGVkMzJSZXBlYXRlZFBhY2tlZEICEAESOgoXZml4ZWQ2NF9yZXBlYXRlZF9wYWNrZWQYNiADKAZSFWZpeGVkNjRSZXBlYXRlZFBhY2tlZEICEAESOAoWdWludDMyX3JlcGVhdGVkX3BhY2tlZBg3IAMoDVIUdWludDMyUmVwZWF0ZWRQYWNrZWRCAhABEjgKFnVpbnQ2NF9yZXBlYXRlZF9wYWNrZWQYOCADKARSFHVpbnQ2NFJlcGVhdGVkUGFja2VkQgIQARI2ChVmbG9hdF9yZXBlYXRlZF9wYWNrZWQYOSADKAJSE2Zsb2F0UmVwZWF0ZWRQYWNrZWRCAhABEjgKFmRvdWJsZV9yZXBlYXRlZF9wYWNrZWQYOiADKAFSFGRvdWJsZVJlcGVhdGVkUGFja2VkQgIQARI5ChZzaW50MzJfcmVwZWF0ZWRfcGFja2VkGPYDIAMoEVIUc2ludDMyUmVwZWF0ZWRQYWNrZWRCAhABEjkKFnNpbnQ2NF9yZXBlYXRlZF9wYWNrZWQY9wMgAygSUhRzaW50NjRSZXBlYXRlZFBhY2tlZEICEAESPQoYc2ZpeGVkMzJfcmVwZWF0ZWRfcGFja2VkGPgDIAMoD1IWc2ZpeGVkMzJSZXBlYXRlZFBhY2tlZEICEAESPQoYc2ZpeGVkNjRfcmVwZWF0ZWRfcGFja2VkGPkDIAMoEFIWc2ZpeGVkNjRSZXBlYXRlZFBhY2tlZEICEAESKwoOYm9vbF9kZWZhdWx0ZWQYKCABKAg6BHRydWVSDWJvb2xEZWZhdWx0ZWQSKwoPaW50MzJfZGVmYXVsdGVkGCkgASgFOgIzMlIOaW50MzJEZWZhdWx0ZWQSKwoPaW50NjRfZGVmYXVsdGVkGCogASgDOgI2NFIOaW50NjREZWZhdWx0ZWQSMAoRZml4ZWQzMl9kZWZhdWx0ZWQYKyABKAc6AzMyMFIQZml4ZWQzMkRlZmF1bHRlZBIwChFmaXhlZDY0X2RlZmF1bHRlZBgsIAEoBjoDNjQwUhBmaXhlZDY0RGVmYXVsdGVkEi8KEHVpbnQzMl9kZWZhdWx0ZWQYLSABKA06BDMyMDBSD3VpbnQzMkRlZmF1bHRlZBIvChB1aW50NjRfZGVmYXVsdGVkGC4gASgEOgQ2NDAwUg91aW50NjREZWZhdWx0ZWQSLwoPZmxvYXRfZGVmYXVsdGVkGC8gASgCOgYzMTQxNTlSDmZsb2F0RGVmYXVsdGVkEjEKEGRvdWJsZV9kZWZhdWx0ZWQYMCABKAE6BjI3MTgyOFIPZG91YmxlRGVmYXVsdGVkEjsKEHN0cmluZ19kZWZhdWx0ZWQYMSABKAk6EGhlbGxvLCAid29ybGQhIgpSD3N0cmluZ0RlZmF1bHRlZBIxCg9ieXRlc19kZWZhdWx0ZWQYkQMgASgMOgdCaWdub3NlUg5ieXRlc0RlZmF1bHRlZBIvChBzaW50MzJfZGVmYXVsdGVkGJIDIAEoEToDLTMyUg9zaW50MzJEZWZhdWx0ZWQSLwoQc2ludDY0X2RlZmF1bHRlZBiTAyABKBI6Ay02NFIPc2ludDY0RGVmYXVsdGVkEjMKEnNmaXhlZDMyX2RlZmF1bHRlZBiUAyABKA86Ay0zMlIRc2ZpeGVkMzJEZWZhdWx0ZWQSMwoSc2ZpeGVkNjRfZGVmYXVsdGVkGJUDIAEoEDoDLTY0UhFzZml4ZWQ2NERlZmF1bHRlZBJbChFtYXBfc3RyaW5nX3N0cmluZxiWAyADKAsyLi5wcm90by5hcGkudjEuVGVzdFJlcXVlc3QuTWFwU3RyaW5nU3RyaW5nRW50cnlSD21hcFN0cmluZ1N0cmluZxJECg9rbm93bl90aW1lc3RhbXAYlwMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIOa25vd25UaW1lc3RhbXASQQoOa25vd25fZHVyYXRpb24YmAMgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uUg1rbm93bkR1cmF0aW9uEjsKDGtub3duX3N0cnVjdBiZAyABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0Ugtrbm93blN0cnVjdBI4Cgtrbm93bl9lbXB0eRiaAyABKAsyFi5nb29nbGUucHJvdG9idWYuRW1wdHlSCmtub3duRW1wdHkSMgoJa25vd25fYW55GJsDIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnlSCGtub3duQW55EjkKBm5lc3RlZBicAyABKAsyIC5wcm90by5hcGkudjEuVGVzdFJlcXVlc3QuTmVzdGVkUgZuZXN0ZWQSFgoGbnVtYmVyGAUgASgFUgZudW1iZXISEgoEbmFtZRgGIAEoCVIEbmFtZRISCgRkYXRhGAcgASgMUgRkYXRhEhUKBnRlbXBfYxgIIAEoAVIFdGVtcEMSMgoDY29sGAkgASgLMiAucHJvdG8uYXBpLnYxLlRlc3RSZXF1ZXN0Lk5lc3RlZFIDY29sEksKCWRlZXBfZW51bRgEIAEoDjIuLnByb3RvLmFwaS52MS5UZXN0UmVxdWVzdC5OZXN0ZWQuRGVlcC5EZWVwRW51bVIIZGVlcEVudW0SRwoLbmVzdGVkX2RlZXAYnQMgASgLMiUucHJvdG8uYXBpLnYxLlRlc3RSZXF1ZXN0Lk5lc3RlZC5EZWVwUgpuZXN0ZWREZWVwEiEKCmxhc3RfZmllbGQY/////wEgASgJUglsYXN0RmllbGQaQgoUTWFwU3RyaW5nU3RyaW5nRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUYAiABKAlSBXZhbHVlOgI4ARrEAgoGTmVzdGVkEhIKBG5hbWUYASABKAlSBG5hbWUSFAoFZ3JvdXAYAiABKAlSBWdyb3VwEjkKBGRlZXAYAyABKAsyJS5wcm90by5hcGkudjEuVGVzdFJlcXVlc3QuTmVzdGVkLkRlZXBSBGRlZXAa1AEKBERlZXASEgoEbmFtZRgBIAIoCVIEbmFtZRIUCgVwaG9uZRgCIAEoCVIFcGhvbmUSFAoFZW1haWwYAyABKAlSBWVtYWlsEksKCWRlZXBfZW51bRgEIAEoDjIuLnByb3RvLmFwaS52MS5UZXN0UmVxdWVzdC5OZXN0ZWQuRGVlcC5EZWVwRW51bVIIZGVlcEVudW0iNgoIRGVlcEVudW0SFwoVREVFUF9FTlVNX1VOU1BFQ0lGSUVEEhEKDURFRVBfRU5VTV9GT08QAUIHCgV1bmlvbiI6CgRLaW5kEhIKEEtJTkRfVU5TUEVDSUZJRUQSCAoEVk9JRBABEgoKBlNUUklORxACEggKBEJPT0wQA0IJCgd4X2ZpZWxkIoYCCg5Bbm90aGVyUmVxdWVzdBI4CgZuZXN0ZWQYASABKAsyIC5wcm90by5hcGkudjEuVGVzdFJlcXVlc3QuTmVzdGVkUgZuZXN0ZWQSOQoEZGVlcBgCIAEoCzIlLnByb3RvLmFwaS52MS5UZXN0UmVxdWVzdC5OZXN0ZWQuRGVlcFIEZGVlcBIyCgRraW5kGAMgASgOMh4ucHJvdG8uYXBpLnYxLlRlc3RSZXF1ZXN0LktpbmRSBGtpbmQSSwoJZGVlcF9lbnVtGAQgASgOMi4ucHJvdG8uYXBpLnYxLlRlc3RSZXF1ZXN0Lk5lc3RlZC5EZWVwLkRlZXBFbnVtUghkZWVwRW51bSoyCgNGb28SEQoPRk9PX1VOU1BFQ0lGSUVEEgsKB0ZPT19CQVIQARILCgdGT09fQkFaEAJK00QKBxIFAACVAQEKCAoBDBIDAAASCggKAQISAwIAFQoJCgIDABIDBAApCgkKAgMBEgMFACgKCQoCAwISAwYAJgoJCgIDAxIDBwAlCgkKAgMEEgMIACMKGwoCBQASBAsAEAEaDyBFbnVtIGNvbW1lbnQuCgoKCgMFAAESAwsFCAocCgQFAAIAEgMNBBgaDyBDYXNlIGNvbW1lbnQuCgoMCgUFAAIAARIDDQQTCgwKBQUAAgACEgMNFhcKCwoEBQACARIDDgQQCgwKBQUAAgEBEgMOBAsKDAoF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';
+
+    #[Override]
+    public function register(Pool\Registry $pool): void
+    {
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
+            'proto.api.v1.TestRequest' => new Pool\MessageMetadata(\Proto\Api\V1\TestRequest\XFieldDeepEnum::class),
+            'proto.api.v1.TestRequest.Nested' => new Pool\MessageMetadata(\Proto\Api\V1\TestRequest\Nested::class),
+            'proto.api.v1.TestRequest.Nested.Deep' => new Pool\MessageMetadata(\Proto\Api\V1\TestRequest\Nested\Deep\UnionEmail::class),
+            'proto.api.v1.AnotherRequest' => new Pool\MessageMetadata(\Proto\Api\V1\AnotherRequest::class),
+            'proto.api.v1.Foo' => new Pool\EnumMetadata(\Proto\Api\V1\Foo::class),
+            'proto.api.v1.TestRequest.Kind' => new Pool\EnumMetadata(\Proto\Api\V1\TestRequest\Kind::class),
+            'proto.api.v1.TestRequest.Nested.Deep.DeepEnum' => new Pool\EnumMetadata(\Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum::class),
+        ]);
+    }
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/autoload.metadata.php',
+                        content: self::autoloadContent(
+                            <<<'PHP'
+\Thesis\Protobuf\Pool\Registry::get()->register(
+    new \Thesis\Protobuf\Pool\OnceRegistrar(new \Proto\Api\V1\Proto2TestDescriptorRegistry()),
+);
+
+PHP,
+                        ),
+                    ),
                 ],
             ),
         ];
@@ -681,6 +721,46 @@ namespace Thesis\Api\V1;
  * @api
  */
 final readonly class TestRequest {}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Api/V1/PhpNamespacePhpNamespaceDescriptorRegistry.php',
+                        content: self::phpContent(
+                            source: 'php_namespace/php_namespace.proto',
+                            content: <<<'PHP'
+namespace Thesis\Api\V1;
+
+use Override;
+use Thesis\Protobuf\Pool;
+
+/**
+ * @api
+ */
+final readonly class PhpNamespacePhpNamespaceDescriptorRegistry implements Pool\Registrar
+{
+    private const string DESCRIPTOR_BUFFER = 'CiFwaHBfbmFtZXNwYWNlL3BocF9uYW1lc3BhY2UucHJvdG8SC3Rlc3QuYXBpLnYxIg0KC1Rlc3RSZXF1ZXN0Qhn4AQHCAgNLZWvKAg1UaGVzaXNcQXBpXFYxSl0KBhIEAAAHFgoICgEMEgMAABIKCAoBCBIDAgApCgkKAggpEgMCACkKCAoBCBIDAwAgCgkKAggoEgMDACAKCAoBAhIDBQAUCgkKAgQAEgMHABYKCgoDBAABEgMHCBNiBnByb3RvMw==';
+
+    #[Override]
+    public function register(Pool\Registry $pool): void
+    {
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
+            'test.api.v1.TestRequest' => new Pool\MessageMetadata(\Thesis\Api\V1\TestRequest::class),
+        ]);
+    }
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Api/V1/autoload.metadata.php',
+                        content: self::autoloadContent(
+                            <<<'PHP'
+\Thesis\Protobuf\Pool\Registry::get()->register(
+    new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Api\V1\PhpNamespacePhpNamespaceDescriptorRegistry()),
+);
 
 PHP,
                         ),
@@ -991,6 +1071,51 @@ final readonly class AnotherRequest
 PHP,
                         ),
                     ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/SnakeCaseSnakeCaseDescriptorRegistry.php',
+                        content: self::phpContent(
+                            'snake_case/snake_case.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1;
+
+use Override;
+use Thesis\Protobuf\Pool;
+
+/**
+ * @api
+ */
+final readonly class SnakeCaseSnakeCaseDescriptorRegistry implements Pool\Registrar
+{
+    private const string DESCRIPTOR_BUFFER = 'ChtzbmFrZV9jYXNlL3NuYWtlX2Nhc2UucHJvdG8SDHByb3RvLmFwaS52MSLrBAoMVGVzdF9SZXF1ZXN0EkEKBm5lc3RlZBgBIAEoCzIpLnByb3RvLmFwaS52MS5UZXN0X1JlcXVlc3QuTmVzdGVkX01lc3NhZ2VSBm5lc3RlZBIWCgZudW1iZXIYAiABKAVSBm51bWJlchI7CgNjb2wYAyABKAsyKS5wcm90by5hcGkudjEuVGVzdF9SZXF1ZXN0Lk5lc3RlZF9NZXNzYWdlUgNjb2wSVQoJZGVlcF9lbnVtGAQgASgOMjgucHJvdG8uYXBpLnYxLlRlc3RfUmVxdWVzdC5OZXN0ZWRfTWVzc2FnZS5EZWVwLkRlZXBfRW51bVIIZGVlcEVudW0STwoLbmVzdGVkX2RlZXAYBSABKAsyLi5wcm90by5hcGkudjEuVGVzdF9SZXF1ZXN0Lk5lc3RlZF9NZXNzYWdlLkRlZXBSCm5lc3RlZERlZXAajwIKDk5lc3RlZF9NZXNzYWdlEkIKBGRlZXAYASABKAsyLi5wcm90by5hcGkudjEuVGVzdF9SZXF1ZXN0Lk5lc3RlZF9NZXNzYWdlLkRlZXBSBGRlZXAauAEKBERlZXASFAoFcGhvbmUYASABKAlSBXBob25lEhQKBWVtYWlsGAIgASgJUgVlbWFpbBJVCglkZWVwX2VudW0YAyABKA4yOC5wcm90by5hcGkudjEuVGVzdF9SZXF1ZXN0Lk5lc3RlZF9NZXNzYWdlLkRlZXAuRGVlcF9FbnVtUghkZWVwRW51bSIkCglEZWVwX0VudW0SFwoVREVFUF9FTlVNX1VOU1BFQ0lGSUVEQgcKBXVuaW9uQgkKB3hfZmllbGQiqwEKD0Fub3RoZXJfUmVxdWVzdBJBCgZuZXN0ZWQYASABKAsyKS5wcm90by5hcGkudjEuVGVzdF9SZXF1ZXN0Lk5lc3RlZF9NZXNzYWdlUgZuZXN0ZWQSVQoJZGVlcF9lbnVtGAIgASgOMjgucHJvdG8uYXBpLnYxLlRlc3RfUmVxdWVzdC5OZXN0ZWRfTWVzc2FnZS5EZWVwLkRlZXBfRW51bVIIZGVlcEVudW0qGAoDRm9vEhEKD0ZPT19VTlNQRUNJRklFREr9BwoGEgQAACMBCggKAQwSAwAAEgoICgECEgMCABUKCgoCBQASBAQABgEKCgoDBQABEgMEBQgKCwoEBQACABIDBQQYCgwKBQUAAgABEgMFBBMKDAoFBQACAAISAwUWFwoKCgIEABIECAAeAQoKCgMEAAESAwgIFAoMCgQEAAMAEgQJBBYFCgwKBQQAAwABEgMJDBoKDgoGBAADAAMAEgQKCBQJCg4KBwQAAwADAAESAwoQFAoQCggEAAMAAwAEABIECwwNDQoQCgkEAAMAAwAEAAESAwsRGgoRCgoEAAMAAwAEAAIAEgMMECoKEgoLBAADAAMABAACAAESAwwQJQoSCgsEAAMAAwAEAAIAAhIDDCgpChAKCAQAAwADAAgAEgQPDBINChAKCQQAAwADAAgAARIDDxIXCg8KCAQAAwADAAIAEgMQECEKEAoJBAADAAMAAgAFEgMQEBYKEAoJBAADAAMAAgABEgMQFxwKEAoJBAADAAMAAgADEgMQHyAKDwoIBAADAAMAAgESAxEQIQoQCgkEAAMAAwACAQUSAxEQFgoQCgkEAAMAAwACAQESAxEXHAoQCgkEAAMAAwACAQMSAxEfIAoPCggEAAMAAwACAhIDEwwkChAKCQQAAwADAAICBhIDEwwVChAKCQQAAwADAAICARIDExYfChAKCQQAAwADAAICAxIDEyIjCg0KBgQAAwACABIDFQgWCg4KBwQAAwACAAYSAxUIDAoOCgcEAAMAAgABEgMVDREKDgoHBAADAAIAAxIDFRQVCgsKBAQAAgASAxcEHgoMCgUEAAIABhIDFwQSCgwKBQQAAgABEgMXExkKDAoFBAACAAMSAxccHQoMCgQEAAgAEgQYBBwFCgwKBQQACAABEgMYChEKCwoEBAACARIDGQgZCgwKBQQAAgEFEgMZCA0KDAoFBAACAQESAxkOFAoMCgUEAAIBAxIDGRcYCgsKBAQAAgISAxoIHwoMCgUEAAICBhIDGggWCgwKBQQAAgIBEgMaFxoKDAoFBAACAgMSAxodHgoLCgQEAAIDEgMbCDQKDAoFBAACAwYSAxsIJQoMCgUEAAIDARIDGyYvCgwKBQQAAgMDEgMbMjMKCwoEBAACBBIDHQQoCgwKBQQAAgQGEgMdBBcKDAoFBAACBAESAx0YIwoMCgUEAAIEAxIDHSYnCgoKAgQBEgQgACMBCgoKAwQBARIDIAgXCgsKBAQBAgASAyEEKwoMCgUEAQIABhIDIQQfCgwKBQQBAgABEgMhICYKDAoFBAECAAMSAyEpKgoLCgQEAQIBEgMiBD0KDAoFBAECAQYSAyIELgoMCgUEAQIBARIDIi84CgwKBQQBAgEDEgMiOzxiBnByb3RvMw==';
+
+    #[Override]
+    public function register(Pool\Registry $pool): void
+    {
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
+            'proto.api.v1.Test_Request' => new Pool\MessageMetadata(\Proto\Api\V1\TestRequest\XFieldDeepEnum::class),
+            'proto.api.v1.Test_Request.Nested_Message' => new Pool\MessageMetadata(\Proto\Api\V1\TestRequest\NestedMessage::class),
+            'proto.api.v1.Test_Request.Nested_Message.Deep' => new Pool\MessageMetadata(\Proto\Api\V1\TestRequest\NestedMessage\Deep\UnionEmail::class),
+            'proto.api.v1.Another_Request' => new Pool\MessageMetadata(\Proto\Api\V1\AnotherRequest::class),
+            'proto.api.v1.Foo' => new Pool\EnumMetadata(\Proto\Api\V1\Foo::class),
+            'proto.api.v1.Test_Request.Nested_Message.Deep.Deep_Enum' => new Pool\EnumMetadata(\Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum::class),
+        ]);
+    }
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/autoload.metadata.php',
+                        content: self::autoloadContent(
+                            <<<'PHP'
+\Thesis\Protobuf\Pool\Registry::get()->register(
+    new \Thesis\Protobuf\Pool\OnceRegistrar(new \Proto\Api\V1\SnakeCaseSnakeCaseDescriptorRegistry()),
+);
+
+PHP,
+                        ),
+                    ),
                 ],
             ),
         ];
@@ -1157,6 +1282,53 @@ final readonly class Break_
 PHP,
                         ),
                     ),
+                    new CodeGeneratorResponse\File(
+                        name: 'ReservedTypes/ReservedNamesReservedNamesDescriptorRegistry.php',
+                        content: self::phpContent(
+                            'reserved_names/reserved_names.proto',
+                            <<<'PHP'
+namespace ReservedTypes;
+
+use Override;
+use Thesis\Protobuf\Pool;
+
+/**
+ * @api
+ */
+final readonly class ReservedNamesReservedNamesDescriptorRegistry implements Pool\Registrar
+{
+    private const string DESCRIPTOR_BUFFER = 'CiNyZXNlcnZlZF9uYW1lcy9yZXNlcnZlZF9uYW1lcy5wcm90bxIOcmVzZXJ2ZWRfdHlwZXMiBgoEZXhpdCJECgpJTlNUQU5DRU9GEjYKBWJyZWFrGAEgASgLMiAucmVzZXJ2ZWRfdHlwZXMuQ2xhc3MuQ2FzZS5CcmVha1IFYnJlYWsiZAoFQ2xhc3MSNgoFYnJlYWsYASABKAsyIC5yZXNlcnZlZF90eXBlcy5DbGFzcy5DYXNlLkJyZWFrUgVicmVhaxojCgRDYXNlGhsKBUJyZWFrEhIKBG5hbWUYASABKAlSBG5hbWUqQgoKTm90QWxsb3dlZBIKCghhYnN0cmFjdBIHCgNhbmQQARIJCgVhcnJheRACEgkKBWVtcHR5EAMSCQoFY2xhc3MQBCoRCgZzdHJpbmcSBwoFWkVSTzEqEAoFVHJhaXQSBwoFWkVSTzJKuQUKBhIEAAAeAQoICgEMEgMAABIKCAoBAhIDAgAXCgoKAgUAEgQEAAoBCgoKAwUAARIDBAUPCgsKBAUAAgASAwUEEQoMCgUFAAIAARIDBQQMCgwKBQUAAgACEgMFDxAKCwoEBQACARIDBgQMCgwKBQUAAgEBEgMGBAcKDAoFBQACAQISAwYKCwoLCgQFAAICEgMHBA4KDAoFBQACAgESAwcECQoMCgUFAAICAhIDBwwNCgsKBAUAAgMSAwgEDgoMCgUFAAIDARIDCAQJCgwKBQUAAgMCEgMIDA0KCwoEBQACBBIDCQQOCgwKBQUAAgQBEgMJBAkKDAoFBQACBAISAwkMDQoJCgIFARIDDAAaCgoKAwUBARIDDAULCgsKBAUBAgASAwwOGAoMCgUFAQIAARIDDA4TCgwKBQUBAgACEgMMFhcKCQoCBQISAw4AGQoKCgMFAgESAw4FCgoLCgQFAgIAEgMODRcKDAoFBQICAAESAw4NEgoMCgUFAgIAAhIDDhUWCgkKAgQAEgMQAA8KCgoDBAABEgMQCAwKCgoCBAESBBIAFAEKCgoDBAEBEgMSCBIKCwoEBAECABIDEwQfCgwKBQQBAgAGEgMTBBQKDAoFBAECAAESAxMVGgoMCgUEAQIAAxIDEx0eCgoKAgQCEgQWAB4BCgoKAwQCARIDFggNCgwKBAQCAwASBBcEGwUKDAoFBAIDAAESAxcMEAoOCgYEAgMAAwASBBgIGgkKDgoHBAIDAAMAARIDGBAVCg8KCAQCAwADAAIAEgMZDBwKEAoJBAIDAAMAAgAFEgMZDBIKEAoJBAIDAAMAAgABEgMZExcKEAoJBAIDAAMAAgADEgMZGhsKCwoEBAICABIDHQQZCgwKBQQCAgAGEgMdBA4KDAoFBAICAAESAx0PFAoMCgUEAgIAAxIDHRcYYgZwcm90bzM=';
+
+    #[Override]
+    public function register(Pool\Registry $pool): void
+    {
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
+            'reserved_types.exit' => new Pool\MessageMetadata(\ReservedTypes\Exit_::class),
+            'reserved_types.INSTANCEOF' => new Pool\MessageMetadata(\ReservedTypes\INSTANCEOF_::class),
+            'reserved_types.Class' => new Pool\MessageMetadata(\ReservedTypes\Class_::class),
+            'reserved_types.Class.Case' => new Pool\MessageMetadata(\ReservedTypes\Class_\Case_::class),
+            'reserved_types.Class.Case.Break' => new Pool\MessageMetadata(\ReservedTypes\Class_\Case_\Break_::class),
+            'reserved_types.NotAllowed' => new Pool\EnumMetadata(\ReservedTypes\NotAllowed::class),
+            'reserved_types.string' => new Pool\EnumMetadata(\ReservedTypes\String_::class),
+            'reserved_types.Trait' => new Pool\EnumMetadata(\ReservedTypes\Trait_::class),
+        ]);
+    }
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'ReservedTypes/autoload.metadata.php',
+                        content: self::autoloadContent(
+                            <<<'PHP'
+\Thesis\Protobuf\Pool\Registry::get()->register(
+    new \Thesis\Protobuf\Pool\OnceRegistrar(new \ReservedTypes\ReservedNamesReservedNamesDescriptorRegistry()),
+);
+
+PHP,
+                        ),
+                    ),
                 ],
             ),
         ];
@@ -1254,6 +1426,46 @@ namespace Proto\Api\V1\TestRequest;
  * )
  */
 interface Contact {}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/Proto3TestDescriptorRegistry.php',
+                        content: self::phpContent(
+                            'proto3/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1;
+
+use Override;
+use Thesis\Protobuf\Pool;
+
+/**
+ * @api
+ */
+final readonly class Proto3TestDescriptorRegistry implements Pool\Registrar
+{
+    private const string DESCRIPTOR_BUFFER = 'ChFwcm90bzMvdGVzdC5wcm90bxIMcHJvdG8uYXBpLnYxIroBCgtUZXN0UmVxdWVzdBIhCgxzdHJpbmdfdmFsdWUYASABKAlSC3N0cmluZ1ZhbHVlEjcKFW9wdGlvbmFsX3N0cmluZ192YWx1ZRgCIAEoCUgBUhNvcHRpb25hbFN0cmluZ1ZhbHVliAEBEhQKBXBob25lGAMgASgJUgVwaG9uZRIUCgVlbWFpbBgEIAEoCVIFZW1haWxCCQoHY29udGFjdEIYChZfb3B0aW9uYWxfc3RyaW5nX3ZhbHVlSroCCgYSBAAACwEKCAoBDBIDAAASCggKAQISAwIAFQoKCgIEABIEBAALAQoKCgMEAAESAwQIEwoLCgQEAAIAEgMFBBwKDAoFBAACAAUSAwUECgoMCgUEAAIAARIDBQsXCgwKBQQAAgADEgMFGhsKCwoEBAACARIDBgQuCgwKBQQAAgEEEgMGBAwKDAoFBAACAQUSAwYNEwoMCgUEAAIBARIDBhQpCgwKBQQAAgEDEgMGLC0KDAoEBAAIABIEBwQKBQoMCgUEAAgAARIDBwoRCgsKBAQAAgISAwgIGQoMCgUEAAICBRIDCAgOCgwKBQQAAgIBEgMIDxQKDAoFBAACAgMSAwgXGAoLCgQEAAIDEgMJCBkKDAoFBAACAwUSAwkIDgoMCgUEAAIDARIDCQ8UCgwKBQQAAgMDEgMJFxhiBnByb3RvMw==';
+
+    #[Override]
+    public function register(Pool\Registry $pool): void
+    {
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
+            'proto.api.v1.TestRequest' => new Pool\MessageMetadata(\Proto\Api\V1\TestRequest\ContactEmail::class),
+        ]);
+    }
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/autoload.metadata.php',
+                        content: self::autoloadContent(
+                            <<<'PHP'
+\Thesis\Protobuf\Pool\Registry::get()->register(
+    new \Thesis\Protobuf\Pool\OnceRegistrar(new \Proto\Api\V1\Proto3TestDescriptorRegistry()),
+);
 
 PHP,
                         ),
@@ -1600,6 +1812,36 @@ PHP,
                         ),
                     ),
                     new CodeGeneratorResponse\File(
+                        name: 'Thesis/Auth/ProtosAuthDescriptorRegistry.php',
+                        content: self::phpContent(
+                            'protos/auth.proto',
+                            <<<'PHP'
+namespace Thesis\Auth;
+
+use Override;
+use Thesis\Protobuf\Pool;
+
+/**
+ * @api
+ */
+final readonly class ProtosAuthDescriptorRegistry implements Pool\Registrar
+{
+    private const string DESCRIPTOR_BUFFER = 'ChFwcm90b3MvYXV0aC5wcm90bxILVGhlc2lzLkF1dGgiPgoMTG9naW5SZXF1ZXN0EhIKBHVzZXIYAiABKAlSBHVzZXISGgoIcGFzc3dvcmQYAyABKAlSCHBhc3N3b3JkIiUKDUxvZ2luUmVzcG9uc2USFAoFdG9rZW4YASABKAlSBXRva2VuSvEBCgYSBAAACwEKCAoBDBIDAAASCggKAQISAwIAFAoKCgIEABIEBAAHAQoKCgMEAAESAwQIFAoLCgQEAAIAEgMFBBQKDAoFBAACAAUSAwUECgoMCgUEAAIAARIDBQsPCgwKBQQAAgADEgMFEhMKCwoEBAACARIDBgQYCgwKBQQAAgEFEgMGBAoKDAoFBAACAQESAwYLEwoMCgUEAAIBAxIDBhYXCgoKAgQBEgQJAAsBCgoKAwQBARIDCQgVCgsKBAQBAgASAwoEFQoMCgUEAQIABRIDCgQKCgwKBQQBAgABEgMKCxAKDAoFBAECAAMSAwoTFGIGcHJvdG8z';
+
+    #[Override]
+    public function register(Pool\Registry $pool): void
+    {
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
+            'Thesis.Auth.LoginRequest' => new Pool\MessageMetadata(\Thesis\Auth\LoginRequest::class),
+            'Thesis.Auth.LoginResponse' => new Pool\MessageMetadata(\Thesis\Auth\LoginResponse::class),
+        ]);
+    }
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
                         name: 'Thesis/Queue/PushRequest.php',
                         content: self::phpContent(
                             'protos/queue.proto',
@@ -1760,6 +2002,55 @@ final readonly class Ping {}
 PHP,
                         ),
                     ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/Queue/ProtosQueueDescriptorRegistry.php',
+                        content: self::phpContent(
+                            'protos/queue.proto',
+                            <<<'PHP'
+namespace Thesis\Queue;
+
+use Override;
+use Thesis\Protobuf\Pool;
+
+/**
+ * @api
+ */
+final readonly class ProtosQueueDescriptorRegistry implements Pool\Registrar
+{
+    private const string DESCRIPTOR_BUFFER = 'ChJwcm90b3MvcXVldWUucHJvdG8SDFRoZXNpcy5RdWV1ZSIyCgtQdXNoUmVxdWVzdBojCgdNZXNzYWdlEhgKB2NvbnRlbnQYASABKAlSB2NvbnRlbnQiVAoLUHVsbFJlcXVlc3QSEAoDcW9zGAEgASgFUgNxb3MaMwoHTWVzc2FnZRIYCgdjb250ZW50GAEgASgJUgdjb250ZW50Eg4KAmlkGAIgASgJUgJpZCI3CglIZWFydGJlYXQaFAoKRnJvbUNsaWVudBoGCgRQaW5nGhQKCkZyb21TZXJ2ZXIaBgoEUGluZ0qGBAoGEgQAABsBCggKAQwSAwAAEgoICgECEgMCABUKCgoCBAASBAQACAEKCgoDBAABEgMECBMKDAoEBAADABIEBQQHBQoMCgUEAAMAARIDBQwTCg0KBgQAAwACABIDBggbCg4KBwQAAwACAAUSAwYIDgoOCgcEAAMAAgABEgMGDxYKDgoHBAADAAIAAxIDBhkaCgoKAgQBEgQKABEBCgoKAwQBARIDCggTCgwKBAQBAwASBAsEDgUKDAoFBAEDAAESAwsMEwoNCgYEAQMAAgASAwwIGwoOCgcEAQMAAgAFEgMMCA4KDgoHBAEDAAIAARIDDA8WCg4KBwQBAwACAAMSAwwZGgoNCgYEAQMAAgESAw0IFgoOCgcEAQMAAgEFEgMNCA4KDgoHBAEDAAIBARIDDQ8RCg4KBwQBAwACAQMSAw0UFQoLCgQEAQIAEgMQBBIKDAoFBAECAAUSAxAECQoMCgUEAQIAARIDEAoNCgwKBQQBAgADEgMQEBEKCgoCBAISBBMAGwEKCgoDBAIBEgMTCBEKDAoEBAIDABIEFAQWBQoMCgUEAgMAARIDFAwWCg0KBgQCAwADABIDFQgXCg4KBwQCAwADAAESAxUQFAoMCgQEAgMBEgQYBBoFCgwKBQQCAwEBEgMYDBYKDQoGBAIDAQMAEgMZCBcKDgoHBAIDAQMAARIDGRAUYgZwcm90bzM=';
+
+    #[Override]
+    public function register(Pool\Registry $pool): void
+    {
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
+            'Thesis.Queue.PushRequest' => new Pool\MessageMetadata(\Thesis\Queue\PushRequest::class),
+            'Thesis.Queue.PushRequest.Message' => new Pool\MessageMetadata(\Thesis\Queue\PushRequest\Message::class),
+            'Thesis.Queue.PullRequest' => new Pool\MessageMetadata(\Thesis\Queue\PullRequest::class),
+            'Thesis.Queue.PullRequest.Message' => new Pool\MessageMetadata(\Thesis\Queue\PullRequest\Message::class),
+            'Thesis.Queue.Heartbeat' => new Pool\MessageMetadata(\Thesis\Queue\Heartbeat::class),
+            'Thesis.Queue.Heartbeat.FromClient' => new Pool\MessageMetadata(\Thesis\Queue\Heartbeat\FromClient::class),
+            'Thesis.Queue.Heartbeat.FromClient.Ping' => new Pool\MessageMetadata(\Thesis\Queue\Heartbeat\FromClient\Ping::class),
+            'Thesis.Queue.Heartbeat.FromServer' => new Pool\MessageMetadata(\Thesis\Queue\Heartbeat\FromServer::class),
+            'Thesis.Queue.Heartbeat.FromServer.Ping' => new Pool\MessageMetadata(\Thesis\Queue\Heartbeat\FromServer\Ping::class),
+        ]);
+    }
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Thesis/autoload.metadata.php',
+                        content: self::autoloadContent(
+                            <<<'PHP'
+\Thesis\Protobuf\Pool\Registry::get()->register(
+    new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Auth\ProtosAuthDescriptorRegistry()),
+    new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Queue\ProtosQueueDescriptorRegistry()),
+);
+
+PHP,
+                        ),
+                    ),
                 ],
             ),
         ];
@@ -1785,6 +2076,28 @@ declare(strict_types=1);
 PHP,
             Package\version('thesis/protoc-plugin'),
             $source,
+            $content,
+        );
+    }
+
+    private static function autoloadContent(string $content): string
+    {
+        return \sprintf(
+            <<<'PHP'
+<?php
+
+/**
+ * Code generated by thesis/protoc-plugin. DO NOT EDIT.
+ * Versions:
+ *   thesis/protoc-plugin — v%s
+ *   protoc               — v6.32.1
+ */
+
+declare(strict_types=1);
+
+%s
+PHP,
+            Package\version('thesis/protoc-plugin'),
             $content,
         );
     }

@@ -20,6 +20,7 @@ final readonly class MessageDescriptor
      */
     public function __construct(
         public string $name,
+        public string $fqcn,
         public string $path,
         public array $fields = [],
         public array $enums = [],
