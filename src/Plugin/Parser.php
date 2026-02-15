@@ -45,7 +45,7 @@ final readonly class Parser
             name: $name,
             file: $descriptor,
             messages: self::parseMessages($descriptor, $descriptor->messageType, $comments),
-            enums: self::parseEnums($descriptor->enumType, $comments),
+            enums: self::parseEnums($descriptor, $descriptor->enumType, $comments),
             services: self::parseServices($descriptor->service, $comments),
             dependencies: $descriptor->dependency,
             package: $descriptor->package,
@@ -95,9 +95,10 @@ final readonly class Parser
 
             $messages[] = new Parser\MessageDescriptor(
                 name: $descriptor->name,
+                fqcn: $file->package !== null ? "{$file->package}.{$path}" : $path,
                 path: $path,
                 fields: self::parseMessageFields($descriptor, $file, $descriptor->field, $messageComments, $path),
-                enums: self::parseEnums($descriptor->enumType, $messageComments, $path),
+                enums: self::parseEnums($file, $descriptor->enumType, $messageComments, $path),
                 messages: self::parseMessages($file, $descriptor->nestedType, $messageComments, $path),
                 oneofs: $oneofs,
                 comment: $messageComments->extract(),
@@ -164,6 +165,7 @@ final readonly class Parser
      * @return list<Parser\EnumDescriptor>
      */
     private static function parseEnums(
+        FileDescriptorProto $file,
         array $descriptors,
         CommentExtractor $comments,
         ?string $parent = null,
@@ -185,6 +187,7 @@ final readonly class Parser
 
             $enums[] = new Parser\EnumDescriptor(
                 $descriptor->name,
+                $file->package !== null ? "{$file->package}.{$path}" : $path,
                 $path,
                 self::parseEnumCases(
                     $descriptor->value,

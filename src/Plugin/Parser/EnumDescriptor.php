@@ -17,6 +17,7 @@ final readonly class EnumDescriptor
      */
     public function __construct(
         public string $name,
+        public string $fqcn,
         public string $path,
         public array $cases,
         public ?Comment $comment = null,

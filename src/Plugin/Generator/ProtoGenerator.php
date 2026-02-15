@@ -12,6 +12,7 @@ use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\PhpNamespace;
 use Thesis\Protoc\Plugin\Dependency;
+use Thesis\Protoc\Plugin\NameIndex;
 use Thesis\Protoc\Plugin\Naming;
 use Thesis\Protoc\Plugin\Parser;
 
@@ -24,6 +25,7 @@ final readonly class ProtoGenerator
 
     public function __construct(
         Dependency\Graph $graph,
+        private NameIndex $index,
         private PhpNamespacer $namespacer,
         private ?string $syntax = null,
     ) {
@@ -34,7 +36,11 @@ final readonly class ProtoGenerator
     {
         $namespace = $this->namespacer->create($enum->path);
 
-        $enumType = new EnumType(Naming::pascalCase($enum->name))
+        $enumName = Naming::pascalCase($enum->name);
+
+        $this->index->addEnumType($enum->fqcn, "{$namespace->getName()}\\{$enumName}");
+
+        $enumType = new EnumType($enumName)
             ->addComment('@api')
             ->addComment($enum->comment !== null ? "\n{$enum->comment}" : '')
             ->setType('int')
@@ -92,6 +98,8 @@ final readonly class ProtoGenerator
         $namespace = $this->namespacer->create($message->path);
 
         $className = Naming::pascalCase($message->name);
+
+        $this->index->addMessageType($message->fqcn, "{$namespace->getName()}\\{$className}");
 
         $classType = new ClassType($className)
             ->setFinal()
@@ -278,6 +286,7 @@ final readonly class ProtoGenerator
 
         $descriptor = new Parser\MessageDescriptor(
             name: $className,
+            fqcn: $message->fqcn,
             path: $path = "{$message->path}.{$className}",
             fields: [
                 // Remove oneof index.
