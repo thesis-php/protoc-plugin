@@ -59,7 +59,7 @@ final readonly class Compiler
     ): iterable {
         $request = $this->parser->parse($request);
 
-        $registry = new Dependency\Registry($request);
+        $registry = new Dependency\Registry($request, $options);
 
         $descriptorPaths = new PathTable();
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Dependency;
 
+use Thesis\Protoc\Plugin\CompilerOptions;
 use Thesis\Protoc\Plugin\Naming;
 use Thesis\Protoc\Plugin\Parser;
 
@@ -21,9 +22,9 @@ final class Registry
     /** @var array<string, list<Index>> */
     private array $fileIndexes = [];
 
-    public function __construct(Parser\Request $request)
+    public function __construct(Parser\Request $request, CompilerOptions $options)
     {
-        $this->createIndex($request);
+        $this->createIndex($request, $options);
         $this->mergeIndex($request);
         $this->createDependencyGraph($request);
     }
@@ -33,7 +34,7 @@ final class Registry
         return $this->graph[$name] ?? throw new \RuntimeException("Graph for file {$name} does not exist.");
     }
 
-    private function createIndex(Parser\Request $request): void
+    private function createIndex(Parser\Request $request, CompilerOptions $options): void
     {
         foreach ($request->descriptors as $name => $descriptor) {
             $types = iterator_to_array(
@@ -50,7 +51,7 @@ final class Registry
             );
 
             $package = $descriptor->package ?? '.';
-            $namespace = $descriptor->options->phpNamespace ?? Naming::namespace($package);
+            $namespace = $options->phpNamespace ?? $descriptor->options->phpNamespace ?? Naming::namespace($package);
 
             $this->index[$name] = new Index(
                 $types,
