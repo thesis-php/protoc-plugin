@@ -6,6 +6,8 @@ namespace Thesis\Protoc;
 
 use Google\Protobuf\Compiler\CodeGeneratorRequest;
 use Google\Protobuf\Compiler\CodeGeneratorResponse;
+use Thesis\Protobuf\Decoder;
+use Thesis\Protobuf\Encoder;
 
 /**
  * @api
@@ -14,7 +16,8 @@ final readonly class Entrypoint
 {
     public function __construct(
         private Plugin\Compiler $compiler,
-        private ProtobufEncoder $protobuf,
+        private Encoder $encoder,
+        private Decoder $decoder,
     ) {}
 
     public function run(
@@ -22,7 +25,7 @@ final readonly class Entrypoint
         WriteOutput $output,
     ): void {
         try {
-            $request = $this->protobuf->decode(
+            $request = $this->decoder->decode(
                 $input->read(),
                 CodeGeneratorRequest::class,
             );
@@ -38,7 +41,7 @@ final readonly class Entrypoint
             );
         }
 
-        $buffer = $this->protobuf->encode($response);
+        $buffer = $this->encoder->encode($response);
 
         if ($buffer !== '') {
             $output->write($buffer);

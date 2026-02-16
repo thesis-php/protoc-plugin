@@ -11,6 +11,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Thesis\Package;
+use Thesis\Protobuf\Decoder;
+use Thesis\Protobuf\Encoder;
 use Thesis\Protoc\Plugin\Compiler;
 
 #[CoversClass(Compiler::class)]
@@ -25,11 +27,12 @@ final class CompilerTest extends TestCase
         $bytes = hex2bin($hex);
         self::assertIsString($bytes);
 
-        $protobuf = ProtobufEncoder::default();
+        $encoder = Encoder\Builder::buildDefault();
+        $decoder = Decoder\Builder::buildDefault();
 
-        $request = $protobuf->decode($bytes, CodeGeneratorRequest::class);
+        $request = $decoder->decode($bytes, CodeGeneratorRequest::class);
 
-        self::assertEquals($response, new Compiler($protobuf)->compile($request));
+        self::assertEquals($response, new Compiler($encoder)->compile($request));
     }
 
     /**

@@ -8,11 +8,11 @@ use BcMath\Number;
 use Google\Protobuf\Compiler\CodeGeneratorRequest;
 use Google\Protobuf\Compiler\CodeGeneratorResponse;
 use Thesis\Package;
+use Thesis\Protobuf\Encoder;
 use Thesis\Protoc\Exception\CodeCannotBeGenerated;
 use Thesis\Protoc\Plugin\Generator\FileFactory;
 use Thesis\Protoc\Plugin\Parser\FileDescriptor;
 use Thesis\Protoc\Plugin\Parser\MessageDescriptor;
-use Thesis\Protoc\ProtobufEncoder;
 use Thesis\Protoc\ProtocException;
 
 /**
@@ -27,7 +27,7 @@ final readonly class Compiler
     private Parser $parser;
 
     public function __construct(
-        private ProtobufEncoder $protobuf,
+        private Encoder $encoder,
     ) {
         $this->parser = new Parser();
     }
@@ -102,7 +102,7 @@ final readonly class Compiler
                 yield $generator->generateDescriptorMetadataRegistry(
                     $index,
                     $descriptorName,
-                    $this->protobuf->encode($proto->file),
+                    $this->encoder->encode($proto->file),
                 );
 
                 $descriptorPaths->addRelation("{$phpNamespace}\\{$descriptorName}", $path);
