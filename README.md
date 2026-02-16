@@ -9,8 +9,10 @@ For this reason, we have written this plugin, which — in addition to addressin
 ### Contents
 - [Usage](#usage)
 - [Plugin options](#plugin-options)
+  - [php_namespace](#php_namespace) 
   - [src_path](#src_path)
   - [grpc](#grpc)
+  - [multiple options](#multiple-options)
 - [Generated code guide](#generated-code-guide)
     - [numbers](#numbers)
     - [repeated](#repeated)
@@ -100,6 +102,16 @@ After generating the code, you must install the [thesis/protobuf](https://github
 
 To extend the plugin's behaviour, cli options are used.
 
+### `php_namespace`
+
+If you want to change the namespace under which the code will be generated, use the `php_namespace` option.
+```shell
+protoc \
+  --plugin=protoc-gen-php-plugin=/usr/local/bin/protoc-gen-php \
+  protos/*.proto \
+  --php-plugin_out=php_namespace="Thesis\\Api\\V1":src
+```
+
 ### `src_path`
 
 If you are generating code within an application, you most likely want to place it in the `genproto/` or `generated/` folder
@@ -137,6 +149,16 @@ protoc \
 ```
 
 To generate only the server code, use `grpc=server`. By default, and when passing `grpc=client,server`, both the client and server will be generated.
+
+### Multiple options
+
+You can pass multiple options separated by commas. For example, if you want to specify a different namespace, place all the code in the root directory, and generate only the `gRPC` client, you can write the following:
+```shell
+protoc \
+  --plugin=protoc-gen-php-plugin=/usr/local/bin/protoc-gen-php \
+  protos/*.proto \
+  --php-plugin_out=php_namespace="Thesis\\Api\\V1",src_path=.,grpc=client:genproto
+```
 
 ### Generated code guide
 
