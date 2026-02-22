@@ -351,6 +351,8 @@ namespace Thesis\Api\V1;
 use Amp\Cancellation;
 use Amp\NullCancellation;
 use Thesis\Grpc\Client;
+use Thesis\Grpc\Exception\ClientStreamIsClosed;
+use Thesis\Grpc\InvokeError;
 use Thesis\Grpc\Metadata;
 
 /**
@@ -473,18 +475,22 @@ final readonly class QueueServiceServerRegistry implements Server\ServiceRegistr
             new Server\Rpc(
                 new Server\Handle('State', \Google\Protobuf\Empty_::class),
                 new Server\UnaryHandler($this->server->state(...)),
+                Server\RpcType::Unary,
             ),
             new Server\Rpc(
                 new Server\Handle('Push', \Thesis\Api\V1\Message::class),
                 new Server\ClientStreamHandler($this->server->push(...)),
+                Server\RpcType::ClientStream,
             ),
             new Server\Rpc(
                 new Server\Handle('Pull', \Google\Protobuf\Empty_::class),
                 new Server\ServerStreamHandler($this->server->pull(...)),
+                Server\RpcType::ServerStream,
             ),
             new Server\Rpc(
                 new Server\Handle('Heartbeats', \Thesis\Api\V1\Heartbeat::class),
                 new Server\BidirectionalStreamHandler($this->server->heartbeats(...)),
+                Server\RpcType::BidirectionalStream,
             ),
         ]);
     }

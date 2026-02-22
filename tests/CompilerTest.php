@@ -1492,6 +1492,8 @@ namespace Thesis\Auth\V1;
 use Amp\Cancellation;
 use Amp\NullCancellation;
 use Thesis\Grpc\Client;
+use Thesis\Grpc\Exception\ClientStreamIsClosed;
+use Thesis\Grpc\InvokeError;
 use Thesis\Grpc\Metadata;
 
 /**
@@ -1503,6 +1505,10 @@ final readonly class AuthServiceClient
         private Client $client,
     ) {}
 
+    /**
+     * @throws ClientStreamIsClosed
+     * @throws InvokeError
+     */
     public function login(
         \Thesis\Auth\LoginRequest $request,
         Metadata $md = new Metadata(),
@@ -1577,6 +1583,7 @@ final readonly class AuthServiceServerRegistry implements Server\ServiceRegistry
             new Server\Rpc(
                 new Server\Handle('Login', \Thesis\Auth\LoginRequest::class),
                 new Server\UnaryHandler($this->server->login(...)),
+                Server\RpcType::Unary,
             ),
         ]);
     }
@@ -1750,14 +1757,17 @@ final readonly class QueueServiceServerRegistry implements Server\ServiceRegistr
             new Server\Rpc(
                 new Server\Handle('Push', \Thesis\Queue\PushRequest\Message::class),
                 new Server\ClientStreamHandler($this->server->push(...)),
+                Server\RpcType::ClientStream,
             ),
             new Server\Rpc(
                 new Server\Handle('Pull', \Thesis\Queue\PullRequest::class),
                 new Server\ServerStreamHandler($this->server->pull(...)),
+                Server\RpcType::ServerStream,
             ),
             new Server\Rpc(
                 new Server\Handle('Heartbeat', \Thesis\Queue\Heartbeat\FromClient\Ping::class),
                 new Server\BidirectionalStreamHandler($this->server->heartbeat(...)),
+                Server\RpcType::BidirectionalStream,
             ),
         ]);
     }

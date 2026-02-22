@@ -94,6 +94,9 @@ final readonly class GrpcGenerator
             $phpdocPrefix = ($method->comment !== null ? "\n" : '');
 
             if (!$method->clientStreaming && !$method->serverStreaming) {
+                $namespace->addUse('Thesis\Grpc\Exception\ClientStreamIsClosed');
+                $namespace->addUse('Thesis\Grpc\InvokeError');
+
                 $classMethod
                     ->setBody(
                         <<<'PHP'
@@ -112,7 +115,9 @@ return $this->client->invoke(
 PHP,
                         $methodBodyParameters,
                     )
-                    ->setReturnType($out->fqcn);
+                    ->setReturnType($out->fqcn)
+                    ->addComment('@throws ClientStreamIsClosed')
+                    ->addComment('@throws InvokeError');
             } elseif ($method->clientStreaming && !$method->serverStreaming) {
                 $classMethod
                     ->setBody(
@@ -305,6 +310,7 @@ PHP,
     new Server\Rpc(
         new Server\Handle(?, ?::class),
         new Server\UnaryHandler($this->server->?(...)),
+        Server\RpcType::Unary,
     )
 PHP,
                     $args,
@@ -315,6 +321,7 @@ PHP,
     new Server\Rpc(
         new Server\Handle(?, ?::class),
         new Server\ClientStreamHandler($this->server->?(...)),
+        Server\RpcType::ClientStream,
     )
 PHP,
                     $args,
@@ -325,6 +332,7 @@ PHP,
     new Server\Rpc(
         new Server\Handle(?, ?::class),
         new Server\ServerStreamHandler($this->server->?(...)),
+        Server\RpcType::ServerStream,
     )
 PHP,
                     $args,
@@ -335,6 +343,7 @@ PHP,
     new Server\Rpc(
         new Server\Handle(?, ?::class),
         new Server\BidirectionalStreamHandler($this->server->?(...)),
+        Server\RpcType::BidirectionalStream,
     )
 PHP,
                     $args,
