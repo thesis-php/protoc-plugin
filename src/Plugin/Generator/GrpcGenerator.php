@@ -248,7 +248,7 @@ PHP,
                         new Parameter('md')->setType('Metadata'),
                         new Parameter('cancellation')->setType('Cancellation'),
                     ])
-                    ->setReturnType('void')
+                    ->setReturnType($out->fqcn)
                     ->addComment("{$phpdocPrefix}@param Server\\ClientStreamChannel<{$in->fqcn}, {$out->fqcn}> \$stream");
             } elseif (!$method->clientStreaming && $method->serverStreaming) {
                 $interfaceMethod

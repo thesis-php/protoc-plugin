@@ -429,7 +429,11 @@ interface QueueServiceServer
     /**
      * @param Server\ClientStreamChannel<\Thesis\Api\V1\Message, \Google\Protobuf\Empty_> $stream
      */
-    public function push(Server\ClientStreamChannel $stream, Metadata $md, Cancellation $cancellation): void;
+    public function push(
+        Server\ClientStreamChannel $stream,
+        Metadata $md,
+        Cancellation $cancellation,
+    ): \Google\Protobuf\Empty_;
 
     /**
      * @param Server\ServerStreamChannel<\Google\Protobuf\Empty_, \Thesis\Api\V1\Message> $stream
