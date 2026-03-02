@@ -8,6 +8,7 @@ For this reason, we have written this plugin, which — in addition to addressin
 
 ### Contents
 - [Usage](#usage)
+- [Docker image](#docker-image)
 - [Plugin options](#plugin-options)
   - [php_namespace](#php_namespace) 
   - [src_path](#src_path)
