@@ -106,7 +106,7 @@ As an alternative to installing `protoc` and the plugin manually, you can use th
 ```sh
 docker run --rm \
     --user $(id -u):$(id -g) \
-    -v $(pwd):/workspace \
+    -v $(PWD):/workspace \
     -w /workspace \
     ghcr.io/thesis-php/protoc-plugin:0.1.10 \
     protos/*.proto \
