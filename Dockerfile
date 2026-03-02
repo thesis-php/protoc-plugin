@@ -12,4 +12,10 @@ RUN curl -L "https://github.com/thesis-php/protoc-plugin/releases/download/${PRO
     -o /usr/local/bin/protoc-gen-php \
     && chmod +x /usr/local/bin/protoc-gen-php
 
+FROM ghcr.io/phpyh/php:8.4
+
+COPY --from=protoc /usr/local/bin/protoc /usr/local/bin/protoc
+COPY --from=protoc /usr/local/include /usr/local/include
+COPY --from=protoc /usr/local/bin/protoc-gen-php /usr/local/bin/protoc-gen-php
+
 ENTRYPOINT ["protoc", "--plugin=protoc-gen-php-plugin=/usr/local/bin/protoc-gen-php"]
