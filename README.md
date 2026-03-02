@@ -99,6 +99,23 @@ final readonly class Request
 
 After generating the code, you must install the [thesis/protobuf](https://github.com/thesis-php/protobuf) library, if you haven't done so already, which is responsible for serializing and deserializing protobuf messages.
 
+### Docker image
+
+As an alternative to installing `protoc` and the plugin manually, you can use the pre-built Docker image that ships with both:
+```sh
+docker run --rm \
+    --user $(id -u):$(id -g) \
+    -v $(pwd):/workspace \
+    -w /workspace \
+    ghcr.io/thesis-php/protoc-plugin:0.1.10 \
+    protos/*.proto \
+    --php-plugin_out=genproto
+```
+
+The image behaves exactly like the `protoc` binary — all the same options and flags apply. The `--user` flag ensures that generated files are owned by the current host user rather than root.
+
+Replace `0.1.10` with the desired version, or use `latest` to always pull the most recent release.
+
 ### Plugin options
 
 To extend the plugin's behaviour, cli options are used.
