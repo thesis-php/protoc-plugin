@@ -254,12 +254,11 @@ PHP,
                 $interfaceMethod
                     ->setParameters([
                         new Parameter('request')->setType($in->fqcn),
-                        new Parameter('stream')->setType('Server\ServerStreamChannel'),
                         new Parameter('md')->setType('Metadata'),
                         new Parameter('cancellation')->setType('Cancellation'),
                     ])
-                    ->setReturnType('void')
-                    ->addComment("{$phpdocPrefix}@param Server\\ServerStreamChannel<{$in->fqcn}, {$out->fqcn}> \$stream");
+                    ->setReturnType('iterable')
+                    ->addComment("@return iterable<array-key, {$out->fqcn}>");
             } else {
                 $interfaceMethod
                     ->setParameters([
