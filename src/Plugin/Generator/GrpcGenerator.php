@@ -212,7 +212,7 @@ PHP,
 
         $useStreaming = array_any(
             $service->methods,
-            static fn(Parser\ServiceMethodDescriptor $method) => $method->clientStreaming || $method->serverStreaming,
+            static fn(Parser\ServiceMethodDescriptor $method) => $method->clientStreaming || $method->bidirectionalStreaming,
         );
 
         if ($useStreaming) {
