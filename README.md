@@ -454,14 +454,13 @@ interface QueueServiceServer
     ): \Google\Protobuf\Empty_;
 
     /**
-     * @param Server\ServerStreamChannel<\Google\Protobuf\Empty_, \Thesis\Api\V1\Message> $stream
+     * @return iterable<array-key, \Thesis\Api\V1\Message>
      */
     public function pull(
         \Google\Protobuf\Empty_ $request,
-        Server\ServerStreamChannel $stream,
         Metadata $md,
         Cancellation $cancellation,
-    ): void;
+    ): iterable;
 
     /**
      * @param Server\BidirectionalStreamChannel<\Thesis\Api\V1\Heartbeat, \Thesis\Api\V1\Heartbeat> $stream

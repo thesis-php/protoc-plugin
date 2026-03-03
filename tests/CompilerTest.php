@@ -1713,14 +1713,9 @@ interface QueueServiceServer
     ): \Google\Protobuf\Empty_;
 
     /**
-     * @param Server\ServerStreamChannel<\Thesis\Queue\PullRequest, \Thesis\Queue\PullRequest\Message> $stream
+     * @return iterable<array-key, \Thesis\Queue\PullRequest\Message>
      */
-    public function pull(
-        \Thesis\Queue\PullRequest $request,
-        Server\ServerStreamChannel $stream,
-        Metadata $md,
-        Cancellation $cancellation,
-    ): void;
+    public function pull(\Thesis\Queue\PullRequest $request, Metadata $md, Cancellation $cancellation): iterable;
 
     /**
      * @param Server\BidirectionalStreamChannel<\Thesis\Queue\Heartbeat\FromClient\Ping, \Thesis\Queue\Heartbeat\FromServer\Ping> $stream
