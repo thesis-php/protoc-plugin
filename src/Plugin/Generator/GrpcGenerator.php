@@ -258,7 +258,7 @@ PHP,
                         new Parameter('cancellation')->setType('Cancellation'),
                     ])
                     ->setReturnType('iterable')
-                    ->addComment("@return iterable<array-key, {$out->fqcn}>");
+                    ->addComment("{$phpdocPrefix}@return iterable<array-key, {$out->fqcn}>");
             } else {
                 $interfaceMethod
                     ->setParameters([
