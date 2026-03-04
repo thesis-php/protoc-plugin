@@ -7,6 +7,7 @@ namespace Thesis\Protoc;
 use BcMath\Number;
 use Google\Protobuf\Compiler\CodeGeneratorRequest;
 use Google\Protobuf\Compiler\CodeGeneratorResponse;
+use Google\Protobuf\Edition;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -44,6 +45,8 @@ final class CompilerTest extends TestCase
             'proto2/test.txt',
             new CodeGeneratorResponse(
                 supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
+                minimumEdition: Edition::EDITION_2023->value,
+                maximumEdition: Edition::EDITION_2024->value,
                 file: [
                     new CodeGeneratorResponse\File(
                         name: 'Proto/Api/V1/Foo.php',
@@ -712,6 +715,8 @@ PHP,
             'php_namespace/php_namespace.txt',
             new CodeGeneratorResponse(
                 supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
+                minimumEdition: Edition::EDITION_2023->value,
+                maximumEdition: Edition::EDITION_2024->value,
                 file: [
                     new CodeGeneratorResponse\File(
                         name: 'Thesis/Api/V1/TestRequest.php',
@@ -776,6 +781,8 @@ PHP,
             'snake_case/snake_case.txt',
             new CodeGeneratorResponse(
                 supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
+                minimumEdition: Edition::EDITION_2023->value,
+                maximumEdition: Edition::EDITION_2024->value,
                 file: [
                     new CodeGeneratorResponse\File(
                         name: 'Proto/Api/V1/Foo.php',
@@ -1127,6 +1134,8 @@ PHP,
             'reserved_names/reserved_names.txt',
             new CodeGeneratorResponse(
                 supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
+                minimumEdition: Edition::EDITION_2023->value,
+                maximumEdition: Edition::EDITION_2024->value,
                 file: [
                     new CodeGeneratorResponse\File(
                         name: 'ReservedTypes/NotAllowed.php',
@@ -1340,6 +1349,8 @@ PHP,
             'proto3/test.txt',
             new CodeGeneratorResponse(
                 supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
+                minimumEdition: Edition::EDITION_2023->value,
+                maximumEdition: Edition::EDITION_2024->value,
                 file: [
                     new CodeGeneratorResponse\File(
                         name: 'Proto/Api/V1/TestRequest.php',
@@ -1481,6 +1492,8 @@ PHP,
             'grpc/test.txt',
             new CodeGeneratorResponse(
                 supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
+                minimumEdition: Edition::EDITION_2023->value,
+                maximumEdition: Edition::EDITION_2024->value,
                 file: [
                     new CodeGeneratorResponse\File(
                         name: 'Thesis/Auth/V1/AuthServiceClient.php',
@@ -2058,6 +2071,95 @@ PHP,
 \Thesis\Protobuf\Pool\Registry::get()->register(
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Auth\ProtosAuthDescriptorRegistry()),
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Queue\ProtosQueueDescriptorRegistry()),
+);
+
+PHP,
+                        ),
+                    ),
+                ],
+            ),
+        ];
+
+        yield [
+            'editions/test.txt',
+            new CodeGeneratorResponse(
+                supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
+                minimumEdition: Edition::EDITION_2023->value,
+                maximumEdition: Edition::EDITION_2024->value,
+                file: [
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/EditionsFeatures.php',
+                        content: self::phpContent(
+                            'editions/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1;
+
+use Thesis\Protobuf\Reflection;
+
+/**
+ * @api
+ */
+final readonly class EditionsFeatures
+{
+    /**
+     * @param list<int> $packed
+     * @param list<int> $expanded
+     * @param list<int> $defaultEncoding
+     */
+    public function __construct(
+        #[Reflection\Field(1, Reflection\StringT::T)]
+        public string $implicit = '',
+        #[Reflection\Field(2, Reflection\StringT::T)]
+        public ?string $explicit = null,
+        #[Reflection\Field(3, Reflection\StringT::T)]
+        public string $defaultPresence = '',
+        #[Reflection\Field(4, new Reflection\ListT(Reflection\Int32T::T, true))]
+        public array $packed = [],
+        #[Reflection\Field(5, new Reflection\ListT(Reflection\Int32T::T, false))]
+        public array $expanded = [],
+        #[Reflection\Field(6, new Reflection\ListT(Reflection\Int32T::T, true))]
+        public array $defaultEncoding = [],
+    ) {}
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/EditionsTestDescriptorRegistry.php',
+                        content: self::phpContent(
+                            'editions/test.proto',
+                            <<<'PHP'
+namespace Proto\Api\V1;
+
+use Override;
+use Thesis\Protobuf\Pool;
+
+/**
+ * @api
+ */
+final readonly class EditionsTestDescriptorRegistry implements Pool\Registrar
+{
+    private const string DESCRIPTOR_BUFFER = 'ChNlZGl0aW9ucy90ZXN0LnByb3RvEgxwcm90by5hcGkudjEi8AEKEEVkaXRpb25zRmVhdHVyZXMSIQoIaW1wbGljaXQYASABKAlSCGltcGxpY2l0QgWqAQIIAhIhCghleHBsaWNpdBgCIAEoCVIIZXhwbGljaXRCBaoBAggBEikKEGRlZmF1bHRfcHJlc2VuY2UYAyABKAlSD2RlZmF1bHRQcmVzZW5jZRIdCgZwYWNrZWQYBCADKAVSBnBhY2tlZEIFqgECGAESIQoIZXhwYW5kZWQYBSADKAVSCGV4cGFuZGVkQgWqAQIYAhIpChBkZWZhdWx0X2VuY29kaW5nGAYgAygFUg9kZWZhdWx0RW5jb2RpbmdKoAQKBhIEAAALAQoICgEMEgMAABEKCAoBAhIDAgAVCgoKAgQAEgQEAAsBCgoKAwQAARIDBAgYCgsKBAQAAgASAwUEPQoMCgUEAAIABRIDBQQKCgwKBQQAAgABEgMFCxMKDAoFBAACAAMSAwUWFwoMCgUEAAIACBIDBRg8Cg4KBwQAAgAIFQESAwUZOwoLCgQEAAIBEgMGBD0KDAoFBAACAQUSAwYECgoMCgUEAAIBARIDBgsTCgwKBQQAAgEDEgMGFhcKDAoFBAACAQgSAwYYPAoOCgcEAAIBCBUBEgMGGTsKCwoEBAACAhIDBwQgCgwKBQQAAgIFEgMHBAoKDAoFBAACAgESAwcLGwoMCgUEAAICAxIDBx4fCgsKBAQAAgMSAwgESgoMCgUEAAIDBBIDCAQMCgwKBQQAAgMFEgMIDRIKDAoFBAACAwESAwgTGQoMCgUEAAIDAxIDCBwdCgwKBQQAAgMIEgMIHkkKDgoHBAACAwgVAxIDCB9ICgsKBAQAAgQSAwkETgoMCgUEAAIEBBIDCQQMCgwKBQQAAgQFEgMJDRIKDAoFBAACBAESAwkTGwoMCgUEAAIEAxIDCR4fCgwKBQQAAgQIEgMJIE0KDgoHBAACBAgVAxIDCSFMCgsKBAQAAgUSAwoEKAoMCgUEAAIFBBIDCgQMCgwKBQQAAgUFEgMKDRIKDAoFBAACBQESAwoTIwoMCgUEAAIFAxIDCiYnYghlZGl0aW9uc3DoBw==';
+
+    #[Override]
+    public function register(Pool\Registry $pool): void
+    {
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
+            'proto.api.v1.EditionsFeatures' => new Pool\MessageMetadata(\Proto\Api\V1\EditionsFeatures::class),
+        ]);
+    }
+}
+
+PHP,
+                        ),
+                    ),
+                    new CodeGeneratorResponse\File(
+                        name: 'Proto/Api/V1/autoload.metadata.php',
+                        content: self::autoloadContent(
+                            <<<'PHP'
+\Thesis\Protobuf\Pool\Registry::get()->register(
+    new \Thesis\Protobuf\Pool\OnceRegistrar(new \Proto\Api\V1\EditionsTestDescriptorRegistry()),
 );
 
 PHP,

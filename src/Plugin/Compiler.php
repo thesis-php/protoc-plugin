@@ -7,6 +7,7 @@ namespace Thesis\Protoc\Plugin;
 use BcMath\Number;
 use Google\Protobuf\Compiler\CodeGeneratorRequest;
 use Google\Protobuf\Compiler\CodeGeneratorResponse;
+use Google\Protobuf\Edition;
 use Thesis\Package;
 use Thesis\Protobuf\Encoder;
 use Thesis\Protoc\Exception\CodeCannotBeGenerated;
@@ -44,6 +45,8 @@ final readonly class Compiler
 
         return new CodeGeneratorResponse(
             supportedFeatures: new Number(self::SUPPORTED_FEATURES),
+            minimumEdition: Edition::EDITION_2023->value,
+            maximumEdition: Edition::EDITION_2024->value,
             file: iterator_to_array($files, false),
         );
     }
@@ -78,6 +81,7 @@ final readonly class Compiler
                 index: $index,
                 package: $proto->package,
                 syntax: $proto->syntax,
+                edition: $proto->file->edition,
             );
 
             foreach ($proto->services as $service) {

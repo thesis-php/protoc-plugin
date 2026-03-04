@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thesis\Protoc\Plugin;
 
 use Google\Protobuf\Compiler\CodeGeneratorResponse;
+use Google\Protobuf\Edition;
 use Thesis\Protoc\Plugin\Generator\FileFactory;
 
 /**
@@ -25,6 +26,7 @@ final readonly class ClassLikeGenerator
         NameIndex $index,
         ?string $package = null,
         ?string $syntax = null,
+        ?Edition $edition = null,
     ) {
         $namespacer = new Generator\PhpNamespacer($namespace);
         $this->grpc = new Generator\GrpcGenerator(
@@ -37,6 +39,7 @@ final readonly class ClassLikeGenerator
             $index,
             $namespacer,
             $syntax,
+            $edition,
         );
         $this->metadata = new Generator\DescriptorMetadataRegistryGenerator(
             $namespacer,

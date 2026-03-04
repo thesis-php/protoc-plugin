@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Generator;
 
+use Google\Protobuf\Edition;
+use Google\Protobuf\FeatureSet;
 use Google\Protobuf\FieldDescriptorProto;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\EnumCase;
@@ -28,6 +30,7 @@ final readonly class ProtoGenerator
         private NameIndex $index,
         private PhpNamespacer $namespacer,
         private ?string $syntax = null,
+        private ?Edition $edition = null,
     ) {
         $this->types = new TypeDeclarationFactory($graph);
     }
@@ -127,6 +130,8 @@ final readonly class ProtoGenerator
                 continue;
             }
 
+            $features = $field->options?->features;
+
             $parameter = $constructor->addPromotedParameter(Naming::camelCase($field->name));
 
             $type = null;
@@ -154,7 +159,11 @@ final readonly class ProtoGenerator
 
             $repeated = $field->label === FieldDescriptorProto\Label::LABEL_REPEATED && !$type->isMap;
 
-            $nullable = ($type->nullable || $field->optional) && !$repeated;
+            $presence = $this->edition !== null
+                ? $features?->fieldPresence === FeatureSet\FieldPresence::EXPLICIT
+                : $field->optional;
+
+            $nullable = ($type->nullable || $presence) && !$repeated;
 
             $phpType = ($nullable ? '?' : '') . ($repeated ? 'array' : $type->phpType);
 
@@ -166,6 +175,9 @@ final readonly class ProtoGenerator
                 // In proto2 all repeated fields are non-packed by default unless explicitly marked with [packed = true].
                 if ($this->syntax === null) {
                     $parameters[] = $field->options?->packed === true;
+                } elseif ($this->edition !== null) {
+                    // In editions, PACKED is the default for eligible types unless explicitly set to EXPANDED.
+                    $parameters[] = $features?->repeatedFieldEncoding === null || $features->repeatedFieldEncoding === FeatureSet\RepeatedFieldEncoding::PACKED;
                 }
 
                 $reflectionType = Literal::new('Reflection\ListT', $parameters);
