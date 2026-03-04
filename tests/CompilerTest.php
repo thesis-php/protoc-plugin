@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc;
 
-use BcMath\Number;
 use Google\Protobuf\Compiler\CodeGeneratorRequest;
 use Google\Protobuf\Compiler\CodeGeneratorResponse;
-use Google\Protobuf\Edition;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -19,8 +17,11 @@ use Thesis\Protoc\Plugin\Compiler;
 #[CoversClass(Compiler::class)]
 final class CompilerTest extends TestCase
 {
+    /**
+     * @param list<CodeGeneratorResponse\File> $files
+     */
     #[DataProvider('provideCompileCases')]
-    public function testCompile(string $file, CodeGeneratorResponse $response): void
+    public function testCompile(string $file, array $files): void
     {
         $hex = file_get_contents(__DIR__ . "/testdata/{$file}");
         self::assertIsString($hex);
@@ -33,26 +34,23 @@ final class CompilerTest extends TestCase
 
         $request = $decoder->decode($bytes, CodeGeneratorRequest::class);
 
-        self::assertEquals($response, new Compiler($encoder)->compile($request));
+        $compiled = new Compiler($encoder)->compile($request);
+        self::assertEquals($files, new Compiler($encoder)->compile($request));
     }
 
     /**
-     * @return iterable<array{non-empty-string, CodeGeneratorResponse}>
+     * @return iterable<array{non-empty-string, list<CodeGeneratorResponse\File>}>
      */
     public static function provideCompileCases(): iterable
     {
         yield [
             'proto2/test.txt',
-            new CodeGeneratorResponse(
-                supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
-                minimumEdition: Edition::EDITION_2023->value,
-                maximumEdition: Edition::EDITION_2024->value,
-                file: [
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/Foo.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+            [
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/Foo.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1;
 
 /**
@@ -69,13 +67,13 @@ enum Foo: int
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1;
 
 use Thesis\Protobuf;
@@ -302,13 +300,13 @@ final readonly class TestRequest
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/XFieldNumber.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/XFieldNumber.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -325,13 +323,13 @@ final readonly class XFieldNumber implements \Proto\Api\V1\TestRequest\XField
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/XFieldName.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/XFieldName.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -348,13 +346,13 @@ final readonly class XFieldName implements \Proto\Api\V1\TestRequest\XField
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/XFieldData.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/XFieldData.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -371,13 +369,13 @@ final readonly class XFieldData implements \Proto\Api\V1\TestRequest\XField
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/XFieldTempC.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/XFieldTempC.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -394,13 +392,13 @@ final readonly class XFieldTempC implements \Proto\Api\V1\TestRequest\XField
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/XFieldCol.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/XFieldCol.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -417,13 +415,13 @@ final readonly class XFieldCol implements \Proto\Api\V1\TestRequest\XField
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/XFieldDeepEnum.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/XFieldDeepEnum.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -440,13 +438,13 @@ final readonly class XFieldDeepEnum implements \Proto\Api\V1\TestRequest\XField
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/XField.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/XField.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 /**
@@ -463,13 +461,13 @@ namespace Proto\Api\V1\TestRequest;
 interface XField {}
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/Kind.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/Kind.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 /**
@@ -487,13 +485,13 @@ enum Kind: int
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/Nested.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/Nested.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -519,13 +517,13 @@ final readonly class Nested
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/Nested/Deep.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/Nested/Deep.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest\Nested;
 
 use Thesis\Protobuf\Reflection;
@@ -546,13 +544,13 @@ final readonly class Deep
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/Nested/Deep/UnionPhone.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/Nested/Deep/UnionPhone.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest\Nested\Deep;
 
 use Thesis\Protobuf\Reflection;
@@ -569,13 +567,13 @@ final readonly class UnionPhone implements \Proto\Api\V1\TestRequest\Nested\Deep
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/Nested/Deep/UnionEmail.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/Nested/Deep/UnionEmail.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest\Nested\Deep;
 
 use Thesis\Protobuf\Reflection;
@@ -592,13 +590,13 @@ final readonly class UnionEmail implements \Proto\Api\V1\TestRequest\Nested\Deep
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/Nested/Deep/Union.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/Nested/Deep/Union.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest\Nested\Deep;
 
 /**
@@ -611,13 +609,13 @@ namespace Proto\Api\V1\TestRequest\Nested\Deep;
 interface Union {}
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/Nested/Deep/DeepEnum.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/Nested/Deep/DeepEnum.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest\Nested\Deep;
 
 /**
@@ -630,13 +628,13 @@ enum DeepEnum: int
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/AnotherRequest.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/AnotherRequest.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1;
 
 use Thesis\Protobuf\Reflection;
@@ -659,13 +657,13 @@ final readonly class AnotherRequest
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/Proto2TestDescriptorRegistry.php',
-                        content: self::phpContent(
-                            'proto2/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/Proto2TestDescriptorRegistry.php',
+                    content: self::phpContent(
+                        'proto2/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1;
 
 use Override;
@@ -694,35 +692,30 @@ final readonly class Proto2TestDescriptorRegistry implements Pool\Registrar
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/autoload.metadata.php',
-                        content: self::autoloadContent(
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/autoload.metadata.php',
+                    content: self::autoloadContent(
+                        <<<'PHP'
 \Thesis\Protobuf\Pool\Registry::get()->register(
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \Proto\Api\V1\Proto2TestDescriptorRegistry()),
 );
 
 PHP,
-                        ),
                     ),
-                ],
-            ),
+                ),
+            ],
         ];
 
         yield [
             'php_namespace/php_namespace.txt',
-            new CodeGeneratorResponse(
-                supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
-                minimumEdition: Edition::EDITION_2023->value,
-                maximumEdition: Edition::EDITION_2024->value,
-                file: [
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Api/V1/TestRequest.php',
-                        content: self::phpContent(
-                            source: 'php_namespace/php_namespace.proto',
-                            content: <<<'PHP'
+            [
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Api/V1/TestRequest.php',
+                    content: self::phpContent(
+                        source: 'php_namespace/php_namespace.proto',
+                        content: <<<'PHP'
 namespace Thesis\Api\V1;
 
 /**
@@ -731,13 +724,13 @@ namespace Thesis\Api\V1;
 final readonly class TestRequest {}
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Api/V1/PhpNamespacePhpNamespaceDescriptorRegistry.php',
-                        content: self::phpContent(
-                            source: 'php_namespace/php_namespace.proto',
-                            content: <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Api/V1/PhpNamespacePhpNamespaceDescriptorRegistry.php',
+                    content: self::phpContent(
+                        source: 'php_namespace/php_namespace.proto',
+                        content: <<<'PHP'
 namespace Thesis\Api\V1;
 
 use Override;
@@ -760,35 +753,30 @@ final readonly class PhpNamespacePhpNamespaceDescriptorRegistry implements Pool\
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Api/V1/autoload.metadata.php',
-                        content: self::autoloadContent(
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Api/V1/autoload.metadata.php',
+                    content: self::autoloadContent(
+                        <<<'PHP'
 \Thesis\Protobuf\Pool\Registry::get()->register(
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Api\V1\PhpNamespacePhpNamespaceDescriptorRegistry()),
 );
 
 PHP,
-                        ),
                     ),
-                ],
-            ),
+                ),
+            ],
         ];
 
         yield [
             'snake_case/snake_case.txt',
-            new CodeGeneratorResponse(
-                supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
-                minimumEdition: Edition::EDITION_2023->value,
-                maximumEdition: Edition::EDITION_2024->value,
-                file: [
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/Foo.php',
-                        content: self::phpContent(
-                            'snake_case/snake_case.proto',
-                            <<<'PHP'
+            [
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/Foo.php',
+                    content: self::phpContent(
+                        'snake_case/snake_case.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1;
 
 /**
@@ -800,13 +788,13 @@ enum Foo: int
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest.php',
-                        content: self::phpContent(
-                            'snake_case/snake_case.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest.php',
+                    content: self::phpContent(
+                        'snake_case/snake_case.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1;
 
 use Thesis\Protobuf\Reflection;
@@ -831,13 +819,13 @@ final readonly class TestRequest
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/XFieldNumber.php',
-                        content: self::phpContent(
-                            'snake_case/snake_case.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/XFieldNumber.php',
+                    content: self::phpContent(
+                        'snake_case/snake_case.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -854,13 +842,13 @@ final readonly class XFieldNumber implements \Proto\Api\V1\TestRequest\XField
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/XFieldCol.php',
-                        content: self::phpContent(
-                            'snake_case/snake_case.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/XFieldCol.php',
+                    content: self::phpContent(
+                        'snake_case/snake_case.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -877,13 +865,13 @@ final readonly class XFieldCol implements \Proto\Api\V1\TestRequest\XField
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/XFieldDeepEnum.php',
-                        content: self::phpContent(
-                            'snake_case/snake_case.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/XFieldDeepEnum.php',
+                    content: self::phpContent(
+                        'snake_case/snake_case.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -900,13 +888,13 @@ final readonly class XFieldDeepEnum implements \Proto\Api\V1\TestRequest\XField
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/XField.php',
-                        content: self::phpContent(
-                            'snake_case/snake_case.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/XField.php',
+                    content: self::phpContent(
+                        'snake_case/snake_case.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 /**
@@ -920,13 +908,13 @@ namespace Proto\Api\V1\TestRequest;
 interface XField {}
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/NestedMessage.php',
-                        content: self::phpContent(
-                            'snake_case/snake_case.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/NestedMessage.php',
+                    content: self::phpContent(
+                        'snake_case/snake_case.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -943,13 +931,13 @@ final readonly class NestedMessage
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep.php',
-                        content: self::phpContent(
-                            'snake_case/snake_case.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep.php',
+                    content: self::phpContent(
+                        'snake_case/snake_case.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest\NestedMessage;
 
 use Thesis\Protobuf\Reflection;
@@ -971,13 +959,13 @@ final readonly class Deep
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep/UnionPhone.php',
-                        content: self::phpContent(
-                            'snake_case/snake_case.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep/UnionPhone.php',
+                    content: self::phpContent(
+                        'snake_case/snake_case.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest\NestedMessage\Deep;
 
 use Thesis\Protobuf\Reflection;
@@ -994,13 +982,13 @@ final readonly class UnionPhone implements \Proto\Api\V1\TestRequest\NestedMessa
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep/UnionEmail.php',
-                        content: self::phpContent(
-                            'snake_case/snake_case.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep/UnionEmail.php',
+                    content: self::phpContent(
+                        'snake_case/snake_case.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest\NestedMessage\Deep;
 
 use Thesis\Protobuf\Reflection;
@@ -1017,13 +1005,13 @@ final readonly class UnionEmail implements \Proto\Api\V1\TestRequest\NestedMessa
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep/Union.php',
-                        content: self::phpContent(
-                            'snake_case/snake_case.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep/Union.php',
+                    content: self::phpContent(
+                        'snake_case/snake_case.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest\NestedMessage\Deep;
 
 /**
@@ -1036,13 +1024,13 @@ namespace Proto\Api\V1\TestRequest\NestedMessage\Deep;
 interface Union {}
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep/DeepEnum.php',
-                        content: self::phpContent(
-                            'snake_case/snake_case.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/NestedMessage/Deep/DeepEnum.php',
+                    content: self::phpContent(
+                        'snake_case/snake_case.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest\NestedMessage\Deep;
 
 /**
@@ -1054,13 +1042,13 @@ enum DeepEnum: int
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/AnotherRequest.php',
-                        content: self::phpContent(
-                            'snake_case/snake_case.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/AnotherRequest.php',
+                    content: self::phpContent(
+                        'snake_case/snake_case.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1;
 
 use Thesis\Protobuf\Reflection;
@@ -1079,13 +1067,13 @@ final readonly class AnotherRequest
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/SnakeCaseSnakeCaseDescriptorRegistry.php',
-                        content: self::phpContent(
-                            'snake_case/snake_case.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/SnakeCaseSnakeCaseDescriptorRegistry.php',
+                    content: self::phpContent(
+                        'snake_case/snake_case.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1;
 
 use Override;
@@ -1113,35 +1101,30 @@ final readonly class SnakeCaseSnakeCaseDescriptorRegistry implements Pool\Regist
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/autoload.metadata.php',
-                        content: self::autoloadContent(
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/autoload.metadata.php',
+                    content: self::autoloadContent(
+                        <<<'PHP'
 \Thesis\Protobuf\Pool\Registry::get()->register(
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \Proto\Api\V1\SnakeCaseSnakeCaseDescriptorRegistry()),
 );
 
 PHP,
-                        ),
                     ),
-                ],
-            ),
+                ),
+            ],
         ];
 
         yield [
             'reserved_names/reserved_names.txt',
-            new CodeGeneratorResponse(
-                supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
-                minimumEdition: Edition::EDITION_2023->value,
-                maximumEdition: Edition::EDITION_2024->value,
-                file: [
-                    new CodeGeneratorResponse\File(
-                        name: 'ReservedTypes/NotAllowed.php',
-                        content: self::phpContent(
-                            'reserved_names/reserved_names.proto',
-                            <<<'PHP'
+            [
+                new CodeGeneratorResponse\File(
+                    name: 'ReservedTypes/NotAllowed.php',
+                    content: self::phpContent(
+                        'reserved_names/reserved_names.proto',
+                        <<<'PHP'
 namespace ReservedTypes;
 
 /**
@@ -1157,13 +1140,13 @@ enum NotAllowed: int
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'ReservedTypes/String_.php',
-                        content: self::phpContent(
-                            'reserved_names/reserved_names.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'ReservedTypes/String_.php',
+                    content: self::phpContent(
+                        'reserved_names/reserved_names.proto',
+                        <<<'PHP'
 namespace ReservedTypes;
 
 /**
@@ -1175,13 +1158,13 @@ enum String_: int
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'ReservedTypes/Trait_.php',
-                        content: self::phpContent(
-                            'reserved_names/reserved_names.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'ReservedTypes/Trait_.php',
+                    content: self::phpContent(
+                        'reserved_names/reserved_names.proto',
+                        <<<'PHP'
 namespace ReservedTypes;
 
 /**
@@ -1193,13 +1176,13 @@ enum Trait_: int
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'ReservedTypes/Exit_.php',
-                        content: self::phpContent(
-                            'reserved_names/reserved_names.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'ReservedTypes/Exit_.php',
+                    content: self::phpContent(
+                        'reserved_names/reserved_names.proto',
+                        <<<'PHP'
 namespace ReservedTypes;
 
 /**
@@ -1208,13 +1191,13 @@ namespace ReservedTypes;
 final readonly class Exit_ {}
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'ReservedTypes/INSTANCEOF_.php',
-                        content: self::phpContent(
-                            'reserved_names/reserved_names.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'ReservedTypes/INSTANCEOF_.php',
+                    content: self::phpContent(
+                        'reserved_names/reserved_names.proto',
+                        <<<'PHP'
 namespace ReservedTypes;
 
 use Thesis\Protobuf\Reflection;
@@ -1231,13 +1214,13 @@ final readonly class INSTANCEOF_
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'ReservedTypes/Class_.php',
-                        content: self::phpContent(
-                            'reserved_names/reserved_names.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'ReservedTypes/Class_.php',
+                    content: self::phpContent(
+                        'reserved_names/reserved_names.proto',
+                        <<<'PHP'
 namespace ReservedTypes;
 
 use Thesis\Protobuf\Reflection;
@@ -1254,13 +1237,13 @@ final readonly class Class_
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'ReservedTypes/Class_/Case_.php',
-                        content: self::phpContent(
-                            'reserved_names/reserved_names.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'ReservedTypes/Class_/Case_.php',
+                    content: self::phpContent(
+                        'reserved_names/reserved_names.proto',
+                        <<<'PHP'
 namespace ReservedTypes\Class_;
 
 /**
@@ -1269,13 +1252,13 @@ namespace ReservedTypes\Class_;
 final readonly class Case_ {}
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'ReservedTypes/Class_/Case_/Break_.php',
-                        content: self::phpContent(
-                            'reserved_names/reserved_names.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'ReservedTypes/Class_/Case_/Break_.php',
+                    content: self::phpContent(
+                        'reserved_names/reserved_names.proto',
+                        <<<'PHP'
 namespace ReservedTypes\Class_\Case_;
 
 use Thesis\Protobuf\Reflection;
@@ -1292,13 +1275,13 @@ final readonly class Break_
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'ReservedTypes/ReservedNamesReservedNamesDescriptorRegistry.php',
-                        content: self::phpContent(
-                            'reserved_names/reserved_names.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'ReservedTypes/ReservedNamesReservedNamesDescriptorRegistry.php',
+                    content: self::phpContent(
+                        'reserved_names/reserved_names.proto',
+                        <<<'PHP'
 namespace ReservedTypes;
 
 use Override;
@@ -1328,35 +1311,30 @@ final readonly class ReservedNamesReservedNamesDescriptorRegistry implements Poo
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'ReservedTypes/autoload.metadata.php',
-                        content: self::autoloadContent(
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'ReservedTypes/autoload.metadata.php',
+                    content: self::autoloadContent(
+                        <<<'PHP'
 \Thesis\Protobuf\Pool\Registry::get()->register(
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \ReservedTypes\ReservedNamesReservedNamesDescriptorRegistry()),
 );
 
 PHP,
-                        ),
                     ),
-                ],
-            ),
+                ),
+            ],
         ];
 
         yield [
             'proto3/test.txt',
-            new CodeGeneratorResponse(
-                supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
-                minimumEdition: Edition::EDITION_2023->value,
-                maximumEdition: Edition::EDITION_2024->value,
-                file: [
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest.php',
-                        content: self::phpContent(
-                            'proto3/test.proto',
-                            <<<'PHP'
+            [
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest.php',
+                    content: self::phpContent(
+                        'proto3/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1;
 
 use Thesis\Protobuf\Reflection;
@@ -1377,13 +1355,13 @@ final readonly class TestRequest
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/ContactPhone.php',
-                        content: self::phpContent(
-                            'proto3/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/ContactPhone.php',
+                    content: self::phpContent(
+                        'proto3/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -1400,13 +1378,13 @@ final readonly class ContactPhone implements \Proto\Api\V1\TestRequest\Contact
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/ContactEmail.php',
-                        content: self::phpContent(
-                            'proto3/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/ContactEmail.php',
+                    content: self::phpContent(
+                        'proto3/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -1423,13 +1401,13 @@ final readonly class ContactEmail implements \Proto\Api\V1\TestRequest\Contact
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/TestRequest/Contact.php',
-                        content: self::phpContent(
-                            'proto3/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/TestRequest/Contact.php',
+                    content: self::phpContent(
+                        'proto3/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1\TestRequest;
 
 /**
@@ -1442,13 +1420,13 @@ namespace Proto\Api\V1\TestRequest;
 interface Contact {}
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/Proto3TestDescriptorRegistry.php',
-                        content: self::phpContent(
-                            'proto3/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/Proto3TestDescriptorRegistry.php',
+                    content: self::phpContent(
+                        'proto3/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1;
 
 use Override;
@@ -1471,35 +1449,30 @@ final readonly class Proto3TestDescriptorRegistry implements Pool\Registrar
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/autoload.metadata.php',
-                        content: self::autoloadContent(
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/autoload.metadata.php',
+                    content: self::autoloadContent(
+                        <<<'PHP'
 \Thesis\Protobuf\Pool\Registry::get()->register(
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \Proto\Api\V1\Proto3TestDescriptorRegistry()),
 );
 
 PHP,
-                        ),
                     ),
-                ],
-            ),
+                ),
+            ],
         ];
 
         yield [
             'grpc/test.txt',
-            new CodeGeneratorResponse(
-                supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
-                minimumEdition: Edition::EDITION_2023->value,
-                maximumEdition: Edition::EDITION_2024->value,
-                file: [
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Auth/V1/AuthServiceClient.php',
-                        content: self::phpContent(
-                            'auth_v1.proto',
-                            <<<'PHP'
+            [
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Auth/V1/AuthServiceClient.php',
+                    content: self::phpContent(
+                        'auth_v1.proto',
+                        <<<'PHP'
 namespace Thesis\Auth\V1;
 
 use Amp\Cancellation;
@@ -1543,13 +1516,13 @@ final readonly class AuthServiceClient
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Auth/V1/AuthServiceServer.php',
-                        content: self::phpContent(
-                            'auth_v1.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Auth/V1/AuthServiceServer.php',
+                    content: self::phpContent(
+                        'auth_v1.proto',
+                        <<<'PHP'
 namespace Thesis\Auth\V1;
 
 use Amp\Cancellation;
@@ -1568,13 +1541,13 @@ interface AuthServiceServer
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Auth/V1/AuthServiceServerRegistry.php',
-                        content: self::phpContent(
-                            'auth_v1.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Auth/V1/AuthServiceServerRegistry.php',
+                    content: self::phpContent(
+                        'auth_v1.proto',
+                        <<<'PHP'
 namespace Thesis\Auth\V1;
 
 use Override;
@@ -1603,13 +1576,13 @@ final readonly class AuthServiceServerRegistry implements Server\ServiceRegistry
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Queue/V1/QueueServiceClient.php',
-                        content: self::phpContent(
-                            'queue_v1.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Queue/V1/QueueServiceClient.php',
+                    content: self::phpContent(
+                        'queue_v1.proto',
+                        <<<'PHP'
 namespace Thesis\Queue\V1;
 
 use Amp\Cancellation;
@@ -1698,13 +1671,13 @@ final readonly class QueueServiceClient
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Queue/V1/QueueServiceServer.php',
-                        content: self::phpContent(
-                            'queue_v1.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Queue/V1/QueueServiceServer.php',
+                    content: self::phpContent(
+                        'queue_v1.proto',
+                        <<<'PHP'
 namespace Thesis\Queue\V1;
 
 use Amp\Cancellation;
@@ -1741,13 +1714,13 @@ interface QueueServiceServer
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Queue/V1/QueueServiceServerRegistry.php',
-                        content: self::phpContent(
-                            'queue_v1.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Queue/V1/QueueServiceServerRegistry.php',
+                    content: self::phpContent(
+                        'queue_v1.proto',
+                        <<<'PHP'
 namespace Thesis\Queue\V1;
 
 use Override;
@@ -1786,13 +1759,13 @@ final readonly class QueueServiceServerRegistry implements Server\ServiceRegistr
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Auth/LoginRequest.php',
-                        content: self::phpContent(
-                            'protos/auth.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Auth/LoginRequest.php',
+                    content: self::phpContent(
+                        'protos/auth.proto',
+                        <<<'PHP'
 namespace Thesis\Auth;
 
 use Thesis\Protobuf\Reflection;
@@ -1811,13 +1784,13 @@ final readonly class LoginRequest
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Auth/LoginResponse.php',
-                        content: self::phpContent(
-                            'protos/auth.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Auth/LoginResponse.php',
+                    content: self::phpContent(
+                        'protos/auth.proto',
+                        <<<'PHP'
 namespace Thesis\Auth;
 
 use Thesis\Protobuf\Reflection;
@@ -1834,13 +1807,13 @@ final readonly class LoginResponse
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Auth/ProtosAuthDescriptorRegistry.php',
-                        content: self::phpContent(
-                            'protos/auth.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Auth/ProtosAuthDescriptorRegistry.php',
+                    content: self::phpContent(
+                        'protos/auth.proto',
+                        <<<'PHP'
 namespace Thesis\Auth;
 
 use Override;
@@ -1864,13 +1837,13 @@ final readonly class ProtosAuthDescriptorRegistry implements Pool\Registrar
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Queue/PushRequest.php',
-                        content: self::phpContent(
-                            'protos/queue.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Queue/PushRequest.php',
+                    content: self::phpContent(
+                        'protos/queue.proto',
+                        <<<'PHP'
 namespace Thesis\Queue;
 
 /**
@@ -1879,13 +1852,13 @@ namespace Thesis\Queue;
 final readonly class PushRequest {}
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Queue/PushRequest/Message.php',
-                        content: self::phpContent(
-                            'protos/queue.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Queue/PushRequest/Message.php',
+                    content: self::phpContent(
+                        'protos/queue.proto',
+                        <<<'PHP'
 namespace Thesis\Queue\PushRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -1902,13 +1875,13 @@ final readonly class Message
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Queue/PullRequest.php',
-                        content: self::phpContent(
-                            'protos/queue.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Queue/PullRequest.php',
+                    content: self::phpContent(
+                        'protos/queue.proto',
+                        <<<'PHP'
 namespace Thesis\Queue;
 
 use Thesis\Protobuf\Reflection;
@@ -1925,13 +1898,13 @@ final readonly class PullRequest
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Queue/PullRequest/Message.php',
-                        content: self::phpContent(
-                            'protos/queue.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Queue/PullRequest/Message.php',
+                    content: self::phpContent(
+                        'protos/queue.proto',
+                        <<<'PHP'
 namespace Thesis\Queue\PullRequest;
 
 use Thesis\Protobuf\Reflection;
@@ -1950,13 +1923,13 @@ final readonly class Message
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Queue/Heartbeat.php',
-                        content: self::phpContent(
-                            'protos/queue.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Queue/Heartbeat.php',
+                    content: self::phpContent(
+                        'protos/queue.proto',
+                        <<<'PHP'
 namespace Thesis\Queue;
 
 /**
@@ -1965,13 +1938,13 @@ namespace Thesis\Queue;
 final readonly class Heartbeat {}
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Queue/Heartbeat/FromClient.php',
-                        content: self::phpContent(
-                            'protos/queue.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Queue/Heartbeat/FromClient.php',
+                    content: self::phpContent(
+                        'protos/queue.proto',
+                        <<<'PHP'
 namespace Thesis\Queue\Heartbeat;
 
 /**
@@ -1980,13 +1953,13 @@ namespace Thesis\Queue\Heartbeat;
 final readonly class FromClient {}
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Queue/Heartbeat/FromClient/Ping.php',
-                        content: self::phpContent(
-                            'protos/queue.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Queue/Heartbeat/FromClient/Ping.php',
+                    content: self::phpContent(
+                        'protos/queue.proto',
+                        <<<'PHP'
 namespace Thesis\Queue\Heartbeat\FromClient;
 
 /**
@@ -1995,13 +1968,13 @@ namespace Thesis\Queue\Heartbeat\FromClient;
 final readonly class Ping {}
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Queue/Heartbeat/FromServer.php',
-                        content: self::phpContent(
-                            'protos/queue.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Queue/Heartbeat/FromServer.php',
+                    content: self::phpContent(
+                        'protos/queue.proto',
+                        <<<'PHP'
 namespace Thesis\Queue\Heartbeat;
 
 /**
@@ -2010,13 +1983,13 @@ namespace Thesis\Queue\Heartbeat;
 final readonly class FromServer {}
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Queue/Heartbeat/FromServer/Ping.php',
-                        content: self::phpContent(
-                            'protos/queue.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Queue/Heartbeat/FromServer/Ping.php',
+                    content: self::phpContent(
+                        'protos/queue.proto',
+                        <<<'PHP'
 namespace Thesis\Queue\Heartbeat\FromServer;
 
 /**
@@ -2025,13 +1998,13 @@ namespace Thesis\Queue\Heartbeat\FromServer;
 final readonly class Ping {}
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/Queue/ProtosQueueDescriptorRegistry.php',
-                        content: self::phpContent(
-                            'protos/queue.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Queue/ProtosQueueDescriptorRegistry.php',
+                    content: self::phpContent(
+                        'protos/queue.proto',
+                        <<<'PHP'
 namespace Thesis\Queue;
 
 use Override;
@@ -2062,36 +2035,31 @@ final readonly class ProtosQueueDescriptorRegistry implements Pool\Registrar
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Thesis/autoload.metadata.php',
-                        content: self::autoloadContent(
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/autoload.metadata.php',
+                    content: self::autoloadContent(
+                        <<<'PHP'
 \Thesis\Protobuf\Pool\Registry::get()->register(
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Auth\ProtosAuthDescriptorRegistry()),
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Queue\ProtosQueueDescriptorRegistry()),
 );
 
 PHP,
-                        ),
                     ),
-                ],
-            ),
+                ),
+            ],
         ];
 
         yield [
             'editions/test.txt',
-            new CodeGeneratorResponse(
-                supportedFeatures: new Number(Compiler::SUPPORTED_FEATURES),
-                minimumEdition: Edition::EDITION_2023->value,
-                maximumEdition: Edition::EDITION_2024->value,
-                file: [
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/EditionsFeatures.php',
-                        content: self::phpContent(
-                            'editions/test.proto',
-                            <<<'PHP'
+            [
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/EditionsFeatures.php',
+                    content: self::phpContent(
+                        'editions/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1;
 
 use Thesis\Protobuf\Reflection;
@@ -2123,13 +2091,13 @@ final readonly class EditionsFeatures
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/EditionsTestDescriptorRegistry.php',
-                        content: self::phpContent(
-                            'editions/test.proto',
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/EditionsTestDescriptorRegistry.php',
+                    content: self::phpContent(
+                        'editions/test.proto',
+                        <<<'PHP'
 namespace Proto\Api\V1;
 
 use Override;
@@ -2152,21 +2120,20 @@ final readonly class EditionsTestDescriptorRegistry implements Pool\Registrar
 }
 
 PHP,
-                        ),
                     ),
-                    new CodeGeneratorResponse\File(
-                        name: 'Proto/Api/V1/autoload.metadata.php',
-                        content: self::autoloadContent(
-                            <<<'PHP'
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Proto/Api/V1/autoload.metadata.php',
+                    content: self::autoloadContent(
+                        <<<'PHP'
 \Thesis\Protobuf\Pool\Registry::get()->register(
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \Proto\Api\V1\EditionsTestDescriptorRegistry()),
 );
 
 PHP,
-                        ),
                     ),
-                ],
-            ),
+                ),
+            ],
         ];
     }
 

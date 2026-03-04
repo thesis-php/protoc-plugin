@@ -13,6 +13,7 @@ use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\PhpNamespace;
+use Thesis\Protoc\Exception\CodeCannotBeGenerated;
 use Thesis\Protoc\Plugin\Dependency;
 use Thesis\Protoc\Plugin\NameIndex;
 use Thesis\Protoc\Plugin\Naming;
@@ -95,6 +96,7 @@ final readonly class ProtoGenerator
 
     /**
      * @param list<string> $implements
+     * @throws CodeCannotBeGenerated
      */
     private function generateMessage(Parser\MessageDescriptor $message, array $implements = []): PhpNamespace
     {
@@ -131,6 +133,10 @@ final readonly class ProtoGenerator
             }
 
             $features = $field->options?->features;
+
+            if ($features?->messageEncoding === FeatureSet\MessageEncoding::DELIMITED) {
+                throw new CodeCannotBeGenerated('DELIMITED message encoding are not supported');
+            }
 
             $parameter = $constructor->addPromotedParameter(Naming::camelCase($field->name));
 

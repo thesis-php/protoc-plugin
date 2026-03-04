@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin;
 
-use BcMath\Number;
 use Google\Protobuf\Compiler\CodeGeneratorRequest;
 use Google\Protobuf\Compiler\CodeGeneratorResponse;
-use Google\Protobuf\Edition;
 use Thesis\Package;
 use Thesis\Protobuf\Encoder;
 use Thesis\Protoc\Exception\CodeCannotBeGenerated;
@@ -22,8 +20,6 @@ use Thesis\Protoc\ProtocException;
 final readonly class Compiler
 {
     private const string PLUGIN_NAME = 'thesis/protoc-plugin';
-    public const int SUPPORTED_FEATURES = CodeGeneratorResponse\Feature::FEATURE_PROTO3_OPTIONAL->value
-        | CodeGeneratorResponse\Feature::FEATURE_SUPPORTS_EDITIONS->value;
 
     private Parser $parser;
 
@@ -34,21 +30,17 @@ final readonly class Compiler
     }
 
     /**
+     * @return list<CodeGeneratorResponse\File>
      * @throws ProtocException
      * @throws \Throwable
      */
-    public function compile(CodeGeneratorRequest $request): CodeGeneratorResponse
+    public function compile(CodeGeneratorRequest $request): array
     {
         $options = CompilerOptions::fromRequest($request);
 
         $files = $this->doGenerate($request, $options);
 
-        return new CodeGeneratorResponse(
-            supportedFeatures: new Number(self::SUPPORTED_FEATURES),
-            minimumEdition: Edition::EDITION_2023->value,
-            maximumEdition: Edition::EDITION_2024->value,
-            file: iterator_to_array($files, false),
-        );
+        return iterator_to_array($files, preserve_keys: false);
     }
 
     /**
