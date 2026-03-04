@@ -27,7 +27,7 @@ message TestRequest {
         BOOL = 3;
     }
 
-    required Kind kind = 1; // base field comment.
+    required Kind kind = 1 [default = VOID]; // base field comment.
     // another field comment.
     required bool bool_required = 10;
     required int32 int32_required = 11;
