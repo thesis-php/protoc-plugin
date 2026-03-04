@@ -20,6 +20,7 @@ find "$ROOT" -type f -name '*.proto' -not -path "*/grpc/*" | while read -r proto
   protoc \
     --plugin=protoc-gen-dump="$PLUGIN" \
     --dump_out=. \
+    --experimental_editions \
     -I "$ROOT" \
     "$proto" 2>&1 | grep -v "hasn't been updated to support optional fields" || true
 done
