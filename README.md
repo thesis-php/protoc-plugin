@@ -557,7 +557,7 @@ To avoid having to generate these types each time, it is recommended to use libr
 - [x] `proto2`
 - [x] `proto3`
 - [x] `proto2 scalar defaults`
-- [ ] `proto2 enum defaults`
+- [x] `enum defaults`
 - [x] `proto3 optional`
 - [ ] `extensions`
 - [ ] `groups`
@@ -572,3 +572,4 @@ To avoid having to generate these types each time, it is recommended to use libr
 - [ ] `option php_class_prefix`
 - [ ] `option php_metadata_namespace`
 - [x] `comments`
+- [x] `editions`

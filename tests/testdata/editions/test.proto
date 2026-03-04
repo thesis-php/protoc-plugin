@@ -2,6 +2,12 @@ edition = "2023";
 
 package proto.api.v1;
 
+enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_PROTO3 = 1;
+    TYPE_EDITIONS = 2;
+}
+
 message EditionsFeatures {
     string implicit = 1 [features.field_presence = IMPLICIT];
     string explicit = 2 [features.field_presence = EXPLICIT];
@@ -9,4 +15,6 @@ message EditionsFeatures {
     repeated int32 packed = 4 [features.repeated_field_encoding = PACKED];
     repeated int32 expanded = 5 [features.repeated_field_encoding = EXPANDED];
     repeated int32 default_encoding = 6;
+    // Default type is TYPE_EDITIONS.
+    Type type = 7 [default = TYPE_EDITIONS];
 }

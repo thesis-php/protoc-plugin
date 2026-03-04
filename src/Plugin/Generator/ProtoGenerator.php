@@ -62,6 +62,7 @@ final readonly class ProtoGenerator
 
     /**
      * @return iterable<string, PhpNamespace>
+     * @throws CodeCannotBeGenerated
      */
     public function generateMessages(Parser\MessageDescriptor $message): iterable
     {
@@ -169,7 +170,7 @@ final readonly class ProtoGenerator
                 ? $features?->fieldPresence === FeatureSet\FieldPresence::EXPLICIT
                 : $field->optional;
 
-            $nullable = ($type->nullable || $presence) && !$repeated;
+            $nullable = ($type->nullable || $presence) && !$repeated && !($field->type === FieldDescriptorProto\Type::TYPE_ENUM && $field->defaultValue !== null);
 
             $phpType = ($nullable ? '?' : '') . ($repeated ? 'array' : $type->phpType);
 
@@ -191,9 +192,12 @@ final readonly class ProtoGenerator
 
             $default = $nullable ? null : $type->default;
 
-            // In proto2 (and only there) scalar fields can have default values set.
-            if ($this->syntax === null && $field->defaultValue !== null && $field->type !== null) {
-                $default = self::parseDefaultValue($field->type, $field->defaultValue);
+            if ($field->defaultValue !== null && $field->type !== null) {
+                $default = $this->parseDefaultValue(
+                    $field->type,
+                    $field->defaultValue,
+                    $field->typeName,
+                );
             }
 
             $parameter
@@ -331,10 +335,15 @@ final readonly class ProtoGenerator
         ]);
     }
 
-    private static function parseDefaultValue(
+    private function parseDefaultValue(
         FieldDescriptorProto\Type $type,
         string $defaultValue,
+        ?string $typename = null,
     ): mixed {
+        if ($type === FieldDescriptorProto\Type::TYPE_ENUM && $typename !== null) {
+            return new Literal(\sprintf("%s::{$defaultValue}", Naming::namespace($typename)));
+        }
+
         return match ($type) {
             FieldDescriptorProto\Type::TYPE_STRING,
             FieldDescriptorProto\Type::TYPE_BYTES => $defaultValue,
