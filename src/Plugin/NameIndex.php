@@ -6,14 +6,19 @@ namespace Thesis\Protoc\Plugin;
 
 /**
  * @api
+ * @phpstan-type GrpcService = object{client: ?string, server: ?string}
  */
-final class NameIndex implements \Countable
+final class NameIndex
 {
     /** @var array<string, string> */
     public private(set) array $messageTypes = [];
 
     /** @var array<string, string> */
     public private(set) array $enumTypes = [];
+
+    /** @var array<string, GrpcService>
+     */
+    public private(set) array $grpc = [];
 
     public function addMessageType(string $type, string $fqcn): void
     {
@@ -25,14 +30,30 @@ final class NameIndex implements \Countable
         $this->enumTypes[$type] = $fqcn;
     }
 
-    public function empty(): bool
+    public function addClient(string $type, string $fqcn): void
     {
-        return $this->messageTypes === [] && $this->enumTypes === [];
+        $this->grpc[$type] ??= new class {
+            public function __construct(
+                public ?string $client = null,
+                public ?string $server = null,
+            ) {}
+        };
+        $this->grpc[$type]->client = $fqcn; // @phpstan-ignore assign.propertyReadOnly
     }
 
-    #[\Override]
-    public function count(): int
+    public function addServer(string $type, string $fqcn): void
     {
-        return \count($this->messageTypes) + \count($this->enumTypes);
+        $this->grpc[$type] ??= new class {
+            public function __construct(
+                public ?string $client = null,
+                public ?string $server = null,
+            ) {}
+        };
+        $this->grpc[$type]->server = $fqcn; // @phpstan-ignore assign.propertyReadOnly
+    }
+
+    public function empty(): bool
+    {
+        return $this->messageTypes === [] && $this->enumTypes === [] && $this->grpc === [];
     }
 }
