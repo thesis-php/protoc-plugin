@@ -11,6 +11,7 @@ use Nette\PhpGenerator\Parameter;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PromotedParameter;
 use Thesis\Protoc\Plugin\Dependency;
+use Thesis\Protoc\Plugin\NameIndex;
 use Thesis\Protoc\Plugin\Naming;
 use Thesis\Protoc\Plugin\Parser;
 
@@ -22,6 +23,7 @@ final readonly class GrpcGenerator
     public function __construct(
         private PhpNamespacer $namespacer,
         private Dependency\Graph $graph,
+        private NameIndex $index,
         private ?string $package = null,
     ) {}
 
@@ -30,6 +32,8 @@ final readonly class GrpcGenerator
         $namespace = $this->namespacer->create($service->path);
 
         $name = \sprintf('%sClient', Naming::pascalCase($service->name));
+
+        $this->index->addClient(($this->package !== null ? "{$this->package}." : '') . $service->path, "{$namespace->getName()}\\{$name}");
 
         $classType = new ClassType($name)
             ->setFinal()
@@ -197,9 +201,11 @@ PHP,
     {
         $namespace = $this->namespacer->create($service->path);
 
-        $interfaceType = new InterfaceType(\sprintf('%sServer', Naming::pascalCase($service->name)))
+        $interfaceType = new InterfaceType($name = \sprintf('%sServer', Naming::pascalCase($service->name)))
             ->addComment('@api')
             ->addComment($service->comment !== null ? "\n{$service->comment}" : '');
+
+        $this->index->addServer(($this->package !== null ? "{$this->package}." : '') . $service->path, "{$namespace->getName()}\\{$name}");
 
         $namespace->add($interfaceType);
 

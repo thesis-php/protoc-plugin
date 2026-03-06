@@ -32,6 +32,7 @@ final readonly class ClassLikeGenerator
         $this->grpc = new Generator\GrpcGenerator(
             $namespacer,
             $graph,
+            $index,
             $package,
         );
         $this->proto = new Generator\ProtoGenerator(
@@ -78,11 +79,25 @@ final readonly class ClassLikeGenerator
         }
     }
 
+    /**
+     * @param list<string> $dependencies
+     */
     public function generateDescriptorMetadataRegistry(
         NameIndex $index,
+        string $filename,
+        array $dependencies,
         string $descriptorName,
         string $buffer,
     ): CodeGeneratorResponse\File {
-        return $this->files->create($this->metadata->generate($index, $descriptorName, $buffer), $descriptorName);
+        return $this->files->create(
+            $this->metadata->generate(
+                $index,
+                $filename,
+                $dependencies,
+                $descriptorName,
+                $buffer,
+            ),
+            $descriptorName,
+        );
     }
 }

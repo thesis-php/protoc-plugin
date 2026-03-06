@@ -667,6 +667,7 @@ namespace Proto\Api\V1;
 
 use Override;
 use Thesis\Protobuf\Pool;
+use Thesis\Protobuf\Pool\File;
 
 /**
  * @api
@@ -678,15 +679,27 @@ final readonly class Proto2TestDescriptorRegistry implements Pool\Registrar
     #[Override]
     public function register(Pool\Registry $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
-            'proto.api.v1.TestRequest' => new Pool\MessageMetadata(\Proto\Api\V1\TestRequest\XFieldDeepEnum::class),
-            'proto.api.v1.TestRequest.Nested' => new Pool\MessageMetadata(\Proto\Api\V1\TestRequest\Nested::class),
-            'proto.api.v1.TestRequest.Nested.Deep' => new Pool\MessageMetadata(\Proto\Api\V1\TestRequest\Nested\Deep\UnionEmail::class),
-            'proto.api.v1.AnotherRequest' => new Pool\MessageMetadata(\Proto\Api\V1\AnotherRequest::class),
-            'proto.api.v1.Foo' => new Pool\EnumMetadata(\Proto\Api\V1\Foo::class),
-            'proto.api.v1.TestRequest.Kind' => new Pool\EnumMetadata(\Proto\Api\V1\TestRequest\Kind::class),
-            'proto.api.v1.TestRequest.Nested.Deep.DeepEnum' => new Pool\EnumMetadata(\Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum::class),
-        ]);
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+            name: 'proto2/test.proto',
+            dependencies: [
+                'google/protobuf/timestamp.proto',
+                'google/protobuf/duration.proto',
+                'google/protobuf/struct.proto',
+                'google/protobuf/empty.proto',
+                'google/protobuf/any.proto',
+            ],
+            messages: [
+                new File\MessageDescriptor('proto.api.v1.TestRequest', \Proto\Api\V1\TestRequest\XFieldDeepEnum::class),
+                new File\MessageDescriptor('proto.api.v1.TestRequest.Nested', \Proto\Api\V1\TestRequest\Nested::class),
+                new File\MessageDescriptor('proto.api.v1.TestRequest.Nested.Deep', \Proto\Api\V1\TestRequest\Nested\Deep\UnionEmail::class),
+                new File\MessageDescriptor('proto.api.v1.AnotherRequest', \Proto\Api\V1\AnotherRequest::class),
+            ],
+            enums: [
+                new File\EnumDescriptor('proto.api.v1.Foo', \Proto\Api\V1\Foo::class),
+                new File\EnumDescriptor('proto.api.v1.TestRequest.Kind', \Proto\Api\V1\TestRequest\Kind::class),
+                new File\EnumDescriptor('proto.api.v1.TestRequest.Nested.Deep.DeepEnum', \Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum::class),
+            ],
+        ));
     }
 }
 
@@ -734,6 +747,7 @@ namespace Thesis\Api\V1;
 
 use Override;
 use Thesis\Protobuf\Pool;
+use Thesis\Protobuf\Pool\File;
 
 /**
  * @api
@@ -745,9 +759,12 @@ final readonly class PhpNamespacePhpNamespaceDescriptorRegistry implements Pool\
     #[Override]
     public function register(Pool\Registry $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
-            'test.api.v1.TestRequest' => new Pool\MessageMetadata(\Thesis\Api\V1\TestRequest::class),
-        ]);
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+            name: 'php_namespace/php_namespace.proto',
+            messages: [
+                new File\MessageDescriptor('test.api.v1.TestRequest', \Thesis\Api\V1\TestRequest::class),
+            ],
+        ));
     }
 }
 
@@ -1077,6 +1094,7 @@ namespace Proto\Api\V1;
 
 use Override;
 use Thesis\Protobuf\Pool;
+use Thesis\Protobuf\Pool\File;
 
 /**
  * @api
@@ -1088,14 +1106,19 @@ final readonly class SnakeCaseSnakeCaseDescriptorRegistry implements Pool\Regist
     #[Override]
     public function register(Pool\Registry $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
-            'proto.api.v1.Test_Request' => new Pool\MessageMetadata(\Proto\Api\V1\TestRequest\XFieldDeepEnum::class),
-            'proto.api.v1.Test_Request.Nested_Message' => new Pool\MessageMetadata(\Proto\Api\V1\TestRequest\NestedMessage::class),
-            'proto.api.v1.Test_Request.Nested_Message.Deep' => new Pool\MessageMetadata(\Proto\Api\V1\TestRequest\NestedMessage\Deep\UnionEmail::class),
-            'proto.api.v1.Another_Request' => new Pool\MessageMetadata(\Proto\Api\V1\AnotherRequest::class),
-            'proto.api.v1.Foo' => new Pool\EnumMetadata(\Proto\Api\V1\Foo::class),
-            'proto.api.v1.Test_Request.Nested_Message.Deep.Deep_Enum' => new Pool\EnumMetadata(\Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum::class),
-        ]);
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+            name: 'snake_case/snake_case.proto',
+            messages: [
+                new File\MessageDescriptor('proto.api.v1.Test_Request', \Proto\Api\V1\TestRequest\XFieldDeepEnum::class),
+                new File\MessageDescriptor('proto.api.v1.Test_Request.Nested_Message', \Proto\Api\V1\TestRequest\NestedMessage::class),
+                new File\MessageDescriptor('proto.api.v1.Test_Request.Nested_Message.Deep', \Proto\Api\V1\TestRequest\NestedMessage\Deep\UnionEmail::class),
+                new File\MessageDescriptor('proto.api.v1.Another_Request', \Proto\Api\V1\AnotherRequest::class),
+            ],
+            enums: [
+                new File\EnumDescriptor('proto.api.v1.Foo', \Proto\Api\V1\Foo::class),
+                new File\EnumDescriptor('proto.api.v1.Test_Request.Nested_Message.Deep.Deep_Enum', \Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum::class),
+            ],
+        ));
     }
 }
 
@@ -1285,6 +1308,7 @@ namespace ReservedTypes;
 
 use Override;
 use Thesis\Protobuf\Pool;
+use Thesis\Protobuf\Pool\File;
 
 /**
  * @api
@@ -1296,16 +1320,21 @@ final readonly class ReservedNamesReservedNamesDescriptorRegistry implements Poo
     #[Override]
     public function register(Pool\Registry $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
-            'reserved_types.exit' => new Pool\MessageMetadata(\ReservedTypes\Exit_::class),
-            'reserved_types.INSTANCEOF' => new Pool\MessageMetadata(\ReservedTypes\INSTANCEOF_::class),
-            'reserved_types.Class' => new Pool\MessageMetadata(\ReservedTypes\Class_::class),
-            'reserved_types.Class.Case' => new Pool\MessageMetadata(\ReservedTypes\Class_\Case_::class),
-            'reserved_types.Class.Case.Break' => new Pool\MessageMetadata(\ReservedTypes\Class_\Case_\Break_::class),
-            'reserved_types.NotAllowed' => new Pool\EnumMetadata(\ReservedTypes\NotAllowed::class),
-            'reserved_types.string' => new Pool\EnumMetadata(\ReservedTypes\String_::class),
-            'reserved_types.Trait' => new Pool\EnumMetadata(\ReservedTypes\Trait_::class),
-        ]);
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+            name: 'reserved_names/reserved_names.proto',
+            messages: [
+                new File\MessageDescriptor('reserved_types.exit', \ReservedTypes\Exit_::class),
+                new File\MessageDescriptor('reserved_types.INSTANCEOF', \ReservedTypes\INSTANCEOF_::class),
+                new File\MessageDescriptor('reserved_types.Class', \ReservedTypes\Class_::class),
+                new File\MessageDescriptor('reserved_types.Class.Case', \ReservedTypes\Class_\Case_::class),
+                new File\MessageDescriptor('reserved_types.Class.Case.Break', \ReservedTypes\Class_\Case_\Break_::class),
+            ],
+            enums: [
+                new File\EnumDescriptor('reserved_types.NotAllowed', \ReservedTypes\NotAllowed::class),
+                new File\EnumDescriptor('reserved_types.string', \ReservedTypes\String_::class),
+                new File\EnumDescriptor('reserved_types.Trait', \ReservedTypes\Trait_::class),
+            ],
+        ));
     }
 }
 
@@ -1430,6 +1459,7 @@ namespace Proto\Api\V1;
 
 use Override;
 use Thesis\Protobuf\Pool;
+use Thesis\Protobuf\Pool\File;
 
 /**
  * @api
@@ -1441,9 +1471,12 @@ final readonly class Proto3TestDescriptorRegistry implements Pool\Registrar
     #[Override]
     public function register(Pool\Registry $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
-            'proto.api.v1.TestRequest' => new Pool\MessageMetadata(\Proto\Api\V1\TestRequest\ContactEmail::class),
-        ]);
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+            name: 'proto3/test.proto',
+            messages: [
+                new File\MessageDescriptor('proto.api.v1.TestRequest', \Proto\Api\V1\TestRequest\ContactEmail::class),
+            ],
+        ));
     }
 }
 
@@ -1571,6 +1604,46 @@ final readonly class AuthServiceServerRegistry implements Server\ServiceRegistry
                 Server\RpcType::Unary,
             ),
         ]);
+    }
+}
+
+PHP,
+                    ),
+                ),
+                new CodeGeneratorResponse\File(
+                    name: 'Thesis/Auth/V1/AuthV1DescriptorRegistry.php',
+                    content: self::phpContent(
+                        'auth_v1.proto',
+                        <<<'PHP'
+namespace Thesis\Auth\V1;
+
+use Override;
+use Thesis\Protobuf\Pool;
+use Thesis\Protobuf\Pool\File;
+
+/**
+ * @api
+ */
+final readonly class AuthV1DescriptorRegistry implements Pool\Registrar
+{
+    private const string DESCRIPTOR_BUFFER = 'Cg1hdXRoX3YxLnByb3RvEg5UaGVzaXMuQXV0aC5WMRoRcHJvdG9zL2F1dGgucHJvdG8yTQoLQXV0aFNlcnZpY2USPgoFTG9naW4SGS5UaGVzaXMuQXV0aC5Mb2dpblJlcXVlc3QaGi5UaGVzaXMuQXV0aC5Mb2dpblJlc3BvbnNlSnYKBhIEAAAIAQoICgEMEgMAABIKCAoBAhIDAgAXCgkKAgMAEgMEABsKCgoCBgASBAYACAEKCgoDBgABEgMGCBMKCwoEBgACABIDBwQ+CgwKBQYAAgABEgMHCA0KDAoFBgACAAISAwcOHwoMCgUGAAIAAxIDByo8YgZwcm90bzM=';
+
+    #[Override]
+    public function register(Pool\Registry $pool): void
+    {
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+            name: 'auth_v1.proto',
+            dependencies: [
+                'protos/auth.proto',
+            ],
+            services: [
+                new File\ServiceDescriptor(
+                    name: 'Thesis.Auth.V1.AuthService',
+                    clientFqcn: \Thesis\Auth\V1\AuthServiceClient::class,
+                    serverFqcn: \Thesis\Auth\V1\AuthServiceServer::class,
+                ),
+            ],
+        ));
     }
 }
 
@@ -1761,6 +1834,47 @@ PHP,
                     ),
                 ),
                 new CodeGeneratorResponse\File(
+                    name: 'Thesis/Queue/V1/QueueV1DescriptorRegistry.php',
+                    content: self::phpContent(
+                        'queue_v1.proto',
+                        <<<'PHP'
+namespace Thesis\Queue\V1;
+
+use Override;
+use Thesis\Protobuf\Pool;
+use Thesis\Protobuf\Pool\File;
+
+/**
+ * @api
+ */
+final readonly class QueueV1DescriptorRegistry implements Pool\Registrar
+{
+    private const string DESCRIPTOR_BUFFER = 'Cg5xdWV1ZV92MS5wcm90bxIPVGhlc2lzLlF1ZXVlLlYxGhJwcm90b3MvcXVldWUucHJvdG8aG2dvb2dsZS9wcm90b2J1Zi9lbXB0eS5wcm90bzL+AQoMUXVldWVTZXJ2aWNlEkMKBFB1c2gSIS5UaGVzaXMuUXVldWUuUHVzaFJlcXVlc3QuTWVzc2FnZRoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSgBEkYKBFB1bGwSGS5UaGVzaXMuUXVldWUuUHVsbFJlcXVlc3QaIS5UaGVzaXMuUXVldWUuUHVsbFJlcXVlc3QuTWVzc2FnZTABEmEKCUhlYXJ0YmVhdBInLlRoZXNpcy5RdWV1ZS5IZWFydGJlYXQuRnJvbUNsaWVudC5QaW5nGicuVGhlc2lzLlF1ZXVlLkhlYXJ0YmVhdC5Gcm9tU2VydmVyLlBpbmcoATABSqcCCgYSBAAACwEKCAoBDBIDAAASCggKAQISAwIAGAoJCgIDABIDBAAcCgkKAgMBEgMFACUKCgoCBgASBAcACwEKCgoDBgABEgMHCBQKCwoEBgACABIDCARPCgwKBQYAAgABEgMICAwKDAoFBgACAAUSAwgNEwoMCgUGAAIAAhIDCBQtCgwKBQYAAgADEgMIOE0KCwoEBgACARIDCQRLCgwKBQYAAgEBEgMJCAwKDAoFBgACAQISAwkNHgoMCgUGAAIBBhIDCSkvCgwKBQYAAgEDEgMJMEkKCwoEBgACAhIDCgRrCgwKBQYAAgIBEgMKCBEKDAoFBgACAgUSAwoSGAoMCgUGAAICAhIDChk4CgwKBQYAAgIGEgMKQ0kKDAoFBgACAgMSAwpKaWIGcHJvdG8z';
+
+    #[Override]
+    public function register(Pool\Registry $pool): void
+    {
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+            name: 'queue_v1.proto',
+            dependencies: [
+                'protos/queue.proto',
+                'google/protobuf/empty.proto',
+            ],
+            services: [
+                new File\ServiceDescriptor(
+                    name: 'Thesis.Queue.V1.QueueService',
+                    clientFqcn: \Thesis\Queue\V1\QueueServiceClient::class,
+                    serverFqcn: \Thesis\Queue\V1\QueueServiceServer::class,
+                ),
+            ],
+        ));
+    }
+}
+
+PHP,
+                    ),
+                ),
+                new CodeGeneratorResponse\File(
                     name: 'Thesis/Auth/LoginRequest.php',
                     content: self::phpContent(
                         'protos/auth.proto',
@@ -1817,6 +1931,7 @@ namespace Thesis\Auth;
 
 use Override;
 use Thesis\Protobuf\Pool;
+use Thesis\Protobuf\Pool\File;
 
 /**
  * @api
@@ -1828,10 +1943,13 @@ final readonly class ProtosAuthDescriptorRegistry implements Pool\Registrar
     #[Override]
     public function register(Pool\Registry $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
-            'Thesis.Auth.LoginRequest' => new Pool\MessageMetadata(\Thesis\Auth\LoginRequest::class),
-            'Thesis.Auth.LoginResponse' => new Pool\MessageMetadata(\Thesis\Auth\LoginResponse::class),
-        ]);
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+            name: 'protos/auth.proto',
+            messages: [
+                new File\MessageDescriptor('Thesis.Auth.LoginRequest', \Thesis\Auth\LoginRequest::class),
+                new File\MessageDescriptor('Thesis.Auth.LoginResponse', \Thesis\Auth\LoginResponse::class),
+            ],
+        ));
     }
 }
 
@@ -2008,6 +2126,7 @@ namespace Thesis\Queue;
 
 use Override;
 use Thesis\Protobuf\Pool;
+use Thesis\Protobuf\Pool\File;
 
 /**
  * @api
@@ -2019,17 +2138,20 @@ final readonly class ProtosQueueDescriptorRegistry implements Pool\Registrar
     #[Override]
     public function register(Pool\Registry $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
-            'Thesis.Queue.PushRequest' => new Pool\MessageMetadata(\Thesis\Queue\PushRequest::class),
-            'Thesis.Queue.PushRequest.Message' => new Pool\MessageMetadata(\Thesis\Queue\PushRequest\Message::class),
-            'Thesis.Queue.PullRequest' => new Pool\MessageMetadata(\Thesis\Queue\PullRequest::class),
-            'Thesis.Queue.PullRequest.Message' => new Pool\MessageMetadata(\Thesis\Queue\PullRequest\Message::class),
-            'Thesis.Queue.Heartbeat' => new Pool\MessageMetadata(\Thesis\Queue\Heartbeat::class),
-            'Thesis.Queue.Heartbeat.FromClient' => new Pool\MessageMetadata(\Thesis\Queue\Heartbeat\FromClient::class),
-            'Thesis.Queue.Heartbeat.FromClient.Ping' => new Pool\MessageMetadata(\Thesis\Queue\Heartbeat\FromClient\Ping::class),
-            'Thesis.Queue.Heartbeat.FromServer' => new Pool\MessageMetadata(\Thesis\Queue\Heartbeat\FromServer::class),
-            'Thesis.Queue.Heartbeat.FromServer.Ping' => new Pool\MessageMetadata(\Thesis\Queue\Heartbeat\FromServer\Ping::class),
-        ]);
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+            name: 'protos/queue.proto',
+            messages: [
+                new File\MessageDescriptor('Thesis.Queue.PushRequest', \Thesis\Queue\PushRequest::class),
+                new File\MessageDescriptor('Thesis.Queue.PushRequest.Message', \Thesis\Queue\PushRequest\Message::class),
+                new File\MessageDescriptor('Thesis.Queue.PullRequest', \Thesis\Queue\PullRequest::class),
+                new File\MessageDescriptor('Thesis.Queue.PullRequest.Message', \Thesis\Queue\PullRequest\Message::class),
+                new File\MessageDescriptor('Thesis.Queue.Heartbeat', \Thesis\Queue\Heartbeat::class),
+                new File\MessageDescriptor('Thesis.Queue.Heartbeat.FromClient', \Thesis\Queue\Heartbeat\FromClient::class),
+                new File\MessageDescriptor('Thesis.Queue.Heartbeat.FromClient.Ping', \Thesis\Queue\Heartbeat\FromClient\Ping::class),
+                new File\MessageDescriptor('Thesis.Queue.Heartbeat.FromServer', \Thesis\Queue\Heartbeat\FromServer::class),
+                new File\MessageDescriptor('Thesis.Queue.Heartbeat.FromServer.Ping', \Thesis\Queue\Heartbeat\FromServer\Ping::class),
+            ],
+        ));
     }
 }
 
@@ -2041,6 +2163,8 @@ PHP,
                     content: self::autoloadContent(
                         <<<'PHP'
 \Thesis\Protobuf\Pool\Registry::get()->register(
+    new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Auth\V1\AuthV1DescriptorRegistry()),
+    new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Queue\V1\QueueV1DescriptorRegistry()),
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Auth\ProtosAuthDescriptorRegistry()),
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Queue\ProtosQueueDescriptorRegistry()),
 );
@@ -2124,6 +2248,7 @@ namespace Proto\Api\V1;
 
 use Override;
 use Thesis\Protobuf\Pool;
+use Thesis\Protobuf\Pool\File;
 
 /**
  * @api
@@ -2135,10 +2260,15 @@ final readonly class EditionsTestDescriptorRegistry implements Pool\Registrar
     #[Override]
     public function register(Pool\Registry $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), [
-            'proto.api.v1.EditionsFeatures' => new Pool\MessageMetadata(\Proto\Api\V1\EditionsFeatures::class),
-            'proto.api.v1.Type' => new Pool\EnumMetadata(\Proto\Api\V1\Type::class),
-        ]);
+        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+            name: 'editions/test.proto',
+            messages: [
+                new File\MessageDescriptor('proto.api.v1.EditionsFeatures', \Proto\Api\V1\EditionsFeatures::class),
+            ],
+            enums: [
+                new File\EnumDescriptor('proto.api.v1.Type', \Proto\Api\V1\Type::class),
+            ],
+        ));
     }
 }
 

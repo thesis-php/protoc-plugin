@@ -97,6 +97,8 @@ final readonly class Compiler
 
                 yield $generator->generateDescriptorMetadataRegistry(
                     $index,
+                    $proto->name,
+                    $proto->dependencies,
                     $descriptorName,
                     $this->encoder->encode($proto->file),
                 );
