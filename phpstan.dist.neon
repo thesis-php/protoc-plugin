@@ -9,6 +9,8 @@ parameters:
         - src
         - bin
         - tests
+    excludePaths:
+        - tests/snapshots
     tmpDir: var/phpstan
     editorUrl: ''
     editorUrlTitle: '%%relFile%%:%%line%%'

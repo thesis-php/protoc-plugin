@@ -13,6 +13,7 @@ $config = new Config()
             ->in(__DIR__ . '/src')
             ->in(__DIR__ . '/bin')
             ->in(__DIR__ . '/tests')
+            ->exclude(['snapshots'])
             ->append([
                 __FILE__,
             ]),
