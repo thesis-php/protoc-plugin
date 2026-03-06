@@ -87,7 +87,7 @@ final class CompilerTest extends TestCase
     {
         self::assertDirectoryExists($snapshotDir);
 
-        $files = [];
+        $collection = [];
 
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator(
@@ -106,12 +106,12 @@ final class CompilerTest extends TestCase
             self::assertIsString($content);
 
             $name = str_replace('\\', '/', substr($file->getPathname(), \strlen($snapshotDir) + 1));
-            $files[$name] = $content;
+            $collection[$name] = $content;
         }
 
-        ksort($files);
+        ksort($collection);
 
-        return $files;
+        return $collection;
     }
 
     private static function normalize(string $content): string
