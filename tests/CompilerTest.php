@@ -31,7 +31,7 @@ final class CompilerTest extends TestCase
         $request = $decoder->decode($bytes, CodeGeneratorRequest::class);
 
         $actual = self::collectFiles(new Compiler($encoder)->compile($request));
-        $expected = self::collectSnapshots(__DIR__ . '/snapshots/' . substr($file, 0, -4));
+        $expected = self::collectSnapshots(__DIR__ . '/snapshots/' . \dirname($file));
 
         foreach ($actual as $name => $content) {
             self::assertArrayHasKey($name, $expected);

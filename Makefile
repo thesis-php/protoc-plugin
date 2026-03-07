@@ -106,9 +106,12 @@ phpstan: var vendor ## Analyze code using PHPStan
 generate-testdata:
 	$(RUN) ./tests/tools/generate.sh
 
-test: var vendor generate-testdata ## Run tests using PHPUnit
+generate-snapshots: executable
+	$(RUN) ./tests/tools/generate-snapshots.sh
+
+test: var vendor generate-testdata generate-snapshots ## Run tests using PHPUnit
 	$(RUN) vendor/bin/phpunit $(ARGS) --colors
-.PHONY: test
+.PHONY: generate-snapshots test
 
 infect: var vendor up ## Run mutation tests using Infection
 	$(RUN) infection --show-mutations $(ARGS)
