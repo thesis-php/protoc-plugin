@@ -2,7 +2,6 @@
 set -euo pipefail
 
 FIXTURES_ROOT="tests/fixtures"
-TESTDATA_ROOT="tests/testdata"
 SNAPSHOTS_ROOT="tests/snapshots"
 PLUGIN="$(realpath "$(pwd)/bin/compiler.php")"
 
@@ -11,10 +10,9 @@ if [[ ! -x "$PLUGIN" ]]; then
   exit 1
 fi
 
-find "$TESTDATA_ROOT" -mindepth 2 -maxdepth 2 -type f -name '*.hex' | sort | while read -r fixture; do
-  rel="${fixture#"$TESTDATA_ROOT"/}"
-  fixture_dir="$FIXTURES_ROOT/$(dirname "$rel")"
-  snapshot_dir="$SNAPSHOTS_ROOT/$(dirname "$rel")"
+find "$FIXTURES_ROOT" -mindepth 1 -maxdepth 1 -type d | sort | while read -r fixture_dir; do
+  case_name="$(basename "$fixture_dir")"
+  snapshot_dir="$SNAPSHOTS_ROOT/$case_name"
 
   mapfile -t all_protos < <(find "$fixture_dir" -type f -name '*.proto' | sort)
   proto_inputs=()
@@ -31,7 +29,7 @@ find "$TESTDATA_ROOT" -mindepth 2 -maxdepth 2 -type f -name '*.hex' | sort | whi
   rm -rf "$snapshot_dir"
   mkdir -p "$snapshot_dir"
 
-  echo "generating $rel -> $snapshot_dir"
+  echo "generating $case_name fixtures -> $snapshot_dir"
 
   protoc \
     --plugin=protoc-gen-custom-plugin="$PLUGIN" \
