@@ -581,11 +581,13 @@ To avoid having to generate these types each time, it is recommended to use libr
 #### Adding new codegen fixtures
 
 1. Add a new `.proto` fixture under `tests/fixtures/<case>/`.
-2. Run `make test` to regenerate `tests/testdata/<case>/request.hex` and `tests/snapshots/*`.
-3. Commit both updated fixture inputs and snapshots:
+2. Run `make test` to regenerate snapshots from fixtures.
+3. Commit updated fixture inputs and snapshots:
    - `tests/fixtures/*`
-   - `tests/testdata/*`
    - `tests/snapshots/*`
+
+Note: intermediate protoc requests are generated into `var/testdata` during test run and are not stored in git.
+You can override this path via `TESTDATA_DIR` in `.env.local`.
 
 #### Code quality checks
 - `make test` — regenerates fixtures/snapshots and runs PHPUnit.
