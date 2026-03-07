@@ -5,7 +5,7 @@
  * Versions:
  *   thesis/protoc-plugin — v0.1.x-dev
  *   protoc               — v6.32.1
- * Source: proto3/test.proto
+ * Source: proto3.proto
  */
 
 declare(strict_types=1);

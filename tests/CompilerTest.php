@@ -33,6 +33,12 @@ final class CompilerTest extends TestCase
         $actual = self::collectFiles(new Compiler($encoder)->compile($request));
         $expected = self::collectSnapshots(__DIR__ . '/snapshots/' . \dirname($file));
 
+        self::assertSame(
+            array_keys($expected),
+            array_keys($actual),
+            "Generated files set mismatch: {$file}",
+        );
+
         foreach ($actual as $name => $content) {
             self::assertArrayHasKey($name, $expected);
             self::assertSame(
@@ -48,7 +54,7 @@ final class CompilerTest extends TestCase
      */
     public static function provideCompileSnapshotsCases(): iterable
     {
-        $fixtures = glob(__DIR__ . '/testdata/*/*.txt');
+        $fixtures = glob(__DIR__ . '/testdata/*/*.hex');
         self::assertIsArray($fixtures);
 
         sort($fixtures);

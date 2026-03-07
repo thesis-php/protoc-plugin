@@ -5,7 +5,7 @@
  * Versions:
  *   thesis/protoc-plugin — v0.1.x-dev
  *   protoc               — v6.32.1
- * Source: php_namespace/php_namespace.proto
+ * Source: php_namespace.proto
  */
 
 declare(strict_types=1);
@@ -19,15 +19,15 @@ use Thesis\Protobuf\Pool\File;
 /**
  * @api
  */
-final readonly class PhpNamespacePhpNamespaceDescriptorRegistry implements Pool\Registrar
+final readonly class PhpNamespaceDescriptorRegistry implements Pool\Registrar
 {
-    private const string DESCRIPTOR_BUFFER = 'CiFwaHBfbmFtZXNwYWNlL3BocF9uYW1lc3BhY2UucHJvdG8SC3Rlc3QuYXBpLnYxIg0KC1Rlc3RSZXF1ZXN0Qhn4AQHCAgNLZWvKAg1UaGVzaXNcQXBpXFYxSl0KBhIEAAAHFgoICgEMEgMAABIKCAoBCBIDAgApCgkKAggpEgMCACkKCAoBCBIDAwAgCgkKAggoEgMDACAKCAoBAhIDBQAUCgkKAgQAEgMHABYKCgoDBAABEgMHCBNiBnByb3RvMw==';
+    private const string DESCRIPTOR_BUFFER = 'ChNwaHBfbmFtZXNwYWNlLnByb3RvEgt0ZXN0LmFwaS52MSINCgtUZXN0UmVxdWVzdEIZ+AEBwgIDS2VrygINVGhlc2lzXEFwaVxWMUpdCgYSBAAABxYKCAoBDBIDAAASCggKAQgSAwIAKQoJCgIIKRIDAgApCggKAQgSAwMAIAoJCgIIKBIDAwAgCggKAQISAwUAFAoJCgIEABIDBwAWCgoKAwQAARIDBwgTYgZwcm90bzM=';
 
     #[Override]
     public function register(Pool\Registry $pool): void
     {
         $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
-            name: 'php_namespace/php_namespace.proto',
+            name: 'php_namespace.proto',
             messages: [
                 new File\MessageDescriptor('test.api.v1.TestRequest', \Thesis\Api\V1\TestRequest::class),
             ],

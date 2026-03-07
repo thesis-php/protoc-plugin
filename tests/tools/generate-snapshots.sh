@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="tests/testdata"
+FIXTURES_ROOT="tests/fixtures"
+TESTDATA_ROOT="tests/testdata"
 SNAPSHOTS_ROOT="tests/snapshots"
 PLUGIN="$(realpath "$(pwd)/bin/compiler.php")"
 
@@ -10,22 +11,17 @@ if [[ ! -x "$PLUGIN" ]]; then
   exit 1
 fi
 
-find "$ROOT" -mindepth 2 -maxdepth 2 -type f -name '*.txt' | sort | while read -r fixture; do
-  rel="${fixture#"$ROOT"/}"
-  case_dir="$(dirname "$fixture")"
-  case_name="$(basename "$fixture" .txt)"
+find "$TESTDATA_ROOT" -mindepth 2 -maxdepth 2 -type f -name '*.hex' | sort | while read -r fixture; do
+  rel="${fixture#"$TESTDATA_ROOT"/}"
+  fixture_dir="$FIXTURES_ROOT/$(dirname "$rel")"
   snapshot_dir="$SNAPSHOTS_ROOT/$(dirname "$rel")"
 
-  proto="$case_dir/$case_name.proto"
+  mapfile -t all_protos < <(find "$fixture_dir" -type f -name '*.proto' | sort)
   proto_inputs=()
 
-  if [[ -f "$proto" ]]; then
-    proto_inputs+=("${proto#"$ROOT"/}")
-  else
-    while read -r entry; do
-      proto_inputs+=("${entry#"$case_dir"/}")
-    done < <(find "$case_dir" -type f -name '*.proto' | sort)
-  fi
+  for proto in "${all_protos[@]}"; do
+    proto_inputs+=("${proto#"$fixture_dir"/}")
+  done
 
   if [[ ${#proto_inputs[@]} -eq 0 ]]; then
     echo "No .proto files found for fixture: $fixture" >&2
@@ -40,7 +36,7 @@ find "$ROOT" -mindepth 2 -maxdepth 2 -type f -name '*.txt' | sort | while read -
   protoc \
     --plugin=protoc-gen-custom-plugin="$PLUGIN" \
     --custom-plugin_out="$snapshot_dir" \
-    -I "$ROOT" \
-    -I "$case_dir" \
+    -I "$FIXTURES_ROOT" \
+    -I "$fixture_dir" \
     "${proto_inputs[@]}"
 done

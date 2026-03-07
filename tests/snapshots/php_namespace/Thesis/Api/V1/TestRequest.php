@@ -5,7 +5,7 @@
  * Versions:
  *   thesis/protoc-plugin — v0.1.x-dev
  *   protoc               — v6.32.1
- * Source: php_namespace/php_namespace.proto
+ * Source: php_namespace.proto
  */
 
 declare(strict_types=1);

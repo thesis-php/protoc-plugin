@@ -580,9 +580,10 @@ To avoid having to generate these types each time, it is recommended to use libr
 
 #### Adding new codegen fixtures
 
-1. Add a new `.proto` fixture under `tests/testdata/<case>/`.
-2. Run `make test` to regenerate `tests/testdata/*.txt` and `tests/snapshots/*`.
+1. Add a new `.proto` fixture under `tests/fixtures/<case>/`.
+2. Run `make test` to regenerate `tests/testdata/<case>/request.hex` and `tests/snapshots/*`.
 3. Commit both updated fixture inputs and snapshots:
+   - `tests/fixtures/*`
    - `tests/testdata/*`
    - `tests/snapshots/*`
 
