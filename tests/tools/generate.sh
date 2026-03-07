@@ -2,7 +2,7 @@
 set -euo pipefail
 
 FIXTURES_ROOT="tests/fixtures"
-TESTDATA_ROOT="tests/testdata"
+TESTDATA_ROOT="${TESTDATA_ROOT:-var/testdata}"
 PLUGIN="$(realpath $(pwd)/tests/tools/plugin.sh)"
 
 if [[ ! -x "$PLUGIN" ]]; then

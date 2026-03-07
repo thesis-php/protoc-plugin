@@ -1,4 +1,6 @@
 SHELL := /bin/bash
+-include .env
+-include .env.local
 
 DOCKER ?= docker
 DOCKER_COMPOSE ?= $(DOCKER) compose $(shell test -f .env.local && echo '--env-file .env --env-file .env.local')
@@ -6,6 +8,7 @@ export CONTAINER_USER ?= $(shell id -u):$(shell id -g)
 
 RUN ?= $(if $(INSIDE_DEVCONTAINER),,$(DOCKER_COMPOSE) run --rm php)
 COMPOSER ?= $(RUN) composer
+TESTDATA_DIR ?= var/testdata
 
 ##
 ## Project
@@ -103,14 +106,15 @@ phpstan: var vendor ## Analyze code using PHPStan
 	$(RUN) phpstan analyze --memory-limit=1G $(ARGS)
 .PHONY: phpstan
 
-generate-testdata:
-	$(RUN) ./tests/tools/generate.sh
+generate-testdata: var
+	rm -rf $(TESTDATA_DIR)
+	$(RUN) env TESTDATA_ROOT=$(TESTDATA_DIR) ./tests/tools/generate.sh
 
 generate-snapshots: executable
 	$(RUN) ./tests/tools/generate-snapshots.sh
 
 test: var vendor generate-testdata generate-snapshots ## Run tests using PHPUnit
-	$(RUN) vendor/bin/phpunit $(ARGS) --colors
+	$(RUN) env TESTDATA_DIR=$(TESTDATA_DIR) vendor/bin/phpunit $(ARGS) --colors
 .PHONY: generate-snapshots test
 
 infect: var vendor up ## Run mutation tests using Infection

@@ -16,10 +16,10 @@ use Thesis\Protoc\Plugin\Compiler;
 #[CoversClass(Compiler::class)]
 final class CompilerTest extends TestCase
 {
-    #[DataProvider('provideCompileSnapshotsCases')]
-    public function testCompileSnapshots(string $file): void
+    #[DataProvider('provideCompileCases')]
+    public function testCompile(string $file): void
     {
-        $hex = file_get_contents(__DIR__ . "/testdata/{$file}");
+        $hex = file_get_contents(self::dataDir() . "/{$file}");
         self::assertIsString($hex);
 
         $bytes = hex2bin($hex);
@@ -52,16 +52,19 @@ final class CompilerTest extends TestCase
     /**
      * @return iterable<array{string}>
      */
-    public static function provideCompileSnapshotsCases(): iterable
+    public static function provideCompileCases(): iterable
     {
-        $fixtures = glob(__DIR__ . '/testdata/*/*.hex');
+        $root = self::dataDir();
+
+        $fixtures = glob($root . '/*/*.hex');
         self::assertIsArray($fixtures);
+        self::assertGreaterThan(0, \count($fixtures), 'No generated testdata found. Run `make test` or `make generate-testdata` first.');
 
         sort($fixtures);
 
         foreach ($fixtures as $fixture) {
             yield [
-                substr($fixture, \strlen(__DIR__ . '/testdata/')),
+                substr($fixture, \strlen($root . '/')),
             ];
         }
     }
@@ -129,5 +132,15 @@ final class CompilerTest extends TestCase
             'thesis/protoc-plugin — v<version>',
             $content,
         );
+    }
+
+    private static function dataDir(): string
+    {
+        $root = getenv('TESTDATA_DIR');
+        if (\is_string($root) && $root !== '') {
+            return $root;
+        }
+
+        return \dirname(__DIR__) . '/var/testdata';
     }
 }
