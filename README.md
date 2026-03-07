@@ -168,7 +168,7 @@ protoc \
   --php-plugin_out=grpc=client:genproto
 ```
 
-To generate only the server code, use `grpc=server`. By default, and when passing `grpc=client,server`, both the client and server will be generated.
+To generate only the server code, use `grpc=server`. By default, and when passing `grpc=client,grpc=server`, both the client and server will be generated.
 
 ### Multiple options
 
