@@ -5,7 +5,7 @@
  * Versions:
  *   thesis/protoc-plugin — v0.1.x-dev
  *   protoc               — v6.32.1
- * Source: snake_case/snake_case.proto
+ * Source: snake_case.proto
  */
 
 declare(strict_types=1);

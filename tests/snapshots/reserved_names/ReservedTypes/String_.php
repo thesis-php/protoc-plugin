@@ -5,7 +5,7 @@
  * Versions:
  *   thesis/protoc-plugin — v0.1.x-dev
  *   protoc               — v6.32.1
- * Source: reserved_names/reserved_names.proto
+ * Source: reserved_names.proto
  */
 
 declare(strict_types=1);

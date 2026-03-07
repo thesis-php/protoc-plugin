@@ -10,5 +10,5 @@
 declare(strict_types=1);
 
 \Thesis\Protobuf\Pool\Registry::get()->register(
-    new \Thesis\Protobuf\Pool\OnceRegistrar(new \ReservedTypes\ReservedNamesReservedNamesDescriptorRegistry()),
+    new \Thesis\Protobuf\Pool\OnceRegistrar(new \ReservedTypes\ReservedNamesDescriptorRegistry()),
 );
