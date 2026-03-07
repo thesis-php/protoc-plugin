@@ -193,7 +193,9 @@ final class Registry
                     continue;
                 }
 
-                $class = Naming::namespace(substr($typeName, \strlen($index->package) + 2));
+                $prefix = $index->package === '.' ? '.' : ".{$index->package}.";
+
+                $class = Naming::namespace(substr($typeName, \strlen($prefix)));
                 $fqcn = "\\{$index->namespace}\\{$class}";
 
                 yield $typeName => new Type(

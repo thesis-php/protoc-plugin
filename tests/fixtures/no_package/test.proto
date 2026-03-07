@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option php_namespace = "Tmp\\NoPkg";
+
+message A {
+  B b = 1;
+}
+
+message B {
+  string v = 1;
+}
