@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 \Thesis\Protobuf\Pool\Registry::get()->register(
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Auth\V1\AuthV1DescriptorRegistry()),
-    new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Queue\V1\QueueV1DescriptorRegistry()),
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Auth\ProtosAuthDescriptorRegistry()),
     new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Queue\ProtosQueueDescriptorRegistry()),
+    new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Queue\V1\QueueV1DescriptorRegistry()),
 );

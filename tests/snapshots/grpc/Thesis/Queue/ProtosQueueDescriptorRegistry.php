@@ -21,7 +21,7 @@ use Thesis\Protobuf\Pool\File;
  */
 final readonly class ProtosQueueDescriptorRegistry implements Pool\Registrar
 {
-    private const string DESCRIPTOR_BUFFER = 'ChJwcm90b3MvcXVldWUucHJvdG8SDFRoZXNpcy5RdWV1ZSIyCgtQdXNoUmVxdWVzdBojCgdNZXNzYWdlEhgKB2NvbnRlbnQYASABKAlSB2NvbnRlbnQiVAoLUHVsbFJlcXVlc3QSEAoDcW9zGAEgASgFUgNxb3MaMwoHTWVzc2FnZRIYCgdjb250ZW50GAEgASgJUgdjb250ZW50Eg4KAmlkGAIgASgJUgJpZCI3CglIZWFydGJlYXQaFAoKRnJvbUNsaWVudBoGCgRQaW5nGhQKCkZyb21TZXJ2ZXIaBgoEUGluZ0qGBAoGEgQAABsBCggKAQwSAwAAEgoICgECEgMCABUKCgoCBAASBAQACAEKCgoDBAABEgMECBMKDAoEBAADABIEBQQHBQoMCgUEAAMAARIDBQwTCg0KBgQAAwACABIDBggbCg4KBwQAAwACAAUSAwYIDgoOCgcEAAMAAgABEgMGDxYKDgoHBAADAAIAAxIDBhkaCgoKAgQBEgQKABEBCgoKAwQBARIDCggTCgwKBAQBAwASBAsEDgUKDAoFBAEDAAESAwsMEwoNCgYEAQMAAgASAwwIGwoOCgcEAQMAAgAFEgMMCA4KDgoHBAEDAAIAARIDDA8WCg4KBwQBAwACAAMSAwwZGgoNCgYEAQMAAgESAw0IFgoOCgcEAQMAAgEFEgMNCA4KDgoHBAEDAAIBARIDDQ8RCg4KBwQBAwACAQMSAw0UFQoLCgQEAQIAEgMQBBIKDAoFBAECAAUSAxAECQoMCgUEAQIAARIDEAoNCgwKBQQBAgADEgMQEBEKCgoCBAISBBMAGwEKCgoDBAIBEgMTCBEKDAoEBAIDABIEFAQWBQoMCgUEAgMAARIDFAwWCg0KBgQCAwADABIDFQgXCg4KBwQCAwADAAESAxUQFAoMCgQEAgMBEgQYBBoFCgwKBQQCAwEBEgMYDBYKDQoGBAIDAQMAEgMZCBcKDgoHBAIDAQMAARIDGRAUYgZwcm90bzM=';
+    private const string DESCRIPTOR_BUFFER = 'ChJwcm90b3MvcXVldWUucHJvdG8SDFRoZXNpcy5RdWV1ZSIyCgtQdXNoUmVxdWVzdBojCgdNZXNzYWdlEhgKB2NvbnRlbnQYASABKAlSB2NvbnRlbnQiVAoLUHVsbFJlcXVlc3QSEAoDcW9zGAEgASgFUgNxb3MaMwoHTWVzc2FnZRIYCgdjb250ZW50GAEgASgJUgdjb250ZW50Eg4KAmlkGAIgASgJUgJpZCI3CglIZWFydGJlYXQaFAoKRnJvbVNlcnZlchoGCgRQaW5nGhQKCkZyb21DbGllbnQaBgoEUGluZ0qGBAoGEgQAABsBCggKAQwSAwAAEgoICgECEgMCABUKCgoCBAASBAQACAEKCgoDBAABEgMECBMKDAoEBAADABIEBQQHBQoMCgUEAAMAARIDBQwTCg0KBgQAAwACABIDBggbCg4KBwQAAwACAAUSAwYIDgoOCgcEAAMAAgABEgMGDxYKDgoHBAADAAIAAxIDBhkaCgoKAgQBEgQKABEBCgoKAwQBARIDCggTCgwKBAQBAwASBAsEDgUKDAoFBAEDAAESAwsMEwoNCgYEAQMAAgASAwwIGwoOCgcEAQMAAgAFEgMMCA4KDgoHBAEDAAIAARIDDA8WCg4KBwQBAwACAAMSAwwZGgoNCgYEAQMAAgESAw0IFgoOCgcEAQMAAgEFEgMNCA4KDgoHBAEDAAIBARIDDQ8RCg4KBwQBAwACAQMSAw0UFQoLCgQEAQIAEgMQBBIKDAoFBAECAAUSAxAECQoMCgUEAQIAARIDEAoNCgwKBQQBAgADEgMQEBEKCgoCBAISBBMAGwEKCgoDBAIBEgMTCBEKDAoEBAIDABIEFAQWBQoMCgUEAgMAARIDFAwWCg0KBgQCAwADABIDFQgXCg4KBwQCAwADAAESAxUQFAoMCgQEAgMBEgQYBBoFCgwKBQQCAwEBEgMYDBYKDQoGBAIDAQMAEgMZCBcKDgoHBAIDAQMAARIDGRAUYgZwcm90bzM=';
 
     #[Override]
     public function register(Pool\Registry $pool): void
@@ -34,10 +34,10 @@ final readonly class ProtosQueueDescriptorRegistry implements Pool\Registrar
                 new File\MessageDescriptor('Thesis.Queue.PullRequest', \Thesis\Queue\PullRequest::class),
                 new File\MessageDescriptor('Thesis.Queue.PullRequest.Message', \Thesis\Queue\PullRequest\Message::class),
                 new File\MessageDescriptor('Thesis.Queue.Heartbeat', \Thesis\Queue\Heartbeat::class),
-                new File\MessageDescriptor('Thesis.Queue.Heartbeat.FromClient', \Thesis\Queue\Heartbeat\FromClient::class),
-                new File\MessageDescriptor('Thesis.Queue.Heartbeat.FromClient.Ping', \Thesis\Queue\Heartbeat\FromClient\Ping::class),
                 new File\MessageDescriptor('Thesis.Queue.Heartbeat.FromServer', \Thesis\Queue\Heartbeat\FromServer::class),
                 new File\MessageDescriptor('Thesis.Queue.Heartbeat.FromServer.Ping', \Thesis\Queue\Heartbeat\FromServer\Ping::class),
+                new File\MessageDescriptor('Thesis.Queue.Heartbeat.FromClient', \Thesis\Queue\Heartbeat\FromClient::class),
+                new File\MessageDescriptor('Thesis.Queue.Heartbeat.FromClient.Ping', \Thesis\Queue\Heartbeat\FromClient\Ping::class),
             ],
         ));
     }

@@ -25,6 +25,7 @@ For this reason, we have written this plugin, which — in addition to addressin
     - [autoload.metadata.php](#autoloadmetadataphp)
 - [Generated libraries](#generated-libraries)
 - [Feature matrix](#feature-matrix)
+- [For contributors](#for-contributors)
 
 ### Usage
 
@@ -573,3 +574,24 @@ To avoid having to generate these types each time, it is recommended to use libr
 - [ ] `option php_metadata_namespace`
 - [x] `comments`
 - [x] `editions`
+
+
+### For contributors
+
+#### Adding new codegen fixtures
+
+1. Add a new `.proto` fixture under `tests/testdata/<case>/`.
+2. Run `make test` to regenerate `tests/testdata/*.txt` and `tests/snapshots/*`.
+3. Commit both updated fixture inputs and snapshots:
+   - `tests/testdata/*`
+   - `tests/snapshots/*`
+
+#### Code quality checks
+- `make test` — regenerates fixtures/snapshots and runs PHPUnit.
+- `make phpstan` — runs PHPStan.
+- `make fix` — applies code style fixes.
+- `make check` — runs the full quality suite (`test`, `phpstan`, `cs`). In most cases, this command is enough on its own.
+
+Run them either:
+- on host directly, or
+- inside container: `make t`, then run the same `make <cmd>`.

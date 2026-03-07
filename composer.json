@@ -32,6 +32,9 @@
         "phpunit/phpunit": "^12.4",
         "symfony/var-dumper": "^8.0"
     },
+    "conflict": {
+        "revolt/event-loop": "<0.2.5"
+    },
     "autoload": {
         "psr-4": {
             "Thesis\\Protoc\\": "src/"
