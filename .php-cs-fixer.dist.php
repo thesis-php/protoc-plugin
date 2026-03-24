@@ -23,6 +23,7 @@ $config = new Config()
 
 new PhpCsFixerCodingStandard()->applyTo($config, [
     'heredoc_indentation' => false,
+    'native_constant_invocation' => false,
 ]);
 
 return $config;
