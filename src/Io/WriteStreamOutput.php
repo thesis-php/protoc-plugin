@@ -14,6 +14,6 @@ final readonly class WriteStreamOutput implements WriteOutput
     #[\Override]
     public function write(string $buffer): void
     {
-        \fwrite(\STDOUT, $buffer);
+        fwrite(\STDOUT, $buffer);
     }
 }
