@@ -118,7 +118,6 @@ docker run --rm \
 The image behaves exactly like the `protoc` binary — all the same options and flags apply. The `--user` flag ensures that generated files are owned by the current host user rather than root.
 
 Replace `0.1.10` with the desired version, or use `latest` to always pull the most recent release.
-If needed, you can pass environment variables to the plugin with `-e`, for example: `-e THESIS_PLUGIN_MEMORY_LIMIT=1G`.
 
 ### Plugin options
 
