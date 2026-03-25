@@ -13,6 +13,7 @@ For this reason, we have written this plugin, which — in addition to addressin
   - [php_namespace](#php_namespace) 
   - [src_path](#src_path)
   - [grpc](#grpc)
+  - [memory limit](#memory-limit)
   - [multiple options](#multiple-options)
 - [Generated code guide](#generated-code-guide)
     - [numbers](#numbers)
@@ -169,6 +170,32 @@ protoc \
 ```
 
 To generate only the server code, use `grpc=server`. By default, and when passing `grpc=client,grpc=server`, both the client and server will be generated.
+
+### `memory limit`
+
+When processing very large schemas, the default PHP `memory_limit` (often `128M`) may be insufficient and lead to plugin exit code `255`.
+
+The plugin now ensures at least `512M` by default. If you need a different value, override it with the `THESIS_PLUGIN_MEMORY_LIMIT` environment variable.
+
+When using a locally installed plugin:
+```shell
+THESIS_PLUGIN_MEMORY_LIMIT=1G protoc \
+  --plugin=protoc-gen-php-plugin=/usr/local/bin/protoc-gen-php \
+  protos/*.proto \
+  --php-plugin_out=genproto
+```
+
+When using the Docker image:
+```shell
+docker run --rm \
+  --user $(id -u):$(id -g) \
+  -e THESIS_PLUGIN_MEMORY_LIMIT=1G \
+  -v "$(PWD):/workspace" \
+  -w /workspace \
+  ghcr.io/thesis-php/protoc-plugin:latest \
+  --php-plugin_out=genproto \
+  protos/*.proto
+```
 
 ### Multiple options
 
