@@ -177,7 +177,7 @@ When processing very large schemas, the default PHP `memory_limit` (often `128M`
 
 The plugin now ensures at least `512M` by default. If you need a different value, override it with the `THESIS_PLUGIN_MEMORY_LIMIT` environment variable.
 
-When using a locally installed plugin (`phar`/binary):
+When using a locally installed plugin:
 ```shell
 THESIS_PLUGIN_MEMORY_LIMIT=1G protoc \
   --plugin=protoc-gen-php-plugin=/usr/local/bin/protoc-gen-php \
