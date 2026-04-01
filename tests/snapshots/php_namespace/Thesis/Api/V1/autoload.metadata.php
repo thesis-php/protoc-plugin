@@ -9,6 +9,6 @@
 
 declare(strict_types=1);
 
-\Thesis\Protobuf\Pool\Registry::get()->register(
-    new \Thesis\Protobuf\Pool\OnceRegistrar(new \Thesis\Api\V1\PhpNamespaceDescriptorRegistry()),
+\Thesis\Protobuf\Registry\Pool::get()->register(
+    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Thesis\Api\V1\PhpNamespaceDescriptorRegistry()),
 );

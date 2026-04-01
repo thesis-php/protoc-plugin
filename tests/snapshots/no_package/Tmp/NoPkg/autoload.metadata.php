@@ -9,6 +9,6 @@
 
 declare(strict_types=1);
 
-\Thesis\Protobuf\Pool\Registry::get()->register(
-    new \Thesis\Protobuf\Pool\OnceRegistrar(new \Tmp\NoPkg\TestDescriptorRegistry()),
+\Thesis\Protobuf\Registry\Pool::get()->register(
+    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Tmp\NoPkg\TestDescriptorRegistry()),
 );

@@ -10,6 +10,7 @@ use Thesis\Package;
 use Thesis\Protobuf\Encoder;
 use Thesis\Protobuf\Registry\File;
 use Thesis\Protoc\Exception\CodeCannotBeGenerated;
+use Thesis\Protoc\Plugin\Generator\AutoloadFunctionGenerator;
 use Thesis\Protoc\Plugin\Generator\FileFactory;
 use Thesis\Protoc\Plugin\Parser\FileDescriptor;
 use Thesis\Protoc\Plugin\Parser\MessageDescriptor;
