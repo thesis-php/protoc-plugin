@@ -13,20 +13,20 @@ declare(strict_types=1);
 namespace Thesis\Queue\V1;
 
 use Override;
-use Thesis\Protobuf\Pool;
-use Thesis\Protobuf\Pool\File;
+use Thesis\Protobuf\Registry;
+use Thesis\Protobuf\Registry\File;
 
 /**
  * @api
  */
-final readonly class QueueV1DescriptorRegistry implements Pool\Registrar
+final readonly class QueueV1DescriptorRegistry implements Registry\Registrar
 {
     private const string DESCRIPTOR_BUFFER = 'Cg5xdWV1ZV92MS5wcm90bxIPVGhlc2lzLlF1ZXVlLlYxGhJwcm90b3MvcXVldWUucHJvdG8aG2dvb2dsZS9wcm90b2J1Zi9lbXB0eS5wcm90bzL+AQoMUXVldWVTZXJ2aWNlEkMKBFB1c2gSIS5UaGVzaXMuUXVldWUuUHVzaFJlcXVlc3QuTWVzc2FnZRoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSgBEkYKBFB1bGwSGS5UaGVzaXMuUXVldWUuUHVsbFJlcXVlc3QaIS5UaGVzaXMuUXVldWUuUHVsbFJlcXVlc3QuTWVzc2FnZTABEmEKCUhlYXJ0YmVhdBInLlRoZXNpcy5RdWV1ZS5IZWFydGJlYXQuRnJvbUNsaWVudC5QaW5nGicuVGhlc2lzLlF1ZXVlLkhlYXJ0YmVhdC5Gcm9tU2VydmVyLlBpbmcoATABSqcCCgYSBAAACwEKCAoBDBIDAAASCggKAQISAwIAGAoJCgIDABIDBAAcCgkKAgMBEgMFACUKCgoCBgASBAcACwEKCgoDBgABEgMHCBQKCwoEBgACABIDCARJCgwKBQYAAgABEgMICAwKDAoFBgACAAUSAwgNEwoMCgUGAAIAAhIDCBQnCgwKBQYAAgADEgMIMkcKCwoEBgACARIDCQQ/CgwKBQYAAgEBEgMJCAwKDAoFBgACAQISAwkNGAoMCgUGAAIBBhIDCSMpCgwKBQYAAgEDEgMJKj0KCwoEBgACAhIDCgRgCgwKBQYAAgIBEgMKCBEKDAoFBgACAgUSAwoTGQoMCgUGAAICAhIDChozCgwKBQYAAgIGEgMKPkQKDAoFBgACAgMSAwpFXmIGcHJvdG8z';
 
     #[Override]
-    public function register(Pool\Registry $pool): void
+    public function register(Registry\Pool $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+        $pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
             name: 'queue_v1.proto',
             dependencies: [
                 'protos/queue.proto',
@@ -35,8 +35,11 @@ final readonly class QueueV1DescriptorRegistry implements Pool\Registrar
             services: [
                 new File\ServiceDescriptor(
                     name: 'Thesis.Queue.V1.QueueService',
-                    clientFqcn: \Thesis\Queue\V1\QueueServiceClient::class,
-                    serverFqcn: \Thesis\Queue\V1\QueueServiceServer::class,
+                    methods: [
+                        new File\MethodDescriptor('Push', true, false),
+                        new File\MethodDescriptor('Pull', false, true),
+                        new File\MethodDescriptor('Heartbeat', true, true),
+                    ],
                 ),
             ],
         ));

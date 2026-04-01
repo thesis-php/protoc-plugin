@@ -8,10 +8,12 @@ use Google\Protobuf\Compiler\CodeGeneratorRequest;
 use Google\Protobuf\Compiler\CodeGeneratorResponse;
 use Thesis\Package;
 use Thesis\Protobuf\Encoder;
+use Thesis\Protobuf\Registry\File;
 use Thesis\Protoc\Exception\CodeCannotBeGenerated;
 use Thesis\Protoc\Plugin\Generator\FileFactory;
 use Thesis\Protoc\Plugin\Parser\FileDescriptor;
 use Thesis\Protoc\Plugin\Parser\MessageDescriptor;
+use Thesis\Protoc\Plugin\Parser\ServiceMethodDescriptor;
 use Thesis\Protoc\ProtocException;
 
 /**
@@ -84,6 +86,24 @@ final readonly class Compiler
                 if ($options->requireGrpcServer) {
                     yield from $generator->generateGrpcServer($service);
                 }
+
+                \assert(($serviceName = ($proto->package !== null ? "{$proto->package}." : '') . $service->path) !== '');
+
+                $index->addService(new File\ServiceDescriptor(
+                    name: $serviceName,
+                    methods: array_map(
+                        static function (ServiceMethodDescriptor $method): File\MethodDescriptor {
+                            \assert($method->name !== '');
+
+                            return new File\MethodDescriptor(
+                                $method->name,
+                                $method->clientStreaming,
+                                $method->serverStreaming,
+                            );
+                        },
+                        $service->methods,
+                    ),
+                ));
             }
 
             yield from array_map($generator->generateEnum(...), $proto->enums);

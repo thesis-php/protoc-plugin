@@ -13,24 +13,29 @@ declare(strict_types=1);
 namespace Proto\Api\V1;
 
 use Override;
-use Thesis\Protobuf\Pool;
-use Thesis\Protobuf\Pool\File;
+use Thesis\Protobuf\Registry;
+use Thesis\Protobuf\Registry\File;
 
 /**
  * @api
  */
-final readonly class SnakeCaseDescriptorRegistry implements Pool\Registrar
+final readonly class SnakeCaseDescriptorRegistry implements Registry\Registrar
 {
     private const string DESCRIPTOR_BUFFER = 'ChBzbmFrZV9jYXNlLnByb3RvEgxwcm90by5hcGkudjEi6wQKDFRlc3RfUmVxdWVzdBJBCgZuZXN0ZWQYASABKAsyKS5wcm90by5hcGkudjEuVGVzdF9SZXF1ZXN0Lk5lc3RlZF9NZXNzYWdlUgZuZXN0ZWQSFgoGbnVtYmVyGAIgASgFUgZudW1iZXISOwoDY29sGAMgASgLMikucHJvdG8uYXBpLnYxLlRlc3RfUmVxdWVzdC5OZXN0ZWRfTWVzc2FnZVIDY29sElUKCWRlZXBfZW51bRgEIAEoDjI4LnByb3RvLmFwaS52MS5UZXN0X1JlcXVlc3QuTmVzdGVkX01lc3NhZ2UuRGVlcC5EZWVwX0VudW1SCGRlZXBFbnVtEk8KC25lc3RlZF9kZWVwGAUgASgLMi4ucHJvdG8uYXBpLnYxLlRlc3RfUmVxdWVzdC5OZXN0ZWRfTWVzc2FnZS5EZWVwUgpuZXN0ZWREZWVwGo8CCg5OZXN0ZWRfTWVzc2FnZRJCCgRkZWVwGAEgASgLMi4ucHJvdG8uYXBpLnYxLlRlc3RfUmVxdWVzdC5OZXN0ZWRfTWVzc2FnZS5EZWVwUgRkZWVwGrgBCgREZWVwEhQKBXBob25lGAEgASgJUgVwaG9uZRIUCgVlbWFpbBgCIAEoCVIFZW1haWwSVQoJZGVlcF9lbnVtGAMgASgOMjgucHJvdG8uYXBpLnYxLlRlc3RfUmVxdWVzdC5OZXN0ZWRfTWVzc2FnZS5EZWVwLkRlZXBfRW51bVIIZGVlcEVudW0iJAoJRGVlcF9FbnVtEhcKFURFRVBfRU5VTV9VTlNQRUNJRklFREIHCgV1bmlvbkIJCgd4X2ZpZWxkIqsBCg9Bbm90aGVyX1JlcXVlc3QSQQoGbmVzdGVkGAEgASgLMikucHJvdG8uYXBpLnYxLlRlc3RfUmVxdWVzdC5OZXN0ZWRfTWVzc2FnZVIGbmVzdGVkElUKCWRlZXBfZW51bRgCIAEoDjI4LnByb3RvLmFwaS52MS5UZXN0X1JlcXVlc3QuTmVzdGVkX01lc3NhZ2UuRGVlcC5EZWVwX0VudW1SCGRlZXBFbnVtKhgKA0ZvbxIRCg9GT09fVU5TUEVDSUZJRURK/QcKBhIEAAAjAQoICgEMEgMAABIKCAoBAhIDAgAVCgoKAgUAEgQEAAYBCgoKAwUAARIDBAUICgsKBAUAAgASAwUEGAoMCgUFAAIAARIDBQQTCgwKBQUAAgACEgMFFhcKCgoCBAASBAgAHgEKCgoDBAABEgMICBQKDAoEBAADABIECQQWBQoMCgUEAAMAARIDCQwaCg4KBgQAAwADABIECggUCQoOCgcEAAMAAwABEgMKEBQKEAoIBAADAAMABAASBAsMDQ0KEAoJBAADAAMABAABEgMLERoKEQoKBAADAAMABAACABIDDBAqChIKCwQAAwADAAQAAgABEgMMECUKEgoLBAADAAMABAACAAISAwwoKQoQCggEAAMAAwAIABIEDwwSDQoQCgkEAAMAAwAIAAESAw8SFwoPCggEAAMAAwACABIDEBAhChAKCQQAAwADAAIABRIDEBAWChAKCQQAAwADAAIAARIDEBccChAKCQQAAwADAAIAAxIDEB8gCg8KCAQAAwADAAIBEgMRECEKEAoJBAADAAMAAgEFEgMREBYKEAoJBAADAAMAAgEBEgMRFxwKEAoJBAADAAMAAgEDEgMRHyAKDwoIBAADAAMAAgISAxMMJAoQCgkEAAMAAwACAgYSAxMMFQoQCgkEAAMAAwACAgESAxMWHwoQCgkEAAMAAwACAgMSAxMiIwoNCgYEAAMAAgASAxUIFgoOCgcEAAMAAgAGEgMVCAwKDgoHBAADAAIAARIDFQ0RCg4KBwQAAwACAAMSAxUUFQoLCgQEAAIAEgMXBB4KDAoFBAACAAYSAxcEEgoMCgUEAAIAARIDFxMZCgwKBQQAAgADEgMXHB0KDAoEBAAIABIEGAQcBQoMCgUEAAgAARIDGAoRCgsKBAQAAgESAxkIGQoMCgUEAAIBBRIDGQgNCgwKBQQAAgEBEgMZDhQKDAoFBAACAQMSAxkXGAoLCgQEAAICEgMaCB8KDAoFBAACAgYSAxoIFgoMCgUEAAICARIDGhcaCgwKBQQAAgIDEgMaHR4KCwoEBAACAxIDGwg0CgwKBQQAAgMGEgMbCCUKDAoFBAACAwESAxsmLwoMCgUEAAIDAxIDGzIzCgsKBAQAAgQSAx0EKAoMCgUEAAIEBhIDHQQXCgwKBQQAAgQBEgMdGCMKDAoFBAACBAMSAx0mJwoKCgIEARIEIAAjAQoKCgMEAQESAyAIFwoLCgQEAQIAEgMhBCsKDAoFBAECAAYSAyEEHwoMCgUEAQIAARIDISAmCgwKBQQBAgADEgMhKSoKCwoEBAECARIDIgQ9CgwKBQQBAgEGEgMiBC4KDAoFBAECAQESAyIvOAoMCgUEAQIBAxIDIjs8YgZwcm90bzM=';
 
     #[Override]
-    public function register(Pool\Registry $pool): void
+    public function register(Registry\Pool $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+        $pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
             name: 'snake_case.proto',
             messages: [
+                new File\MessageDescriptor('proto.api.v1.Test_Request', \Proto\Api\V1\TestRequest::class),
+                new File\MessageDescriptor('proto.api.v1.Test_Request', \Proto\Api\V1\TestRequest\XFieldNumber::class),
+                new File\MessageDescriptor('proto.api.v1.Test_Request', \Proto\Api\V1\TestRequest\XFieldCol::class),
                 new File\MessageDescriptor('proto.api.v1.Test_Request', \Proto\Api\V1\TestRequest\XFieldDeepEnum::class),
                 new File\MessageDescriptor('proto.api.v1.Test_Request.Nested_Message', \Proto\Api\V1\TestRequest\NestedMessage::class),
+                new File\MessageDescriptor('proto.api.v1.Test_Request.Nested_Message.Deep', \Proto\Api\V1\TestRequest\NestedMessage\Deep::class),
+                new File\MessageDescriptor('proto.api.v1.Test_Request.Nested_Message.Deep', \Proto\Api\V1\TestRequest\NestedMessage\Deep\UnionPhone::class),
                 new File\MessageDescriptor('proto.api.v1.Test_Request.Nested_Message.Deep', \Proto\Api\V1\TestRequest\NestedMessage\Deep\UnionEmail::class),
                 new File\MessageDescriptor('proto.api.v1.Another_Request', \Proto\Api\V1\AnotherRequest::class),
             ],

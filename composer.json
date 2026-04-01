@@ -25,7 +25,8 @@
         "thesis/package-version": "0.1.2",
         "thesis/protobuf": "^0.1.6",
         "thesis/protobuf-compiler-types": "0.1.0",
-        "thesis/protobuf-descriptor-types": "0.1.0"
+        "thesis/protobuf-descriptor-types": "0.1.0",
+        "thesis/protoregistry": "^0.1.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^12.4",

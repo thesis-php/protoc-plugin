@@ -13,6 +13,7 @@ use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\PhpNamespace;
+use Thesis\Protobuf\Registry\File;
 use Thesis\Protoc\Exception\CodeCannotBeGenerated;
 use Thesis\Protoc\Plugin\Dependency;
 use Thesis\Protoc\Plugin\NameIndex;
@@ -42,7 +43,15 @@ final readonly class ProtoGenerator
 
         $enumName = Naming::pascalCase($enum->name);
 
-        $this->index->addEnumType($enum->fqcn, "{$namespace->getName()}\\{$enumName}");
+        \assert($enum->fqcn !== '');
+
+        /** @var class-string $enumFqcn */
+        $enumFqcn = "{$namespace->getName()}\\{$enumName}";
+
+        $this->index->addEnumType(new File\EnumDescriptor(
+            $enum->fqcn,
+            $enumFqcn,
+        ));
 
         $enumType = new EnumType($enumName)
             ->addComment('@api')
@@ -105,7 +114,15 @@ final readonly class ProtoGenerator
 
         $className = Naming::pascalCase($message->name);
 
-        $this->index->addMessageType($message->fqcn, "{$namespace->getName()}\\{$className}");
+        \assert($message->fqcn !== '');
+
+        /** @var class-string $messageFqcn */
+        $messageFqcn = "{$namespace->getName()}\\{$className}";
+
+        $this->index->addMessageType(new File\MessageDescriptor(
+            $message->fqcn,
+            $messageFqcn,
+        ));
 
         $classType = new ClassType($className)
             ->setFinal()

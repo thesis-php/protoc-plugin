@@ -32,7 +32,6 @@ final readonly class ClassLikeGenerator
         $this->grpc = new Generator\GrpcGenerator(
             $namespacer,
             $graph,
-            $index,
             $package,
         );
         $this->proto = new Generator\ProtoGenerator(

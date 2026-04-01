@@ -13,20 +13,20 @@ declare(strict_types=1);
 namespace Thesis\Auth;
 
 use Override;
-use Thesis\Protobuf\Pool;
-use Thesis\Protobuf\Pool\File;
+use Thesis\Protobuf\Registry;
+use Thesis\Protobuf\Registry\File;
 
 /**
  * @api
  */
-final readonly class ProtosAuthDescriptorRegistry implements Pool\Registrar
+final readonly class ProtosAuthDescriptorRegistry implements Registry\Registrar
 {
     private const string DESCRIPTOR_BUFFER = 'ChFwcm90b3MvYXV0aC5wcm90bxILVGhlc2lzLkF1dGgiPgoMTG9naW5SZXF1ZXN0EhIKBHVzZXIYAiABKAlSBHVzZXISGgoIcGFzc3dvcmQYAyABKAlSCHBhc3N3b3JkIiUKDUxvZ2luUmVzcG9uc2USFAoFdG9rZW4YASABKAlSBXRva2VuSvEBCgYSBAAACwEKCAoBDBIDAAASCggKAQISAwIAFAoKCgIEABIEBAAHAQoKCgMEAAESAwQIFAoLCgQEAAIAEgMFBBQKDAoFBAACAAUSAwUECgoMCgUEAAIAARIDBQsPCgwKBQQAAgADEgMFEhMKCwoEBAACARIDBgQYCgwKBQQAAgEFEgMGBAoKDAoFBAACAQESAwYLEwoMCgUEAAIBAxIDBhYXCgoKAgQBEgQJAAsBCgoKAwQBARIDCQgVCgsKBAQBAgASAwoEFQoMCgUEAQIABRIDCgQKCgwKBQQBAgABEgMKCxAKDAoFBAECAAMSAwoTFGIGcHJvdG8z';
 
     #[Override]
-    public function register(Pool\Registry $pool): void
+    public function register(Registry\Pool $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+        $pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
             name: 'protos/auth.proto',
             messages: [
                 new File\MessageDescriptor('Thesis.Auth.LoginRequest', \Thesis\Auth\LoginRequest::class),

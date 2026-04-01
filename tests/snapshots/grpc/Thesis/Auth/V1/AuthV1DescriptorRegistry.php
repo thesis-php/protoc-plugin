@@ -13,20 +13,20 @@ declare(strict_types=1);
 namespace Thesis\Auth\V1;
 
 use Override;
-use Thesis\Protobuf\Pool;
-use Thesis\Protobuf\Pool\File;
+use Thesis\Protobuf\Registry;
+use Thesis\Protobuf\Registry\File;
 
 /**
  * @api
  */
-final readonly class AuthV1DescriptorRegistry implements Pool\Registrar
+final readonly class AuthV1DescriptorRegistry implements Registry\Registrar
 {
     private const string DESCRIPTOR_BUFFER = 'Cg1hdXRoX3YxLnByb3RvEg5UaGVzaXMuQXV0aC5WMRoRcHJvdG9zL2F1dGgucHJvdG8yTQoLQXV0aFNlcnZpY2USPgoFTG9naW4SGS5UaGVzaXMuQXV0aC5Mb2dpblJlcXVlc3QaGi5UaGVzaXMuQXV0aC5Mb2dpblJlc3BvbnNlSnYKBhIEAAAIAQoICgEMEgMAABIKCAoBAhIDAgAXCgkKAgMAEgMEABsKCgoCBgASBAYACAEKCgoDBgABEgMGCBMKCwoEBgACABIDBwQ+CgwKBQYAAgABEgMHCA0KDAoFBgACAAISAwcOHwoMCgUGAAIAAxIDByo8YgZwcm90bzM=';
 
     #[Override]
-    public function register(Pool\Registry $pool): void
+    public function register(Registry\Pool $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+        $pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
             name: 'auth_v1.proto',
             dependencies: [
                 'protos/auth.proto',
@@ -34,8 +34,9 @@ final readonly class AuthV1DescriptorRegistry implements Pool\Registrar
             services: [
                 new File\ServiceDescriptor(
                     name: 'Thesis.Auth.V1.AuthService',
-                    clientFqcn: \Thesis\Auth\V1\AuthServiceClient::class,
-                    serverFqcn: \Thesis\Auth\V1\AuthServiceServer::class,
+                    methods: [
+                        new File\MethodDescriptor('Login', false, false),
+                    ],
                 ),
             ],
         ));
