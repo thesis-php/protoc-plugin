@@ -24,8 +24,8 @@
         "nette/php-generator": "4.2.1",
         "thesis/package-version": "0.1.2",
         "thesis/protobuf": "^0.1.7",
-        "thesis/protobuf-compiler-types": "0.1.0",
-        "thesis/protobuf-descriptor-types": "0.1.0",
+        "thesis/protobuf-compiler-types": "0.1.3",
+        "thesis/protobuf-descriptor-types": "0.1.3",
         "thesis/protoregistry": "^0.1.1"
     },
     "require-dev": {
