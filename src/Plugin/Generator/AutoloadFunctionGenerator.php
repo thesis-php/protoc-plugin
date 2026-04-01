@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Thesis\Protoc\Plugin;
+namespace Thesis\Protoc\Plugin\Generator;
 
 use Google\Protobuf\Compiler\CodeGeneratorResponse;
-use Thesis\Protoc\Plugin\Generator\FileFactory;
 
 /**
  * @api
@@ -24,13 +23,13 @@ final readonly class AutoloadFunctionGenerator
         return $this->files->create(
             code: \sprintf(
                 <<<'PHP'
-\Thesis\Protobuf\Pool\Registry::get()->register(
+\Thesis\Protobuf\Registry\Pool::get()->register(
 %s,
 );
 
 PHP,
                 implode(",\n", array_map(
-                    static fn(string $descriptor) => "    new \\Thesis\\Protobuf\\Pool\\OnceRegistrar(new \\{$descriptor}())",
+                    static fn(string $descriptor) => "    new \\Thesis\\Protobuf\\Registry\\OnceRegistrar(new \\{$descriptor}())",
                     $descriptors,
                 )),
             ),

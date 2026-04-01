@@ -13,6 +13,7 @@ use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\PhpNamespace;
+use Thesis\Protobuf\Registry\File;
 use Thesis\Protoc\Exception\CodeCannotBeGenerated;
 use Thesis\Protoc\Plugin\Dependency;
 use Thesis\Protoc\Plugin\NameIndex;
@@ -42,7 +43,15 @@ final readonly class ProtoGenerator
 
         $enumName = Naming::pascalCase($enum->name);
 
-        $this->index->addEnumType($enum->fqcn, "{$namespace->getName()}\\{$enumName}");
+        \assert($enum->fqcn !== '');
+
+        /** @var class-string $enumFqcn */
+        $enumFqcn = "{$namespace->getName()}\\{$enumName}";
+
+        $this->index->addEnumType(new File\EnumDescriptor(
+            $enum->fqcn,
+            $enumFqcn,
+        ));
 
         $enumType = new EnumType($enumName)
             ->addComment('@api')
@@ -66,7 +75,21 @@ final readonly class ProtoGenerator
      */
     public function generateMessages(Parser\MessageDescriptor $message): iterable
     {
-        yield $message->path => $this->generateMessage($message);
+        $namespace = $this->namespacer->create($message->path);
+
+        $className = Naming::pascalCase($message->name);
+
+        \assert($message->fqcn !== '');
+
+        /** @var class-string $messageFqcn */
+        $messageFqcn = "{$namespace->getName()}\\{$className}";
+
+        $this->index->addMessageType(new File\MessageDescriptor(
+            $message->fqcn,
+            $messageFqcn,
+        ));
+
+        yield $message->path => $this->generateMessage($namespace, $className, $message);
 
         $oneofByIndex = [];
 
@@ -99,14 +122,8 @@ final readonly class ProtoGenerator
      * @param list<string> $implements
      * @throws CodeCannotBeGenerated
      */
-    private function generateMessage(Parser\MessageDescriptor $message, array $implements = []): PhpNamespace
+    private function generateMessage(PhpNamespace $namespace, string $className, Parser\MessageDescriptor $message, array $implements = []): PhpNamespace
     {
-        $namespace = $this->namespacer->create($message->path);
-
-        $className = Naming::pascalCase($message->name);
-
-        $this->index->addMessageType($message->fqcn, "{$namespace->getName()}\\{$className}");
-
         $classType = new ClassType($className)
             ->setFinal()
             ->setReadOnly()
@@ -325,14 +342,19 @@ final readonly class ProtoGenerator
             ],
         );
 
-        yield $path => $this->generateMessage($descriptor, [
-            Naming::joinNamespace([
-                '',
-                $this->namespacer->namespace,
-                $message->path,
-                $interfaceName,
-            ]),
-        ]);
+        yield $path => $this->generateMessage(
+            $this->namespacer->create($path),
+            Naming::pascalCase($className),
+            $descriptor,
+            [
+                Naming::joinNamespace([
+                    '',
+                    $this->namespacer->namespace,
+                    $message->path,
+                    $interfaceName,
+                ]),
+            ],
+        );
     }
 
     private function parseDefaultValue(

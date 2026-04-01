@@ -13,20 +13,20 @@ declare(strict_types=1);
 namespace Thesis\Api\V1;
 
 use Override;
-use Thesis\Protobuf\Pool;
-use Thesis\Protobuf\Pool\File;
+use Thesis\Protobuf\Registry;
+use Thesis\Protobuf\Registry\File;
 
 /**
  * @api
  */
-final readonly class PhpNamespaceDescriptorRegistry implements Pool\Registrar
+final readonly class PhpNamespaceDescriptorRegistry implements Registry\Registrar
 {
     private const string DESCRIPTOR_BUFFER = 'ChNwaHBfbmFtZXNwYWNlLnByb3RvEgt0ZXN0LmFwaS52MSINCgtUZXN0UmVxdWVzdEIZ+AEBwgIDS2VrygINVGhlc2lzXEFwaVxWMUpdCgYSBAAABxYKCAoBDBIDAAASCggKAQgSAwIAKQoJCgIIKRIDAgApCggKAQgSAwMAIAoJCgIIKBIDAwAgCggKAQISAwUAFAoJCgIEABIDBwAWCgoKAwQAARIDBwgTYgZwcm90bzM=';
 
     #[Override]
-    public function register(Pool\Registry $pool): void
+    public function register(Registry\Pool $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+        $pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
             name: 'php_namespace.proto',
             messages: [
                 new File\MessageDescriptor('test.api.v1.TestRequest', \Thesis\Api\V1\TestRequest::class),

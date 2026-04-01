@@ -4,56 +4,40 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin;
 
+use Thesis\Protobuf\Registry\File;
+
 /**
  * @api
- * @phpstan-type GrpcService = object{client: ?string, server: ?string}
  */
 final class NameIndex
 {
-    /** @var array<string, string> */
+    /** @var list<File\MessageDescriptor> */
     public private(set) array $messageTypes = [];
 
-    /** @var array<string, string> */
+    /** @var list<File\EnumDescriptor> */
     public private(set) array $enumTypes = [];
 
-    /** @var array<string, GrpcService>
+    /** @var list<File\ServiceDescriptor>
      */
-    public private(set) array $grpc = [];
+    public private(set) array $services = [];
 
-    public function addMessageType(string $type, string $fqcn): void
+    public function addMessageType(File\MessageDescriptor $message): void
     {
-        $this->messageTypes[$type] = $fqcn;
+        $this->messageTypes[] = $message;
     }
 
-    public function addEnumType(string $type, string $fqcn): void
+    public function addEnumType(File\EnumDescriptor $enum): void
     {
-        $this->enumTypes[$type] = $fqcn;
+        $this->enumTypes[] = $enum;
     }
 
-    public function addClient(string $type, string $fqcn): void
+    public function addService(File\ServiceDescriptor $service): void
     {
-        $this->grpc[$type] ??= new class {
-            public function __construct(
-                public ?string $client = null,
-                public ?string $server = null,
-            ) {}
-        };
-        $this->grpc[$type]->client = $fqcn; // @phpstan-ignore assign.propertyReadOnly
-    }
-
-    public function addServer(string $type, string $fqcn): void
-    {
-        $this->grpc[$type] ??= new class {
-            public function __construct(
-                public ?string $client = null,
-                public ?string $server = null,
-            ) {}
-        };
-        $this->grpc[$type]->server = $fqcn; // @phpstan-ignore assign.propertyReadOnly
+        $this->services[] = $service;
     }
 
     public function empty(): bool
     {
-        return $this->messageTypes === [] && $this->enumTypes === [] && $this->grpc === [];
+        return $this->messageTypes === [] && $this->enumTypes === [] && $this->services === [];
     }
 }

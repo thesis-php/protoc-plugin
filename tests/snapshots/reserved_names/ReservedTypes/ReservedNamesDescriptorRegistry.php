@@ -13,20 +13,20 @@ declare(strict_types=1);
 namespace ReservedTypes;
 
 use Override;
-use Thesis\Protobuf\Pool;
-use Thesis\Protobuf\Pool\File;
+use Thesis\Protobuf\Registry;
+use Thesis\Protobuf\Registry\File;
 
 /**
  * @api
  */
-final readonly class ReservedNamesDescriptorRegistry implements Pool\Registrar
+final readonly class ReservedNamesDescriptorRegistry implements Registry\Registrar
 {
     private const string DESCRIPTOR_BUFFER = 'ChRyZXNlcnZlZF9uYW1lcy5wcm90bxIOcmVzZXJ2ZWRfdHlwZXMiBgoEZXhpdCJECgpJTlNUQU5DRU9GEjYKBWJyZWFrGAEgASgLMiAucmVzZXJ2ZWRfdHlwZXMuQ2xhc3MuQ2FzZS5CcmVha1IFYnJlYWsiZAoFQ2xhc3MSNgoFYnJlYWsYASABKAsyIC5yZXNlcnZlZF90eXBlcy5DbGFzcy5DYXNlLkJyZWFrUgVicmVhaxojCgRDYXNlGhsKBUJyZWFrEhIKBG5hbWUYASABKAlSBG5hbWUqQgoKTm90QWxsb3dlZBIKCghhYnN0cmFjdBIHCgNhbmQQARIJCgVhcnJheRACEgkKBWVtcHR5EAMSCQoFY2xhc3MQBCoRCgZzdHJpbmcSBwoFWkVSTzEqEAoFVHJhaXQSBwoFWkVSTzJKuQUKBhIEAAAeAQoICgEMEgMAABIKCAoBAhIDAgAXCgoKAgUAEgQEAAoBCgoKAwUAARIDBAUPCgsKBAUAAgASAwUEEQoMCgUFAAIAARIDBQQMCgwKBQUAAgACEgMFDxAKCwoEBQACARIDBgQMCgwKBQUAAgEBEgMGBAcKDAoFBQACAQISAwYKCwoLCgQFAAICEgMHBA4KDAoFBQACAgESAwcECQoMCgUFAAICAhIDBwwNCgsKBAUAAgMSAwgEDgoMCgUFAAIDARIDCAQJCgwKBQUAAgMCEgMIDA0KCwoEBQACBBIDCQQOCgwKBQUAAgQBEgMJBAkKDAoFBQACBAISAwkMDQoJCgIFARIDDAAaCgoKAwUBARIDDAULCgsKBAUBAgASAwwOGAoMCgUFAQIAARIDDA4TCgwKBQUBAgACEgMMFhcKCQoCBQISAw4AGQoKCgMFAgESAw4FCgoLCgQFAgIAEgMODRcKDAoFBQICAAESAw4NEgoMCgUFAgIAAhIDDhUWCgkKAgQAEgMQAA8KCgoDBAABEgMQCAwKCgoCBAESBBIAFAEKCgoDBAEBEgMSCBIKCwoEBAECABIDEwQfCgwKBQQBAgAGEgMTBBQKDAoFBAECAAESAxMVGgoMCgUEAQIAAxIDEx0eCgoKAgQCEgQWAB4BCgoKAwQCARIDFggNCgwKBAQCAwASBBcEGwUKDAoFBAIDAAESAxcMEAoOCgYEAgMAAwASBBgIGgkKDgoHBAIDAAMAARIDGBAVCg8KCAQCAwADAAIAEgMZDBwKEAoJBAIDAAMAAgAFEgMZDBIKEAoJBAIDAAMAAgABEgMZExcKEAoJBAIDAAMAAgADEgMZGhsKCwoEBAICABIDHQQZCgwKBQQCAgAGEgMdBA4KDAoFBAICAAESAx0PFAoMCgUEAgIAAxIDHRcYYgZwcm90bzM=';
 
     #[Override]
-    public function register(Pool\Registry $pool): void
+    public function register(Registry\Pool $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+        $pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
             name: 'reserved_names.proto',
             messages: [
                 new File\MessageDescriptor('reserved_types.exit', \ReservedTypes\Exit_::class),

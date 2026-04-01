@@ -13,20 +13,20 @@ declare(strict_types=1);
 namespace Tmp\NoPkg;
 
 use Override;
-use Thesis\Protobuf\Pool;
-use Thesis\Protobuf\Pool\File;
+use Thesis\Protobuf\Registry;
+use Thesis\Protobuf\Registry\File;
 
 /**
  * @api
  */
-final readonly class TestDescriptorRegistry implements Pool\Registrar
+final readonly class TestDescriptorRegistry implements Registry\Registrar
 {
     private const string DESCRIPTOR_BUFFER = 'Cgp0ZXN0LnByb3RvIhUKAUESEAoBYhgBIAEoCzICLkJSAWIiEQoBQhIMCgF2GAEgASgJUgF2Qg/4AQHKAglUbXBcTm9Qa2dKxQEKBhIEAAAKAQoICgEMEgMAABIKCAoBCBIDAgAkCgkKAggpEgMCACQKCgoCBAASBAQABgEKCgoDBAABEgMECAkKCwoEBAACABIDBQIKCgwKBQQAAgAGEgMFAgMKDAoFBAACAAESAwUEBQoMCgUEAAIAAxIDBQgJCgoKAgQBEgQIAAoBCgoKAwQBARIDCAgJCgsKBAQBAgASAwkCDwoMCgUEAQIABRIDCQIICgwKBQQBAgABEgMJCQoKDAoFBAECAAMSAwkNDmIGcHJvdG8z';
 
     #[Override]
-    public function register(Pool\Registry $pool): void
+    public function register(Registry\Pool $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+        $pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
             name: 'test.proto',
             messages: [
                 new File\MessageDescriptor('A', \Tmp\NoPkg\A::class),

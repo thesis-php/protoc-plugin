@@ -10,6 +10,7 @@ use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\Parameter;
 use Nette\PhpGenerator\PhpNamespace;
+use Thesis\Protobuf\Registry\File;
 use Thesis\Protoc\Plugin\NameIndex;
 
 /**
@@ -38,7 +39,7 @@ final readonly class DescriptorMetadataRegistryGenerator
             ->setReadOnly()
             ->addComment('@api')
             ->setImplements([
-                'Pool\Registrar',
+                'Registry\Registrar',
             ])
             ->addMember(
                 new Constant('DESCRIPTOR_BUFFER')
@@ -49,20 +50,20 @@ final readonly class DescriptorMetadataRegistryGenerator
 
         $namespace->add($classType);
 
-        $namespace->addUse('Thesis\Protobuf\Pool');
-        $namespace->addUse('Thesis\Protobuf\Pool\File');
+        $namespace->addUse('Thesis\Protobuf\Registry');
+        $namespace->addUse('Thesis\Protobuf\Registry\File');
         $namespace->addUse(\Override::class);
 
         $method = $classType
             ->addMethod('register')
             ->setPublic()
             ->setParameters([
-                new Parameter('pool')->setType('Pool\Registry'),
+                new Parameter('pool')->setType('Registry\Pool'),
             ])
             ->setReturnType('void')
             ->addAttribute(\Override::class);
 
-        $method->addBody('$pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(');
+        $method->addBody('$pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(');
         $method->addBody('    name: ?,', [$filename]);
 
         self::pushParameter($method, 'dependencies', $dependencies);
@@ -70,32 +71,41 @@ final readonly class DescriptorMetadataRegistryGenerator
             $method,
             'messages',
             $index->messageTypes,
-            static fn(string $type, string $fqcn) => new Literal(
-                \sprintf("new File\\MessageDescriptor('%s', \\%s::class)", $type, $fqcn),
+            static fn(File\MessageDescriptor $descriptor) => new Literal(
+                \sprintf("new File\\MessageDescriptor('%s', \\%s::class)", $descriptor->name, $descriptor->fqcn),
             ),
         );
-        self::pushParameter($method, 'enums', $index->enumTypes, static fn(string $type, string $fqcn) => new Literal(
-            \sprintf("new File\\EnumDescriptor('%s', \\%s::class)", $type, $fqcn),
+        self::pushParameter($method, 'enums', $index->enumTypes, static fn(File\EnumDescriptor $descriptor) => new Literal(
+            \sprintf("new File\\EnumDescriptor('%s', \\%s::class)", $descriptor->name, $descriptor->fqcn),
         ));
         self::pushParameter(
             $method,
             'services',
-            $index->grpc,
-            static fn(string $type, object $service) => new Literal(
-                vsprintf(
-                    <<<'PHP'
-        new File\ServiceDescriptor(
-            name: '%s',
-            clientFqcn: %s,
-            serverFqcn: %s,
+            $index->services,
+            static fn(File\ServiceDescriptor $descriptor) => new Literal(
+                <<<'PHP'
+new File\ServiceDescriptor(
+            name: ?,
+            methods: [
+                ?
+            ],
         )
 PHP,
-                    [
-                        $type,
-                        isset($service->client) ? "\\{$service->client}::class" : 'null',
-                        isset($service->server) ? "\\{$service->server}::class" : 'null',
-                    ],
-                ),
+                [
+                    $descriptor->name,
+                    new Literal(implode(
+                        "\n                ",
+                        array_map(
+                            static fn(File\MethodDescriptor $method) => \sprintf(
+                                "new File\\MethodDescriptor('%s', %s, %s),",
+                                $method->name,
+                                $method->clientStream ? 'true' : 'false',
+                                $method->serverStream ? 'true' : 'false',
+                            ),
+                            $descriptor->methods,
+                        ),
+                    )),
+                ],
             ),
         );
 
@@ -105,12 +115,11 @@ PHP,
     }
 
     /**
-     * @template K of array-key
      * @template V
      * @template R
      * @param non-empty-string $name
-     * @param array<K, V> $items
-     * @param ?\Closure(K, V): R $format
+     * @param list<V> $items
+     * @param ?\Closure(V): R $format
      */
     private static function pushParameter(
         Method $method,
@@ -118,13 +127,13 @@ PHP,
         array $items,
         ?\Closure $format = null,
     ): void {
-        $format ??= static fn(mixed $key, mixed $value) => $value;
+        $format ??= static fn(mixed $value) => $value;
 
         if ($items !== []) {
             $method->addBody("    {$name}: [");
 
-            foreach ($items as $key => $value) {
-                $method->addBody('        ?,', [$format($key, $value)]);
+            foreach ($items as $value) {
+                $method->addBody('        ?,', [$format($value)]);
             }
 
             $method->addBody('    ],');

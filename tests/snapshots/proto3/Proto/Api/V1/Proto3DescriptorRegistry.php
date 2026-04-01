@@ -13,23 +13,23 @@ declare(strict_types=1);
 namespace Proto\Api\V1;
 
 use Override;
-use Thesis\Protobuf\Pool;
-use Thesis\Protobuf\Pool\File;
+use Thesis\Protobuf\Registry;
+use Thesis\Protobuf\Registry\File;
 
 /**
  * @api
  */
-final readonly class Proto3DescriptorRegistry implements Pool\Registrar
+final readonly class Proto3DescriptorRegistry implements Registry\Registrar
 {
     private const string DESCRIPTOR_BUFFER = 'Cgxwcm90bzMucHJvdG8SDHByb3RvLmFwaS52MSK6AQoLVGVzdFJlcXVlc3QSIQoMc3RyaW5nX3ZhbHVlGAEgASgJUgtzdHJpbmdWYWx1ZRI3ChVvcHRpb25hbF9zdHJpbmdfdmFsdWUYAiABKAlIAVITb3B0aW9uYWxTdHJpbmdWYWx1ZYgBARIUCgVwaG9uZRgDIAEoCVIFcGhvbmUSFAoFZW1haWwYBCABKAlSBWVtYWlsQgkKB2NvbnRhY3RCGAoWX29wdGlvbmFsX3N0cmluZ192YWx1ZUq6AgoGEgQAAAsBCggKAQwSAwAAEgoICgECEgMCABUKCgoCBAASBAQACwEKCgoDBAABEgMECBMKCwoEBAACABIDBQQcCgwKBQQAAgAFEgMFBAoKDAoFBAACAAESAwULFwoMCgUEAAIAAxIDBRobCgsKBAQAAgESAwYELgoMCgUEAAIBBBIDBgQMCgwKBQQAAgEFEgMGDRMKDAoFBAACAQESAwYUKQoMCgUEAAIBAxIDBiwtCgwKBAQACAASBAcECgUKDAoFBAAIAAESAwcKEQoLCgQEAAICEgMICBkKDAoFBAACAgUSAwgIDgoMCgUEAAICARIDCA8UCgwKBQQAAgIDEgMIFxgKCwoEBAACAxIDCQgZCgwKBQQAAgMFEgMJCA4KDAoFBAACAwESAwkPFAoMCgUEAAIDAxIDCRcYYgZwcm90bzM=';
 
     #[Override]
-    public function register(Pool\Registry $pool): void
+    public function register(Registry\Pool $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+        $pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
             name: 'proto3.proto',
             messages: [
-                new File\MessageDescriptor('proto.api.v1.TestRequest', \Proto\Api\V1\TestRequest\ContactEmail::class),
+                new File\MessageDescriptor('proto.api.v1.TestRequest', \Proto\Api\V1\TestRequest::class),
             ],
         ));
     }

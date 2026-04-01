@@ -13,20 +13,20 @@ declare(strict_types=1);
 namespace Thesis\Queue;
 
 use Override;
-use Thesis\Protobuf\Pool;
-use Thesis\Protobuf\Pool\File;
+use Thesis\Protobuf\Registry;
+use Thesis\Protobuf\Registry\File;
 
 /**
  * @api
  */
-final readonly class ProtosQueueDescriptorRegistry implements Pool\Registrar
+final readonly class ProtosQueueDescriptorRegistry implements Registry\Registrar
 {
     private const string DESCRIPTOR_BUFFER = 'ChJwcm90b3MvcXVldWUucHJvdG8SDFRoZXNpcy5RdWV1ZSIyCgtQdXNoUmVxdWVzdBojCgdNZXNzYWdlEhgKB2NvbnRlbnQYASABKAlSB2NvbnRlbnQiVAoLUHVsbFJlcXVlc3QSEAoDcW9zGAEgASgFUgNxb3MaMwoHTWVzc2FnZRIYCgdjb250ZW50GAEgASgJUgdjb250ZW50Eg4KAmlkGAIgASgJUgJpZCI3CglIZWFydGJlYXQaFAoKRnJvbVNlcnZlchoGCgRQaW5nGhQKCkZyb21DbGllbnQaBgoEUGluZ0qGBAoGEgQAABsBCggKAQwSAwAAEgoICgECEgMCABUKCgoCBAASBAQACAEKCgoDBAABEgMECBMKDAoEBAADABIEBQQHBQoMCgUEAAMAARIDBQwTCg0KBgQAAwACABIDBggbCg4KBwQAAwACAAUSAwYIDgoOCgcEAAMAAgABEgMGDxYKDgoHBAADAAIAAxIDBhkaCgoKAgQBEgQKABEBCgoKAwQBARIDCggTCgwKBAQBAwASBAsEDgUKDAoFBAEDAAESAwsMEwoNCgYEAQMAAgASAwwIGwoOCgcEAQMAAgAFEgMMCA4KDgoHBAEDAAIAARIDDA8WCg4KBwQBAwACAAMSAwwZGgoNCgYEAQMAAgESAw0IFgoOCgcEAQMAAgEFEgMNCA4KDgoHBAEDAAIBARIDDQ8RCg4KBwQBAwACAQMSAw0UFQoLCgQEAQIAEgMQBBIKDAoFBAECAAUSAxAECQoMCgUEAQIAARIDEAoNCgwKBQQBAgADEgMQEBEKCgoCBAISBBMAGwEKCgoDBAIBEgMTCBEKDAoEBAIDABIEFAQWBQoMCgUEAgMAARIDFAwWCg0KBgQCAwADABIDFQgXCg4KBwQCAwADAAESAxUQFAoMCgQEAgMBEgQYBBoFCgwKBQQCAwEBEgMYDBYKDQoGBAIDAQMAEgMZCBcKDgoHBAIDAQMAARIDGRAUYgZwcm90bzM=';
 
     #[Override]
-    public function register(Pool\Registry $pool): void
+    public function register(Registry\Pool $pool): void
     {
-        $pool->add(Pool\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+        $pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
             name: 'protos/queue.proto',
             messages: [
                 new File\MessageDescriptor('Thesis.Queue.PushRequest', \Thesis\Queue\PushRequest::class),
