@@ -30,13 +30,8 @@ final readonly class SnakeCaseDescriptorRegistry implements Registry\Registrar
             name: 'snake_case.proto',
             messages: [
                 new File\MessageDescriptor('proto.api.v1.Test_Request', \Proto\Api\V1\TestRequest::class),
-                new File\MessageDescriptor('proto.api.v1.Test_Request', \Proto\Api\V1\TestRequest\XFieldNumber::class),
-                new File\MessageDescriptor('proto.api.v1.Test_Request', \Proto\Api\V1\TestRequest\XFieldCol::class),
-                new File\MessageDescriptor('proto.api.v1.Test_Request', \Proto\Api\V1\TestRequest\XFieldDeepEnum::class),
                 new File\MessageDescriptor('proto.api.v1.Test_Request.Nested_Message', \Proto\Api\V1\TestRequest\NestedMessage::class),
                 new File\MessageDescriptor('proto.api.v1.Test_Request.Nested_Message.Deep', \Proto\Api\V1\TestRequest\NestedMessage\Deep::class),
-                new File\MessageDescriptor('proto.api.v1.Test_Request.Nested_Message.Deep', \Proto\Api\V1\TestRequest\NestedMessage\Deep\UnionPhone::class),
-                new File\MessageDescriptor('proto.api.v1.Test_Request.Nested_Message.Deep', \Proto\Api\V1\TestRequest\NestedMessage\Deep\UnionEmail::class),
                 new File\MessageDescriptor('proto.api.v1.Another_Request', \Proto\Api\V1\AnotherRequest::class),
             ],
             enums: [

@@ -37,16 +37,8 @@ final readonly class Proto2DescriptorRegistry implements Registry\Registrar
             ],
             messages: [
                 new File\MessageDescriptor('proto.api.v1.TestRequest', \Proto\Api\V1\TestRequest::class),
-                new File\MessageDescriptor('proto.api.v1.TestRequest', \Proto\Api\V1\TestRequest\XFieldNumber::class),
-                new File\MessageDescriptor('proto.api.v1.TestRequest', \Proto\Api\V1\TestRequest\XFieldName::class),
-                new File\MessageDescriptor('proto.api.v1.TestRequest', \Proto\Api\V1\TestRequest\XFieldData::class),
-                new File\MessageDescriptor('proto.api.v1.TestRequest', \Proto\Api\V1\TestRequest\XFieldTempC::class),
-                new File\MessageDescriptor('proto.api.v1.TestRequest', \Proto\Api\V1\TestRequest\XFieldCol::class),
-                new File\MessageDescriptor('proto.api.v1.TestRequest', \Proto\Api\V1\TestRequest\XFieldDeepEnum::class),
                 new File\MessageDescriptor('proto.api.v1.TestRequest.Nested', \Proto\Api\V1\TestRequest\Nested::class),
                 new File\MessageDescriptor('proto.api.v1.TestRequest.Nested.Deep', \Proto\Api\V1\TestRequest\Nested\Deep::class),
-                new File\MessageDescriptor('proto.api.v1.TestRequest.Nested.Deep', \Proto\Api\V1\TestRequest\Nested\Deep\UnionPhone::class),
-                new File\MessageDescriptor('proto.api.v1.TestRequest.Nested.Deep', \Proto\Api\V1\TestRequest\Nested\Deep\UnionEmail::class),
                 new File\MessageDescriptor('proto.api.v1.AnotherRequest', \Proto\Api\V1\AnotherRequest::class),
             ],
             enums: [

@@ -30,8 +30,6 @@ final readonly class Proto3DescriptorRegistry implements Registry\Registrar
             name: 'proto3.proto',
             messages: [
                 new File\MessageDescriptor('proto.api.v1.TestRequest', \Proto\Api\V1\TestRequest::class),
-                new File\MessageDescriptor('proto.api.v1.TestRequest', \Proto\Api\V1\TestRequest\ContactPhone::class),
-                new File\MessageDescriptor('proto.api.v1.TestRequest', \Proto\Api\V1\TestRequest\ContactEmail::class),
             ],
         ));
     }

@@ -75,7 +75,21 @@ final readonly class ProtoGenerator
      */
     public function generateMessages(Parser\MessageDescriptor $message): iterable
     {
-        yield $message->path => $this->generateMessage($message);
+        $namespace = $this->namespacer->create($message->path);
+
+        $className = Naming::pascalCase($message->name);
+
+        \assert($message->fqcn !== '');
+
+        /** @var class-string $messageFqcn */
+        $messageFqcn = "{$namespace->getName()}\\{$className}";
+
+        $this->index->addMessageType(new File\MessageDescriptor(
+            $message->fqcn,
+            $messageFqcn,
+        ));
+
+        yield $message->path => $this->generateMessage($namespace, $className, $message);
 
         $oneofByIndex = [];
 
@@ -108,22 +122,8 @@ final readonly class ProtoGenerator
      * @param list<string> $implements
      * @throws CodeCannotBeGenerated
      */
-    private function generateMessage(Parser\MessageDescriptor $message, array $implements = []): PhpNamespace
+    private function generateMessage(PhpNamespace $namespace, string $className, Parser\MessageDescriptor $message, array $implements = []): PhpNamespace
     {
-        $namespace = $this->namespacer->create($message->path);
-
-        $className = Naming::pascalCase($message->name);
-
-        \assert($message->fqcn !== '');
-
-        /** @var class-string $messageFqcn */
-        $messageFqcn = "{$namespace->getName()}\\{$className}";
-
-        $this->index->addMessageType(new File\MessageDescriptor(
-            $message->fqcn,
-            $messageFqcn,
-        ));
-
         $classType = new ClassType($className)
             ->setFinal()
             ->setReadOnly()
@@ -342,14 +342,19 @@ final readonly class ProtoGenerator
             ],
         );
 
-        yield $path => $this->generateMessage($descriptor, [
-            Naming::joinNamespace([
-                '',
-                $this->namespacer->namespace,
-                $message->path,
-                $interfaceName,
-            ]),
-        ]);
+        yield $path => $this->generateMessage(
+            $this->namespacer->create($path),
+            Naming::pascalCase($className),
+            $descriptor,
+            [
+                Naming::joinNamespace([
+                    '',
+                    $this->namespacer->namespace,
+                    $message->path,
+                    $interfaceName,
+                ]),
+            ],
+        );
     }
 
     private function parseDefaultValue(
