@@ -25,6 +25,7 @@ jobs:
           repository: ${{ matrix.repository }}
           token: ${{ secrets.DOWNSTREAM_RELEASE_TOKEN }}
           path: downstream
+          submodules: recursive
 
       - name: Run downstream update command
         working-directory: downstream
