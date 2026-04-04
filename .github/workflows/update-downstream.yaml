@@ -1,0 +1,46 @@
+name: Update downstream repositories
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: ~
+
+jobs:
+  update-downstream:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - repository: thesis-php/googleapis-rpc-types
+          - repository: thesis-php/google-types
+          - repository: thesis-php/protobuf-compiler-types
+          - repository: thesis-php/protobuf-descriptor-types
+          - repository: thesis-php/protobuf-known-types
+
+    steps:
+      - name: Checkout downstream repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.repository }}
+          token: ${{ secrets.DOWNSTREAM_RELEASE_TOKEN }}
+          path: downstream
+
+      - name: Run downstream update command
+        working-directory: downstream
+        run: make compile
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.DOWNSTREAM_RELEASE_TOKEN }}
+          path: downstream
+          commit-message: "chore: regenerate code for protoc-plugin ${{ github.event.release.tag_name || 'manual-run' }}"
+          branch: "chore/protoc-plugin-${{ github.event.release.tag_name || github.run_id }}"
+          delete-branch: true
+          title: "chore: regenerate code for protoc-plugin ${{ github.event.release.tag_name || 'manual run' }}"
+          body: |
+            Automated update triggered by protoc-plugin release `${{ github.event.release.tag_name || 'manual run' }}`.
+
+            - Source repository: `${{ github.repository }}`
+            - Workflow run: `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
