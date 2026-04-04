@@ -28,7 +28,7 @@ jobs:
 
       - name: Run downstream update command
         working-directory: downstream
-        run: make compile CONTAINER_USER=$(id -u):$(id -g)
+        run: make compile
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v7
