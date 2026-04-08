@@ -54,15 +54,23 @@ final readonly class ProtoGenerator
         ));
 
         $enumType = new EnumType($enumName)
-            ->addComment('@api')
-            ->addComment($enum->comment !== null ? "\n{$enum->comment}" : '')
             ->setType('int')
             ->setCases(array_map(
                 static fn(Parser\EnumCaseDescriptor $case) => new EnumCase(Naming::secureEnumCase($case->name))
                     ->setValue($case->value)
-                    ->setComment((string) $case->comment),
+                    ->addComment(($deprecated = $case->options?->deprecated) === true ? '@deprecated' : '')
+                    ->addComment(($deprecated === true ? "\n" : '') . (string) $case->comment),
                 $enum->cases,
-            ));
+            ))
+            ->addComment('@api');
+
+        if ($enum->options?->deprecated === true) {
+            $enumType = $enumType->addComment('@deprecated');
+        }
+
+        if ($enum->comment !== null) {
+            $enumType = $enumType->addComment("\n{$enum->comment}");
+        }
 
         $namespace->add($enumType);
 
@@ -127,9 +135,17 @@ final readonly class ProtoGenerator
         $classType = new ClassType($className)
             ->setFinal()
             ->setReadOnly()
-            ->setImplements($implements)
-            ->addComment('@api')
-            ->addComment($message->comment !== null ? "\n{$message->comment}" : '');
+            ->setImplements($implements);
+
+        $classType = $classType->addComment('@api');
+
+        if ($message->options?->deprecated === true) {
+            $classType = $classType->addComment('@deprecated');
+        }
+
+        if ($message->comment !== null) {
+            $classType = $classType->addComment("\n{$message->comment}");
+        }
 
         $namespace->add($classType);
 
@@ -225,6 +241,10 @@ final readonly class ProtoGenerator
                 ])
                 ->setNullable($nullable)
                 ->setDefaultValue($repeated ? [] : $default);
+
+            if ($field->options?->deprecated === true) {
+                $parameter->addComment('@deprecated');
+            }
 
             if ($repeated || $field->comment !== null || $type->isMap) {
                 $docType = $type->resolvedType();
