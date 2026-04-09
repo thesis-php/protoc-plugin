@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Parser;
 
+use Google\Protobuf\ServiceOptions;
 use Thesis\Protoc\Plugin\Comment;
 
 /**
@@ -19,5 +20,6 @@ final readonly class ServiceDescriptor
         public string $path,
         public array $methods,
         public ?Comment $comment = null,
+        public ?ServiceOptions $options = null,
     ) {}
 }

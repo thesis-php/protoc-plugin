@@ -26,3 +26,13 @@ message Request {
         string name = 1 [deprecated = true];
     }
 }
+
+// Service is deprecated.
+service EchoService {
+    option deprecated = true;
+
+    // Rpc is also deprecated.
+    rpc Echo(Request) returns (Request) {
+        option deprecated = true;
+    };
+}
