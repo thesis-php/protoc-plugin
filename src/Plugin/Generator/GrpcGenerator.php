@@ -34,8 +34,15 @@ final readonly class GrpcGenerator
         $classType = new ClassType($name)
             ->setFinal()
             ->setReadOnly()
-            ->addComment('@api')
-            ->addComment($service->comment !== null ? "\n{$service->comment}" : '');
+            ->addComment('@api');
+
+        if ($service->options?->deprecated === true) {
+            $classType = $classType->addComment('@deprecated');
+        }
+
+        if ($service->comment !== null) {
+            $classType = $classType->addComment("\n{$service->comment}");
+        }
 
         $namespace->add($classType);
 
@@ -58,6 +65,12 @@ final readonly class GrpcGenerator
             $classMethod = $classType
                 ->addMethod(Naming::camelCase($method->name))
                 ->setPublic();
+
+            if ($method->options?->deprecated === true) {
+                $namespace->addUse('Deprecated');
+
+                $classMethod = $classMethod->addAttribute('Deprecated');
+            }
 
             if ($method->comment !== null) {
                 $classMethod->addComment((string) $method->comment);
@@ -198,8 +211,15 @@ PHP,
         $namespace = $this->namespacer->create($service->path);
 
         $interfaceType = new InterfaceType(\sprintf('%sServer', Naming::pascalCase($service->name)))
-            ->addComment('@api')
-            ->addComment($service->comment !== null ? "\n{$service->comment}" : '');
+            ->addComment('@api');
+
+        if ($service->options?->deprecated === true) {
+            $interfaceType = $interfaceType->addComment('@deprecated');
+        }
+
+        if ($service->comment !== null) {
+            $interfaceType = $interfaceType->addComment("\n{$service->comment}");
+        }
 
         $namespace->add($interfaceType);
 
@@ -223,6 +243,12 @@ PHP,
             $interfaceMethod = $interfaceType
                 ->addMethod(Naming::camelCase($method->name))
                 ->setPublic();
+
+            if ($method->options?->deprecated === true) {
+                $namespace->addUse('Deprecated');
+
+                $interfaceMethod = $interfaceMethod->addAttribute('Deprecated');
+            }
 
             if ($method->comment !== null) {
                 $interfaceMethod->addComment((string) $method->comment);

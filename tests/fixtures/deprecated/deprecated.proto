@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package test.api.v1;
+
+// Type is deprecated.
+enum Type {
+    option deprecated = true;
+
+    // Case is deprecated.
+    TYPE_UNSPECIFIED = 0 [deprecated = true];
+    TYPE_PROTO3 = 1;
+}
+
+// Request is deprecated.
+message Request {
+    option deprecated = true;
+
+    // Field is deprecated.
+    string name = 1 [deprecated = true];
+
+    // Nested message is also deprecated.
+    message NestedRequest {
+        option deprecated = true;
+
+        // Nested field is deprecated too.
+        string name = 1 [deprecated = true];
+    }
+}
+
+// Service is deprecated.
+service EchoService {
+    option deprecated = true;
+
+    // Rpc is also deprecated.
+    rpc Echo(Request) returns (Request) {
+        option deprecated = true;
+    };
+}

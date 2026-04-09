@@ -245,6 +245,7 @@ final readonly class Parser
                 $name,
                 self::parseServiceMethods($descriptor->method, $comments->clone($commentPath)),
                 $comments->extract($commentPath),
+                $descriptor->options,
             );
         }
 
@@ -273,6 +274,7 @@ final readonly class Parser
                 clientStreaming: $descriptor->clientStreaming ?? false,
                 serverStreaming: $descriptor->serverStreaming ?? false,
                 comment: $comments->extract(\sprintf('%d.%d', Comments::SERVICE_METHOD_COMMENT_PATH, $idx)),
+                options: $descriptor->options,
             );
         }
 

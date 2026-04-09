@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Parser;
 
+use Google\Protobuf\MethodOptions;
 use Thesis\Protoc\Plugin\Comment;
 
 /**
@@ -20,6 +21,7 @@ final readonly class ServiceMethodDescriptor
         public bool $clientStreaming,
         public bool $serverStreaming,
         public ?Comment $comment = null,
+        public ?MethodOptions $options = null,
     ) {
         $this->bidirectionalStreaming = $this->clientStreaming && $this->serverStreaming;
     }
