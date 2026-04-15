@@ -23,6 +23,6 @@ final readonly class AnotherRequest
         #[Reflection\Field(1, new Reflection\ObjectT(\Proto\Api\V1\TestRequest\NestedMessage::class))]
         public ?\Proto\Api\V1\TestRequest\NestedMessage $nested = null,
         #[Reflection\Field(2, new Reflection\EnumT(\Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum::class))]
-        public ?\Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum $deepEnum = null,
+        public \Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum $deepEnum = \Proto\Api\V1\TestRequest\NestedMessage\Deep\DeepEnum::DEEP_ENUM_UNSPECIFIED,
     ) {}
 }

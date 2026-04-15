@@ -8,13 +8,23 @@ enum Type {
     TYPE_EDITIONS = 2;
 }
 
+message Inner {
+    string name = 1;
+}
+
 message EditionsFeatures {
     string implicit = 1 [features.field_presence = IMPLICIT];
     string explicit = 2 [features.field_presence = EXPLICIT];
-    string default_presence = 3;
-    repeated int32 packed = 4 [features.repeated_field_encoding = PACKED];
-    repeated int32 expanded = 5 [features.repeated_field_encoding = EXPANDED];
-    repeated int32 default_encoding = 6;
+    // Required legacy.
+    string legacy_required = 3 [features.field_presence = LEGACY_REQUIRED];
+    string default_presence = 4;
+    repeated int32 packed = 5 [features.repeated_field_encoding = PACKED];
+    repeated int32 expanded = 6 [features.repeated_field_encoding = EXPANDED];
+    repeated int32 default_encoding = 7;
     // Default type is TYPE_EDITIONS.
-    Type type = 7 [default = TYPE_EDITIONS];
+    Type type = 8 [default = TYPE_EDITIONS];
+    Type implicit_type = 9 [features.field_presence = IMPLICIT];
+    Type default_type = 10;
+    // Message fields always have presence (nullable) regardless of features.
+    Inner inner = 11;
 }

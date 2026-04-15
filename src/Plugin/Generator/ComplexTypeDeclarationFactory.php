@@ -7,6 +7,7 @@ namespace Thesis\Protoc\Plugin\Generator;
 use Google\Protobuf\FieldDescriptorProto\Type;
 use Nette\PhpGenerator\Literal;
 use Thesis\Protoc\Plugin\Dependency;
+use Thesis\Protoc\Plugin\Naming;
 use Thesis\Protoc\Plugin\Parser;
 
 /**
@@ -22,13 +23,26 @@ final readonly class ComplexTypeDeclarationFactory
     {
         $fieldType = $this->graph->get($typeName);
 
+        $isEnum = $field->type === Type::TYPE_ENUM;
+
+        $default = null;
+
+        if ($isEnum && $fieldType->default !== null) {
+            $default = new Literal(\sprintf(
+                '%s::%s',
+                $fieldType->fqcn,
+                Naming::secureEnumCase($fieldType->default),
+            ));
+        }
+
         return new TypeDeclaration(
             phpType: $fieldType->fqcn,
-            reflectionType: Literal::new('Reflection\\' . ($field->type === Type::TYPE_MESSAGE ? 'ObjectT' : 'EnumT'), [
+            reflectionType: Literal::new('Reflection\\' . ($isEnum ? 'EnumT' : 'ObjectT'), [
                 new Literal("{$fieldType->fqcn}::class"),
             ]),
-            nullable: true,
+            nullable: !$isEnum,
             docType: $fieldType->fqcn,
+            default: $default,
         );
     }
 }

@@ -21,7 +21,7 @@ final readonly class Deep
 {
     public function __construct(
         #[Reflection\Field(1, Reflection\StringT::T)]
-        public string $name = '',
+        public string $name,
         #[Reflection\Field(4, new Reflection\EnumT(\Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum::class))]
         public ?\Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum $deepEnum = null,
         #[Reflection\OneOf([\Proto\Api\V1\TestRequest\Nested\Deep\UnionPhone::class, \Proto\Api\V1\TestRequest\Nested\Deep\UnionEmail::class])]

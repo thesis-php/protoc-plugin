@@ -58,37 +58,37 @@ final readonly class TestRequest
      */
     public function __construct(
         #[Reflection\Field(1, new Reflection\EnumT(\Proto\Api\V1\TestRequest\Kind::class))]
-        public \Proto\Api\V1\TestRequest\Kind $kind = \Proto\Api\V1\TestRequest\Kind::VOID,
+        public \Proto\Api\V1\TestRequest\Kind $kind,
         #[Reflection\Field(10, Reflection\BoolT::T)]
-        public bool $boolRequired = false,
+        public bool $boolRequired,
         #[Reflection\Field(11, Reflection\Int32T::T)]
-        public int $int32Required = 0,
+        public int $int32Required,
         #[Reflection\Field(12, Reflection\Int64T::T)]
-        public \BcMath\Number $int64Required = new \BcMath\Number(0),
+        public \BcMath\Number $int64Required,
         #[Reflection\Field(13, Reflection\Fixed32T::T)]
-        public int $fixed32Required = 0,
+        public int $fixed32Required,
         #[Reflection\Field(14, Reflection\Fixed64T::T)]
-        public \BcMath\Number $fixed64Required = new \BcMath\Number(0),
+        public \BcMath\Number $fixed64Required,
         #[Reflection\Field(15, Reflection\Uint32T::T)]
-        public int $uint32Required = 0,
+        public int $uint32Required,
         #[Reflection\Field(16, Reflection\Uint64T::T)]
-        public \BcMath\Number $uint64Required = new \BcMath\Number(0),
+        public \BcMath\Number $uint64Required,
         #[Reflection\Field(17, Reflection\FloatT::T)]
-        public float $gloatRequired = 0,
+        public float $gloatRequired,
         #[Reflection\Field(18, Reflection\DoubleT::T)]
-        public float $doubleRequired = 0,
+        public float $doubleRequired,
         #[Reflection\Field(19, Reflection\StringT::T)]
-        public string $stringRequired = '',
+        public string $stringRequired,
         #[Reflection\Field(101, Reflection\BytesT::T)]
-        public string $bytesRequired = '',
+        public string $bytesRequired,
         #[Reflection\Field(102, Reflection\SInt32T::T)]
-        public int $sint32Required = 0,
+        public int $sint32Required,
         #[Reflection\Field(103, Reflection\SInt64T::T)]
-        public \BcMath\Number $sint64Required = new \BcMath\Number(0),
+        public \BcMath\Number $sint64Required,
         #[Reflection\Field(104, Reflection\SFixed32T::T)]
-        public int $sfixed32Required = 0,
+        public int $sfixed32Required,
         #[Reflection\Field(105, Reflection\SFixed64T::T)]
-        public \BcMath\Number $sfixed64Required = new \BcMath\Number(0),
+        public \BcMath\Number $sfixed64Required,
         #[Reflection\Field(30, Reflection\BoolT::T)]
         public ?bool $boolOptional = null,
         #[Reflection\Field(31, Reflection\Int32T::T)]
@@ -176,35 +176,35 @@ final readonly class TestRequest
         #[Reflection\Field(505, new Reflection\ListT(Reflection\SFixed64T::T, true))]
         public array $sfixed64RepeatedPacked = [],
         #[Reflection\Field(40, Reflection\BoolT::T)]
-        public ?bool $boolDefaulted = true,
+        public ?bool $boolDefaulted = null,
         #[Reflection\Field(41, Reflection\Int32T::T)]
-        public ?int $int32Defaulted = 32,
+        public ?int $int32Defaulted = null,
         #[Reflection\Field(42, Reflection\Int64T::T)]
-        public ?\BcMath\Number $int64Defaulted = new \BcMath\Number(64),
+        public ?\BcMath\Number $int64Defaulted = null,
         #[Reflection\Field(43, Reflection\Fixed32T::T)]
-        public ?int $fixed32Defaulted = 320,
+        public ?int $fixed32Defaulted = null,
         #[Reflection\Field(44, Reflection\Fixed64T::T)]
-        public ?\BcMath\Number $fixed64Defaulted = new \BcMath\Number(640),
+        public ?\BcMath\Number $fixed64Defaulted = null,
         #[Reflection\Field(45, Reflection\Uint32T::T)]
-        public ?int $uint32Defaulted = 3200,
+        public ?int $uint32Defaulted = null,
         #[Reflection\Field(46, Reflection\Uint64T::T)]
-        public ?\BcMath\Number $uint64Defaulted = new \BcMath\Number(6400),
+        public ?\BcMath\Number $uint64Defaulted = null,
         #[Reflection\Field(47, Reflection\FloatT::T)]
-        public ?float $floatDefaulted = 314159.0,
+        public ?float $floatDefaulted = null,
         #[Reflection\Field(48, Reflection\DoubleT::T)]
-        public ?float $doubleDefaulted = 271828.0,
+        public ?float $doubleDefaulted = null,
         #[Reflection\Field(49, Reflection\StringT::T)]
-        public ?string $stringDefaulted = "hello, \"world!\"\n",
+        public ?string $stringDefaulted = null,
         #[Reflection\Field(401, Reflection\BytesT::T)]
-        public ?string $bytesDefaulted = 'Bignose',
+        public ?string $bytesDefaulted = null,
         #[Reflection\Field(402, Reflection\SInt32T::T)]
-        public ?int $sint32Defaulted = -32,
+        public ?int $sint32Defaulted = null,
         #[Reflection\Field(403, Reflection\SInt64T::T)]
-        public ?\BcMath\Number $sint64Defaulted = new \BcMath\Number(-64),
+        public ?\BcMath\Number $sint64Defaulted = null,
         #[Reflection\Field(404, Reflection\SFixed32T::T)]
-        public ?int $sfixed32Defaulted = -32,
+        public ?int $sfixed32Defaulted = null,
         #[Reflection\Field(405, Reflection\SFixed64T::T)]
-        public ?\BcMath\Number $sfixed64Defaulted = new \BcMath\Number(-64),
+        public ?\BcMath\Number $sfixed64Defaulted = null,
         #[Reflection\Field(406, new Reflection\MapT(Reflection\StringT::T, Reflection\StringT::T))]
         public Protobuf\Map $mapStringString = new Protobuf\Map(),
         #[Reflection\Field(407, new Reflection\ObjectT(\Google\Protobuf\Timestamp::class))]

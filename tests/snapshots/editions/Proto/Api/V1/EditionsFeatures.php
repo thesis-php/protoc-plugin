@@ -20,25 +20,35 @@ use Thesis\Protobuf\Reflection;
 final readonly class EditionsFeatures
 {
     /**
+     * @param string $legacyRequired Required legacy.
      * @param list<int> $packed
      * @param list<int> $expanded
      * @param list<int> $defaultEncoding
      * @param \Proto\Api\V1\Type $type Default type is TYPE_EDITIONS.
+     * @param ?\Proto\Api\V1\Inner $inner Message fields always have presence (nullable) regardless of features.
      */
     public function __construct(
+        #[Reflection\Field(3, Reflection\StringT::T)]
+        public string $legacyRequired,
         #[Reflection\Field(1, Reflection\StringT::T)]
         public string $implicit = '',
         #[Reflection\Field(2, Reflection\StringT::T)]
         public ?string $explicit = null,
-        #[Reflection\Field(3, Reflection\StringT::T)]
-        public string $defaultPresence = '',
-        #[Reflection\Field(4, new Reflection\ListT(Reflection\Int32T::T, true))]
+        #[Reflection\Field(4, Reflection\StringT::T)]
+        public ?string $defaultPresence = null,
+        #[Reflection\Field(5, new Reflection\ListT(Reflection\Int32T::T, true))]
         public array $packed = [],
-        #[Reflection\Field(5, new Reflection\ListT(Reflection\Int32T::T, false))]
+        #[Reflection\Field(6, new Reflection\ListT(Reflection\Int32T::T, false))]
         public array $expanded = [],
-        #[Reflection\Field(6, new Reflection\ListT(Reflection\Int32T::T, true))]
+        #[Reflection\Field(7, new Reflection\ListT(Reflection\Int32T::T, true))]
         public array $defaultEncoding = [],
-        #[Reflection\Field(7, new Reflection\EnumT(\Proto\Api\V1\Type::class))]
+        #[Reflection\Field(8, new Reflection\EnumT(\Proto\Api\V1\Type::class))]
         public \Proto\Api\V1\Type $type = \Proto\Api\V1\Type::TYPE_EDITIONS,
+        #[Reflection\Field(9, new Reflection\EnumT(\Proto\Api\V1\Type::class))]
+        public \Proto\Api\V1\Type $implicitType = \Proto\Api\V1\Type::TYPE_UNSPECIFIED,
+        #[Reflection\Field(10, new Reflection\EnumT(\Proto\Api\V1\Type::class))]
+        public ?\Proto\Api\V1\Type $defaultType = null,
+        #[Reflection\Field(11, new Reflection\ObjectT(\Proto\Api\V1\Inner::class))]
+        public ?\Proto\Api\V1\Inner $inner = null,
     ) {}
 }
