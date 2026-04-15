@@ -21,11 +21,11 @@
         "php": "^8.4",
         "ext-bcmath": "*",
         "ext-filter": "*",
-        "nette/php-generator": "4.2.1",
-        "thesis/package-version": "0.1.2",
-        "thesis/protobuf": "^0.1.8",
-        "thesis/protobuf-compiler-types": "0.1.4",
-        "thesis/protobuf-descriptor-types": "0.1.4",
+        "nette/php-generator": "^4.2.1",
+        "thesis/package-version": "^0.1.2",
+        "thesis/protobuf": "^0.1.10",
+        "thesis/protobuf-compiler-types": "^0.1.6",
+        "thesis/protobuf-descriptor-types": "^0.1.6",
         "thesis/protoregistry": "^0.1.2"
     },
     "require-dev": {

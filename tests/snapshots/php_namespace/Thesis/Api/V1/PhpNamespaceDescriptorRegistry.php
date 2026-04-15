@@ -21,7 +21,7 @@ use Thesis\Protobuf\Registry\File;
  */
 final readonly class PhpNamespaceDescriptorRegistry implements Registry\Registrar
 {
-    private const string DESCRIPTOR_BUFFER = 'ChNwaHBfbmFtZXNwYWNlLnByb3RvEgt0ZXN0LmFwaS52MSINCgtUZXN0UmVxdWVzdEIbSAH4AQHCAgNLZWvKAg1UaGVzaXNcQXBpXFYxSl0KBhIEAAAHFgoICgEMEgMAABIKCAoBCBIDAgApCgkKAggpEgMCACkKCAoBCBIDAwAgCgkKAggoEgMDACAKCAoBAhIDBQAUCgkKAgQAEgMHABYKCgoDBAABEgMHCBNiBnByb3RvMw==';
+    private const string DESCRIPTOR_BUFFER = 'ChNwaHBfbmFtZXNwYWNlLnByb3RvEgt0ZXN0LmFwaS52MSINCgtUZXN0UmVxdWVzdEIYSAHCAgNLZWvKAg1UaGVzaXNcQXBpXFYxSl0KBhIEAAAHFgoICgEMEgMAABIKCAoBCBIDAgApCgkKAggpEgMCACkKCAoBCBIDAwAgCgkKAggoEgMDACAKCAoBAhIDBQAUCgkKAgQAEgMHABYKCgoDBAABEgMHCBNiBnByb3RvMw==';
 
     #[Override]
     public function register(Registry\Pool $pool): void
