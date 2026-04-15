@@ -6,8 +6,10 @@ namespace Thesis\Protoc\Plugin;
 
 use Google\Protobuf\Compiler\CodeGeneratorRequest;
 use Google\Protobuf\DescriptorProto;
+use Google\Protobuf\Edition;
 use Google\Protobuf\EnumDescriptorProto;
 use Google\Protobuf\EnumValueDescriptorProto;
+use Google\Protobuf\FeatureSet;
 use Google\Protobuf\FieldDescriptorProto;
 use Google\Protobuf\FileDescriptorProto;
 use Google\Protobuf\MethodDescriptorProto;
@@ -44,9 +46,31 @@ final readonly class Parser
         return new Parser\FileDescriptor(
             name: $name,
             file: $descriptor,
-            messages: self::parseMessages($descriptor, $descriptor->messageType, $comments),
-            enums: self::parseEnums($descriptor, $descriptor->enumType, $comments),
-            services: self::parseServices($descriptor->service, $comments),
+            messages: self::parseMessages(
+                file: $descriptor,
+                descriptors: $descriptor->messageType,
+                comments: $comments,
+                edition: match (true) {
+                    $descriptor->edition !== null && $descriptor->edition !== Edition::EDITION_UNKNOWN => $descriptor->edition,
+                    default => match ($descriptor->syntax) {
+                        'proto3' => Edition::EDITION_PROTO3,
+                        default => Edition::EDITION_PROTO2,
+                    },
+                },
+                parentFeatures: array_filter(
+                    [$descriptor->options?->features],
+                    static fn(?FeatureSet $set) => $set !== null,
+                ),
+            ),
+            enums: self::parseEnums(
+                file: $descriptor,
+                descriptors: $descriptor->enumType,
+                comments: $comments,
+            ),
+            services: self::parseServices(
+                descriptors: $descriptor->service,
+                comments: $comments,
+            ),
             dependencies: $descriptor->dependency,
             package: $descriptor->package,
             options: $descriptor->options,
@@ -59,13 +83,16 @@ final readonly class Parser
 
     /**
      * @param list<DescriptorProto> $descriptors
+     * @param list<FeatureSet> $parentFeatures
      * @return list<Parser\MessageDescriptor>
      */
     public static function parseMessages(
         FileDescriptorProto $file,
         array $descriptors,
         CommentExtractor $comments,
+        Edition $edition,
         ?string $parent = null,
+        array $parentFeatures = [],
     ): array {
         $messages = [];
 
@@ -93,13 +120,40 @@ final readonly class Parser
                 }
             }
 
+            $messageFeatures = array_values(
+                array_filter(
+                    [...$parentFeatures, $descriptor->options?->features],
+                    static fn(?FeatureSet $set) => $set !== null,
+                ),
+            );
+
             $messages[] = new Parser\MessageDescriptor(
                 name: $descriptor->name,
                 fqcn: $file->package !== null ? "{$file->package}.{$path}" : $path,
                 path: $path,
-                fields: self::parseMessageFields($descriptor, $file, $descriptor->field, $messageComments, $path),
-                enums: self::parseEnums($file, $descriptor->enumType, $messageComments, $path),
-                messages: self::parseMessages($file, $descriptor->nestedType, $messageComments, $path),
+                fields: self::parseMessageFields(
+                    message: $descriptor,
+                    file: $file,
+                    descriptors: $descriptor->field,
+                    comments: $messageComments,
+                    path: $path,
+                    edition: $edition,
+                    parentFeatures: $messageFeatures,
+                ),
+                enums: self::parseEnums(
+                    file: $file,
+                    descriptors: $descriptor->enumType,
+                    comments: $messageComments,
+                    parent: $path,
+                ),
+                messages: self::parseMessages(
+                    file: $file,
+                    descriptors: $descriptor->nestedType,
+                    comments: $messageComments,
+                    edition: $edition,
+                    parent: $path,
+                    parentFeatures: $messageFeatures,
+                ),
                 oneofs: $oneofs,
                 comment: $messageComments->extract(),
                 options: $descriptor->options,
@@ -111,6 +165,7 @@ final readonly class Parser
 
     /**
      * @param list<FieldDescriptorProto> $descriptors
+     * @param list<FeatureSet> $parentFeatures
      * @return list<Parser\FieldDescriptor>
      */
     private static function parseMessageFields(
@@ -119,6 +174,8 @@ final readonly class Parser
         array $descriptors,
         CommentExtractor $comments,
         string $path,
+        Edition $edition,
+        array $parentFeatures = [],
     ): array {
         $fields = [];
 
@@ -139,9 +196,26 @@ final readonly class Parser
                     if ($typename === $descriptor->typeName && $nestedType->options?->mapEntry === true) {
                         \assert(\count($nestedType->field) === 2, 'Each MapEntry must have exactly 2 fields.');
 
+                        $entryFeatures = array_values(
+                            array_filter(
+                                [...$parentFeatures, $nestedType->options->features],
+                                static fn(?FeatureSet $set) => $set !== null,
+                            ),
+                        );
+
                         $map = new Parser\MapDescriptor(
-                            self::createFieldDescriptor($nestedType->field[0], $file),
-                            self::createFieldDescriptor($nestedType->field[1], $file),
+                            self::createFieldDescriptor(
+                                descriptor: $nestedType->field[0],
+                                file: $file,
+                                edition: $edition,
+                                parentFeatures: $entryFeatures,
+                            ),
+                            self::createFieldDescriptor(
+                                descriptor: $nestedType->field[1],
+                                file: $file,
+                                edition: $edition,
+                                parentFeatures: $entryFeatures,
+                            ),
                         );
 
                         break;
@@ -150,10 +224,12 @@ final readonly class Parser
             }
 
             $fields[] = self::createFieldDescriptor(
-                $descriptor,
-                $file,
-                $comments->extract(\sprintf('%d.%d', Comments::MESSAGE_FIELD_COMMENT_PATH, $idx)),
-                $map,
+                descriptor: $descriptor,
+                file: $file,
+                edition: $edition,
+                comment: $comments->extract(\sprintf('%d.%d', Comments::MESSAGE_FIELD_COMMENT_PATH, $idx)),
+                map: $map,
+                parentFeatures: $parentFeatures,
             );
         }
 
@@ -281,14 +357,29 @@ final readonly class Parser
         return $methods;
     }
 
+    /**
+     * @param list<FeatureSet> $parentFeatures
+     */
     private static function createFieldDescriptor(
         FieldDescriptorProto $descriptor,
         FileDescriptorProto $file,
+        Edition $edition,
         ?Comment $comment = null,
         ?Parser\MapDescriptor $map = null,
+        array $parentFeatures = [],
     ): Parser\FieldDescriptor {
         \assert($descriptor->name !== null, 'Field name must not be null.');
         \assert($descriptor->number !== null, 'Field number must not be null.');
+
+        $features = Parser\FeatureCalculator::calculate(
+            $edition,
+            array_values(
+                array_filter(
+                    [...$parentFeatures, $descriptor->options?->features],
+                    static fn(?FeatureSet $set) => $set !== null,
+                ),
+            ),
+        );
 
         return new Parser\FieldDescriptor(
             name: $descriptor->name,
@@ -303,6 +394,7 @@ final readonly class Parser
             oneOfIndex: $descriptor->oneofIndex,
             defaultValue: $descriptor->defaultValue,
             map: $map,
+            features: $features,
         );
     }
 }

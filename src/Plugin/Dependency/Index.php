@@ -10,7 +10,7 @@ namespace Thesis\Protoc\Plugin\Dependency;
 final readonly class Index
 {
     /**
-     * @param array<string, 1> $types
+     * @param array<string, ?string> $types map of fully-qualified type name to default value (zero case for enums or null for messages)
      */
     public function __construct(
         public array $types,

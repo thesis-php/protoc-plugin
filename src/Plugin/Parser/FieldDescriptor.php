@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Parser;
 
+use Google\Protobuf\FeatureSet;
 use Google\Protobuf\FieldDescriptorProto\Label;
 use Google\Protobuf\FieldDescriptorProto\Type;
 use Google\Protobuf\FieldOptions;
@@ -27,5 +28,6 @@ final readonly class FieldDescriptor
         public ?int $oneOfIndex = null,
         public ?string $defaultValue = null,
         public ?MapDescriptor $map = null,
+        public ?FeatureSet $features = null,
     ) {}
 }

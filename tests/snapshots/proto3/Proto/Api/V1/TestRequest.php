@@ -24,6 +24,10 @@ final readonly class TestRequest
         public string $stringValue = '',
         #[Reflection\Field(2, Reflection\StringT::T)]
         public ?string $optionalStringValue = null,
+        #[Reflection\Field(5, new Reflection\EnumT(\Proto\Api\V1\Kind::class))]
+        public \Proto\Api\V1\Kind $implicitKind = \Proto\Api\V1\Kind::KIND_UNSPECIFIED,
+        #[Reflection\Field(6, new Reflection\EnumT(\Proto\Api\V1\Kind::class))]
+        public ?\Proto\Api\V1\Kind $optionalKind = null,
         #[Reflection\OneOf([\Proto\Api\V1\TestRequest\ContactPhone::class, \Proto\Api\V1\TestRequest\ContactEmail::class])]
         public ?\Proto\Api\V1\TestRequest\Contact $contact = null,
     ) {}

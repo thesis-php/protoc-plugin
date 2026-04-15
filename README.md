@@ -130,7 +130,8 @@ If you want to change the namespace under which the code will be generated, use 
 protoc \
   --plugin=protoc-gen-php-plugin=/usr/local/bin/protoc-gen-php \
   protos/*.proto \
-  --php-plugin_out=php_namespace="Thesis\\Api\\V1":src
+  --php-plugin_opt=php_namespace="Thesis\\Api\\V1" \
+  --php-plugin_out=src
 ```
 
 ### `src_path`
@@ -147,7 +148,8 @@ and configure autoloading via composer without creating unnecessary nesting. To 
 protoc \
   --plugin=protoc-gen-php-plugin=/usr/local/bin/protoc-gen-php \
   protos/*.proto \
-  --php-plugin_out=src_path=.:src
+  --php-plugin_opt=src_path=. \
+  --php-plugin_out=src
 ```
 
 ### `grpc`
@@ -158,7 +160,8 @@ If you do not want to generate `gRPC` code, you can disable this behavior using 
 protoc \
   --plugin=protoc-gen-php-plugin=/usr/local/bin/protoc-gen-php \
   protos/*.proto \
-  --php-plugin_out=grpc=none:genproto
+  --php-plugin_opt=grpc=none \
+  --php-plugin_out=genproto
 ```
 
 If you want to generate only the client code, use `grpc=client`:
@@ -166,7 +169,8 @@ If you want to generate only the client code, use `grpc=client`:
 protoc \
   --plugin=protoc-gen-php-plugin=/usr/local/bin/protoc-gen-php \
   protos/*.proto \
-  --php-plugin_out=grpc=client:genproto
+  --php-plugin_opt=grpc=client \
+  --php-plugin_out=genproto
 ```
 
 To generate only the server code, use `grpc=server`. By default, and when passing `grpc=client,grpc=server`, both the client and server will be generated.
@@ -199,12 +203,15 @@ docker run --rm \
 
 ### Multiple options
 
-You can pass multiple options separated by commas. For example, if you want to specify a different namespace, place all the code in the root directory, and generate only the `gRPC` client, you can write the following:
+You can pass multiple options by repeating `--php-plugin_opt`. For example, if you want to specify a different namespace, place all the code in the root directory, and generate only the `gRPC` client, you can write the following:
 ```shell
 protoc \
   --plugin=protoc-gen-php-plugin=/usr/local/bin/protoc-gen-php \
   protos/*.proto \
-  --php-plugin_out=php_namespace="Thesis\\Api\\V1",src_path=.,grpc=client:genproto
+  --php-plugin_opt=php_namespace="Thesis\\Api\\V1" \
+  --php-plugin_opt=src_path=. \
+  --php-plugin_opt=grpc=client \
+  --php-plugin_out=genproto
 ```
 
 ### Generated code guide

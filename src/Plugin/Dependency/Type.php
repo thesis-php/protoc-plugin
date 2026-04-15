@@ -12,5 +12,6 @@ final readonly class Type
     public function __construct(
         public string $fqcn,
         public string $class,
+        public ?string $default = null,
     ) {}
 }

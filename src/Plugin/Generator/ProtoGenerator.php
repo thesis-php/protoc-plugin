@@ -12,6 +12,7 @@ use Nette\PhpGenerator\EnumCase;
 use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Literal;
+use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
 use Thesis\Protobuf\Registry\File;
 use Thesis\Protoc\Exception\CodeCannotBeGenerated;
@@ -166,7 +167,7 @@ final readonly class ProtoGenerator
                 continue;
             }
 
-            $features = $field->options?->features;
+            $features = $field->features;
 
             if ($features?->messageEncoding === FeatureSet\MessageEncoding::DELIMITED) {
                 throw new CodeCannotBeGenerated('DELIMITED message encoding are not supported');
@@ -198,12 +199,13 @@ final readonly class ProtoGenerator
             }
 
             $repeated = $field->label === FieldDescriptorProto\Label::LABEL_REPEATED && !$type->isMap;
+            $required = $field->label === FieldDescriptorProto\Label::LABEL_REQUIRED || $features?->fieldPresence === FeatureSet\FieldPresence::LEGACY_REQUIRED;
 
             $presence = $this->edition !== null
                 ? $features?->fieldPresence === FeatureSet\FieldPresence::EXPLICIT
                 : $field->optional;
 
-            $nullable = ($type->nullable || $presence) && !$repeated && !($field->type === FieldDescriptorProto\Type::TYPE_ENUM && $field->defaultValue !== null);
+            $nullable = ($type->nullable || $presence) && !$repeated && !$required && !($field->type === FieldDescriptorProto\Type::TYPE_ENUM && $field->defaultValue !== null);
 
             $phpType = ($nullable ? '?' : '') . ($repeated ? 'array' : $type->phpType);
 
@@ -225,7 +227,10 @@ final readonly class ProtoGenerator
 
             $default = $nullable ? null : $type->default;
 
-            if ($field->defaultValue !== null && $field->type !== null) {
+            // Only bake the proto-defined default into the constructor when the field
+            // is non-nullable. For nullable fields we keep `null` so that presence
+            // round-trips: the user can distinguish "field unset" from "field set to its proto default".
+            if (!$nullable && $field->defaultValue !== null && $field->type !== null) {
                 $default = $this->parseDefaultValue(
                     $field->type,
                     $field->defaultValue,
@@ -239,8 +244,11 @@ final readonly class ProtoGenerator
                     $field->number,
                     $reflectionType,
                 ])
-                ->setNullable($nullable)
-                ->setDefaultValue($repeated ? [] : $default);
+                ->setNullable($nullable);
+
+            if (!$required) {
+                $parameter->setDefaultValue($repeated ? [] : $default);
+            }
 
             if ($field->options?->deprecated === true) {
                 $parameter->addComment('@deprecated');
@@ -300,7 +308,31 @@ final readonly class ProtoGenerator
                 ]);
         }
 
+        $this->reorderRequiredFirst($constructor);
+
         return $namespace;
+    }
+
+    private function reorderRequiredFirst(Method $constructor): void
+    {
+        [$required, $optional] = [[], []];
+
+        foreach ($constructor->getParameters() as $parameter) {
+            if ($parameter->hasDefaultValue()) {
+                $optional[] = $parameter;
+            } else {
+                $required[] = $parameter;
+            }
+        }
+
+        if ($required === [] || $optional === []) {
+            return;
+        }
+
+        $constructor->setParameters([
+            ...$required,
+            ...$optional,
+        ]);
     }
 
     /**

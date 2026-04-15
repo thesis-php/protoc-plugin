@@ -2,9 +2,17 @@ syntax = "proto3";
 
 package proto.api.v1;
 
+enum Kind {
+    KIND_UNSPECIFIED = 0;
+    KIND_FIRST = 1;
+    KIND_SECOND = 2;
+}
+
 message TestRequest {
     string string_value = 1;
     optional string optional_string_value = 2;
+    Kind implicit_kind = 5;
+    optional Kind optional_kind = 6;
     oneof contact {
         string phone = 3;
         string email = 4;

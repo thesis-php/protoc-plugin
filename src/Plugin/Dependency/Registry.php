@@ -42,12 +42,6 @@ final class Registry
                     proto: $descriptor,
                     package: $descriptor->package === null ? '.' : ".{$descriptor->package}.",
                 ),
-                preserve_keys: false,
-            );
-
-            $types = array_combine(
-                $types,
-                array_fill(0, \count($types), 1),
             );
 
             $package = $descriptor->package ?? '.';
@@ -152,12 +146,12 @@ final class Registry
     }
 
     /**
-     * @return iterable<string>
+     * @return iterable<string, ?string>
      */
     private function createFileIndex(Parser\FileDescriptor $proto, string $package): iterable
     {
         foreach ($proto->enums as $enum) {
-            yield "{$package}{$enum->name}";
+            yield "{$package}{$enum->name}" => $enum->cases[0]->name ?? null;
         }
 
         foreach ($proto->messages as $message) {
@@ -166,18 +160,18 @@ final class Registry
     }
 
     /**
-     * @return iterable<string>
+     * @return iterable<string, ?string>
      */
     private function createDescriptorIndex(Parser\MessageDescriptor $descriptor, string $name): iterable
     {
-        yield $name = "{$name}{$descriptor->name}";
+        yield $name = "{$name}{$descriptor->name}" => null;
 
         foreach ($descriptor->messages as $it) {
             yield from $this->createDescriptorIndex($it, "{$name}.");
         }
 
         foreach ($descriptor->enums as $it) {
-            yield "{$name}.{$it->name}";
+            yield "{$name}.{$it->name}" => $it->cases[0]->name ?? null;
         }
     }
 
@@ -189,7 +183,7 @@ final class Registry
     {
         foreach ($typeNames as $typeName) {
             foreach ($this->fileIndexes[$proto] ?? [] as $index) {
-                if (!isset($index->types[$typeName])) {
+                if (!\array_key_exists($typeName, $index->types)) {
                     continue;
                 }
 
@@ -201,6 +195,7 @@ final class Registry
                 yield $typeName => new Type(
                     $fqcn,
                     $class,
+                    $index->types[$typeName],
                 );
             }
         }
