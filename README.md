@@ -20,7 +20,7 @@ For this reason, we have written this plugin, which — in addition to addressin
     - [repeated](#repeated)
     - [maps](#maps)
     - [oneof](#oneof)
-    - [precedence](#precedence)
+    - [presence](#presence)
     - [grpc client](#grpc-client)
     - [grpc server](#grpc-server)
     - [autoload.metadata.php](#autoloadmetadataphp)
@@ -366,10 +366,26 @@ final readonly class ContactPhone implements \Thesis\Api\Request\Contact
 
 #### presence
 
-By default, all fields with scalar data types will have corresponding default values (0 for numbers, false for booleans, and so on).
-If proto2 is used and the field is marked as `optional`, scalar types will become nullable, with null as the default value.
-The same applies to `optional` in proto3. Lists and maps, however, will always be non-nullable (especially since they cannot be `required` or `optional`) but will have empty default values.
-Meanwhile, all objects will always be nullable, regardless of `required`/`optional` labels, which allows the serializer to quickly skip such fields and avoid writing unnecessary data.
+The plugin resolves effective field presence from syntax/edition features and generates constructor signatures accordingly.
+For editions, inherited features are resolved through `file` -> `message` -> `field`.
+
+The generator decides nullable/default/required for each field using these rules:
+
+1. A field is generated as required constructor argument (no default) when either:
+    - proto2 label is `required`;
+    - editions effective `features.field_presence = LEGACY_REQUIRED`.
+2. `repeated` fields are always non-nullable and always default to `[]`.
+3. `map` fields are always non-nullable and default to `new \Thesis\Protobuf\Map()`.
+4. `oneof` container property is always nullable (`?T = null`), because "no active variant" is valid.
+5. Scalar fields with explicit presence (for example `optional` in proto2/proto3, or editions `EXPLICIT`) are nullable and default to `null`.
+6. Scalar fields with implicit presence are non-nullable and use protobuf zero defaults.
+7. Enum fields:
+    - without explicit field default: use enum zero/first case default for non-nullable fields;
+    - with explicit proto default (`[default = ...]`): generated as non-nullable with that enum case as PHP default;
+    - nullable enum fields default to `null`.
+8. Message/object fields are nullable by default and default to `null`; if such field is required (rule 1), it becomes a required constructor argument.
+
+For nullable fields, proto-defined defaults are intentionally not baked into constructor defaults, so "unset" can be distinguished from "set to proto default".
 
 #### grpc client
 

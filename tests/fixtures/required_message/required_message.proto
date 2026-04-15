@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package proto.required.v1;
+
+message Inner {
+    optional string name = 1;
+}
+
+message Request {
+    required Inner required_inner = 1;
+    optional Inner optional_inner = 2;
+}
