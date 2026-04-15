@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package test.main.v1;
+
+import "dep.proto";
+
+message MainMessage {
+  dep.pkg.v1.DepMessage dep = 1;
+}

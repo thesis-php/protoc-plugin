@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+package dep.pkg.v1;
+option php_namespace = "Test\\Deps\\Custom";
+
+message DepMessage {}
