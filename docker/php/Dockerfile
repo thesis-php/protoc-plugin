@@ -9,5 +9,7 @@ RUN apk add --no-cache curl unzip && \
 
 FROM ghcr.io/phpyh/php:8.4
 
+RUN apk add --no-cache bash
+
 COPY --from=protoc /usr/local/bin/protoc /usr/local/bin/protoc
 COPY --from=protoc /usr/local/include /usr/local/include
