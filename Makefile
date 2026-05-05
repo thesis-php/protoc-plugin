@@ -148,7 +148,7 @@ executable:
 
 generate: executable
 	rm -rf compiled/*
-	protoc -I./protos --plugin=protoc-gen-custom-plugin=./bin/compiler.php ./protos/*.proto --custom-plugin_out=compiled
+	protoc -I./protos --plugin=protoc-gen-php-plugin=./bin/compiler.php ./protos/*.proto --php-plugin_out=compiled
 .PHONY: generate
 
 # -----------------------

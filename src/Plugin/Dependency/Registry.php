@@ -146,12 +146,12 @@ final class Registry
     }
 
     /**
-     * @return iterable<string, ?string>
+     * @return iterable<string, Parser\MessageDescriptor|Parser\EnumDescriptor>
      */
     private function createFileIndex(Parser\FileDescriptor $proto, string $package): iterable
     {
         foreach ($proto->enums as $enum) {
-            yield "{$package}{$enum->name}" => $enum->cases[0]->name ?? null;
+            yield "{$package}{$enum->name}" => $enum;
         }
 
         foreach ($proto->messages as $message) {
@@ -160,18 +160,18 @@ final class Registry
     }
 
     /**
-     * @return iterable<string, ?string>
+     * @return iterable<string, Parser\MessageDescriptor|Parser\EnumDescriptor>
      */
     private function createDescriptorIndex(Parser\MessageDescriptor $descriptor, string $name): iterable
     {
-        yield $name = "{$name}{$descriptor->name}" => null;
+        yield $name = "{$name}{$descriptor->name}" => $descriptor;
 
         foreach ($descriptor->messages as $it) {
             yield from $this->createDescriptorIndex($it, "{$name}.");
         }
 
         foreach ($descriptor->enums as $it) {
-            yield "{$name}.{$it->name}" => $it->cases[0]->name ?? null;
+            yield "{$name}.{$it->name}" => $it;
         }
     }
 
