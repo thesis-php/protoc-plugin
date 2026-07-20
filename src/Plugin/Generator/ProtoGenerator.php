@@ -246,7 +246,9 @@ final readonly class ProtoGenerator
                 ])
                 ->setNullable($nullable);
 
-            if (!$required) {
+            $hasDefault = !$required || ($this->edition !== null && $field->defaultValue !== null);
+
+            if ($hasDefault) {
                 $parameter->setDefaultValue($repeated ? [] : $default);
             }
 

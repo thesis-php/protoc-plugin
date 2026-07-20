@@ -28,12 +28,12 @@ final readonly class EditionsFeatures
      * @param ?\Proto\Api\V1\Inner $inner Message fields always have presence (nullable) regardless of features.
      */
     public function __construct(
-        #[Reflection\Field(3, Reflection\StringT::T)]
-        public string $legacyRequired,
         #[Reflection\Field(1, Reflection\StringT::T)]
         public string $implicit = '',
         #[Reflection\Field(2, Reflection\StringT::T)]
         public ?string $explicit = null,
+        #[Reflection\Field(3, Reflection\StringT::T)]
+        public string $legacyRequired = 'test',
         #[Reflection\Field(4, Reflection\StringT::T)]
         public ?string $defaultPresence = null,
         #[Reflection\Field(5, new Reflection\ListT(Reflection\Int32T::T, true))]
