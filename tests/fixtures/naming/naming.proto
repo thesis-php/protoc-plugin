@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package naming;
+
+message Naming {
+    string user_id = 1;
+    string http_status_code = 2;
+
+    uint64 ID = 3;
+    uint64 TTL = 4;
+    string URL = 5;
+
+    string user_ID = 6;
+    string lease_TTL = 7;
+    string ID_prefix = 8;
+
+    string alreadyCamel = 9;
+    string leaseID = 10;
+    string HTTPStatus = 11;
+
+    string a = 12;
+    string field_2 = 13;
+    string trailing_ = 14;
+    string _leading = 15;
+}

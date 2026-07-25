@@ -29,5 +29,6 @@ final readonly class FieldDescriptor
         public ?string $defaultValue = null,
         public ?MapDescriptor $map = null,
         public ?FeatureSet $features = null,
+        public ?string $jsonName = null,
     ) {}
 }

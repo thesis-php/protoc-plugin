@@ -117,6 +117,15 @@ enum Naming
         return lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $name))));
     }
 
+    public static function propertyName(string $name): string
+    {
+        return (string) preg_replace_callback(
+            '/_(\w)/',
+            static fn(array $m): string => strtoupper($m[1]),
+            $name,
+        );
+    }
+
     public static function pascalCase(string $name): string
     {
         return self::secure(ucfirst(self::camelCase($name)));

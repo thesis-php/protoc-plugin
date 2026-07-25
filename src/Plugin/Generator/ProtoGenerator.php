@@ -173,7 +173,13 @@ final readonly class ProtoGenerator
                 throw new CodeCannotBeGenerated('DELIMITED message encoding are not supported');
             }
 
-            $parameter = $constructor->addPromotedParameter(Naming::camelCase($field->name));
+            $parameterName = $field->jsonName;
+
+            if ($parameterName === null || $parameterName === '') {
+                $parameterName = Naming::propertyName($field->name);
+            }
+
+            $parameter = $constructor->addPromotedParameter($parameterName);
 
             $type = null;
 
@@ -286,7 +292,7 @@ final readonly class ProtoGenerator
             $oneOfName = Naming::pascalCase($oneOf->name);
 
             $constructor
-                ->addPromotedParameter(Naming::camelCase($oneOf->name))
+                ->addPromotedParameter(Naming::propertyName($oneOf->name))
                 ->setType(Naming::joinNamespace([
                     '',
                     $this->namespacer->namespace,
@@ -392,6 +398,7 @@ final readonly class ProtoGenerator
                     comment: $variant->comment,
                     options: $variant->options,
                     optional: $variant->optional,
+                    jsonName: $variant->jsonName,
                 ),
             ],
         );

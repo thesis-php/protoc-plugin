@@ -395,6 +395,7 @@ final readonly class Parser
             defaultValue: $descriptor->defaultValue,
             map: $map,
             features: $features,
+            jsonName: $descriptor->jsonName,
         );
     }
 }
