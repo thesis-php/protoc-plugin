@@ -358,7 +358,7 @@ final readonly class ProtoGenerator
             ->addComment('@api')
             ->addComment('@phpstan-sealed (')
             ->addComment(implode(" |\n", array_map(
-                static fn(Parser\FieldDescriptor $variant) => \sprintf('  %s%s', $interfaceName, Naming::pascalCase($variant->name)),
+                static fn(Parser\FieldDescriptor $variant) => \sprintf('  %s', self::oneofVariantName($oneof->name, $variant->name)),
                 $variants,
             )))
             ->addComment(')');
@@ -381,7 +381,7 @@ final readonly class ProtoGenerator
         Parser\FieldDescriptor $variant,
     ): iterable {
         $interfaceName = Naming::pascalCase($oneof->name);
-        $className = \sprintf('%s%s', $interfaceName, Naming::pascalCase($variant->name));
+        $className = self::oneofVariantName($oneof->name, $variant->name);
 
         $descriptor = new Parser\MessageDescriptor(
             name: $className,
@@ -447,5 +447,10 @@ final readonly class ProtoGenerator
             FieldDescriptorProto\Type::TYPE_DOUBLE => filter_var($defaultValue, FILTER_VALIDATE_FLOAT),
             default => null,
         };
+    }
+
+    private static function oneofVariantName(string $oneof, string $variant): string
+    {
+        return Naming::pascalCase("{$oneof} {$variant}");
     }
 }
