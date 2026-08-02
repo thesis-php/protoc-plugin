@@ -107,7 +107,7 @@ enum Naming
         $info = pathinfo($file);
         $dir = $info['dirname'] ?? '.';
         $filename = $info['filename'];
-        $name = Naming::pascalCase(($dir !== '.' ? (str_replace('/', ' ', $dir) . ' ') : '') . $filename);
+        $name = Naming::pascalCase(self::words(($dir !== '.' ? "{$dir} " : '') . $filename));
 
         return "{$name}DescriptorRegistry";
     }
@@ -166,6 +166,11 @@ enum Naming
             self::pascalCase(...),
             explode('.', $path),
         ));
+    }
+
+    private static function words(string $name): string
+    {
+        return trim((string) preg_replace('/[^a-zA-Z0-9]+/', ' ', $name));
     }
 
     public static function secure(string $name): string
