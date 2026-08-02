@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package pg_query;
+
+message Node {
+    oneof node {
+        Integer integer = 263 [json_name="Integer"];
+        Float float = 264 [json_name="Float"];
+        Boolean boolean = 265 [json_name="Boolean"];
+        String string = 266 [json_name="String"];
+        BitString bit_string = 267 [json_name="BitString"];
+        List list = 268 [json_name="List"];
+    }
+}
+
+message Integer
+{
+    int32 ival = 1;
+}
+
+message Float
+{
+    string fval = 1;
+}
+
+message Boolean
+{
+    bool boolval = 1;
+}
+
+message String
+{
+    string sval = 1;
+}
+
+message BitString
+{
+    string bsval = 1;
+}
+
+message List
+{
+    repeated Node items = 1;
+}
