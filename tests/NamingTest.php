@@ -12,6 +12,17 @@ use Thesis\Protoc\Plugin\Naming;
 #[CoversClass(Naming::class)]
 final class NamingTest extends TestCase
 {
+    #[TestWith(['pg_query.proto', 'PgQueryDescriptorRegistry'])]
+    #[TestWith(['protos/queue.proto', 'ProtosQueueDescriptorRegistry'])]
+    #[TestWith(['.build/libpg_query/protobuf/pg_query.proto', 'BuildLibpgQueryProtobufPgQueryDescriptorRegistry'])]
+    #[TestWith(['./api/v1/main.proto', 'ApiV1MainDescriptorRegistry'])]
+    #[TestWith(['pg-query.proto', 'PgQueryDescriptorRegistry'])]
+    #[TestWith(['api/v1.beta/main.proto', 'ApiV1BetaMainDescriptorRegistry'])]
+    public function testDescriptorName(string $actual, string $expected): void
+    {
+        self::assertSame($expected, Naming::descriptorName($actual));
+    }
+
     #[TestWith(['foo', 'foo'])]
     #[TestWith(['foo_bar', 'fooBar'])]
     #[TestWith(['Foo_Bar', 'fooBar'])]
