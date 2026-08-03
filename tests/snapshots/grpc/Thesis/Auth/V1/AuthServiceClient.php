@@ -14,6 +14,7 @@ namespace Thesis\Auth\V1;
 
 use Amp\Cancellation;
 use Amp\NullCancellation;
+use Thesis\Grpc;
 use Thesis\Grpc\Client;
 use Thesis\Grpc\Exception\ClientStreamIsClosed;
 use Thesis\Grpc\InvokeError;
@@ -40,7 +41,8 @@ final readonly class AuthServiceClient
         /** @var Client\Invoke<\Thesis\Auth\LoginRequest, \Thesis\Auth\LoginResponse> $invoke */
         $invoke = new Client\Invoke(
             method: '/Thesis.Auth.V1.AuthService/Login',
-            type: \Thesis\Auth\LoginResponse::class,
+            output: \Thesis\Auth\LoginResponse::class,
+            type: Grpc\RpcType::Unary,
         );
 
         return $this->client->invoke(

@@ -52,6 +52,7 @@ final readonly class GrpcGenerator
 
         $namespace->addUse('Amp\Cancellation');
         $namespace->addUse('Amp\NullCancellation');
+        $namespace->addUse('Thesis\Grpc');
         $namespace->addUse('Thesis\Grpc\Client');
         $namespace->addUse('Thesis\Grpc\Metadata');
 
@@ -116,7 +117,8 @@ final readonly class GrpcGenerator
 /** @var Client\Invoke<?, ?> $invoke */
 $invoke = new Client\Invoke(
     method: ?,
-    type: ?::class,
+    output: ?::class,
+    type: Grpc\RpcType::Unary,
 );
 
 return $this->client->invoke(
@@ -138,7 +140,8 @@ PHP,
 /** @var Client\Invoke<?, ?> $invoke */
 $invoke = new Client\Invoke(
     method: ?,
-    type: ?::class,
+    output: ?::class,
+    type: Grpc\RpcType::ClientStream,
 );
 
 $stream = $this->client->createStream(
@@ -160,7 +163,8 @@ PHP,
 /** @var Client\Invoke<?, ?> $invoke */
 $invoke = new Client\Invoke(
     method: ?,
-    type: ?::class,
+    output: ?::class,
+    type: Grpc\RpcType::ServerStream,
 );
 
 $stream = $this->client->createStream(
@@ -185,7 +189,8 @@ PHP,
 /** @var Client\Invoke<?, ?> $invoke */
 $invoke = new Client\Invoke(
     method: ?,
-    type: ?::class,
+    output: ?::class,
+    type: Grpc\RpcType::BidirectionalStream,
 );
 
 $stream = $this->client->createStream(
@@ -314,6 +319,7 @@ PHP,
 
         $namespace->add($classType);
 
+        $namespace->addUse('Thesis\Grpc');
         $namespace->addUse('Thesis\Grpc\Server');
 
         $handlers = [];
@@ -333,9 +339,9 @@ PHP,
                 $handlers[] = new Literal(
                     <<<'PHP'
     new Server\Rpc(
-        new Server\Handle(?, ?::class),
-        new Server\UnaryHandler($this->server->?(...)),
-        Server\RpcType::Unary,
+        handle: new Server\Handle(?, ?::class),
+        handler: new Server\UnaryHandler($this->server->?(...)),
+        type: Grpc\RpcType::Unary,
     )
 PHP,
                     $args,
@@ -344,9 +350,9 @@ PHP,
                 $handlers[] = new Literal(
                     <<<'PHP'
     new Server\Rpc(
-        new Server\Handle(?, ?::class),
-        new Server\ClientStreamHandler($this->server->?(...)),
-        Server\RpcType::ClientStream,
+        handle: new Server\Handle(?, ?::class),
+        handler: new Server\ClientStreamHandler($this->server->?(...)),
+        type: Grpc\RpcType::ClientStream,
     )
 PHP,
                     $args,
@@ -355,9 +361,9 @@ PHP,
                 $handlers[] = new Literal(
                     <<<'PHP'
     new Server\Rpc(
-        new Server\Handle(?, ?::class),
-        new Server\ServerStreamHandler($this->server->?(...)),
-        Server\RpcType::ServerStream,
+        handle: new Server\Handle(?, ?::class),
+        handler: new Server\ServerStreamHandler($this->server->?(...)),
+        type: Grpc\RpcType::ServerStream,
     )
 PHP,
                     $args,
@@ -366,9 +372,9 @@ PHP,
                 $handlers[] = new Literal(
                     <<<'PHP'
     new Server\Rpc(
-        new Server\Handle(?, ?::class),
-        new Server\BidirectionalStreamHandler($this->server->?(...)),
-        Server\RpcType::BidirectionalStream,
+        handle: new Server\Handle(?, ?::class),
+        handler: new Server\BidirectionalStreamHandler($this->server->?(...)),
+        type: Grpc\RpcType::BidirectionalStream,
     )
 PHP,
                     $args,

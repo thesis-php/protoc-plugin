@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Thesis\Auth\V1;
 
 use Override;
+use Thesis\Grpc;
 use Thesis\Grpc\Server;
 
 /**
@@ -29,9 +30,9 @@ final readonly class AuthServiceServerRegistry implements Server\ServiceRegistry
     {
         yield new Server\Service('Thesis.Auth.V1.AuthService', [
             new Server\Rpc(
-                new Server\Handle('Login', \Thesis\Auth\LoginRequest::class),
-                new Server\UnaryHandler($this->server->login(...)),
-                Server\RpcType::Unary,
+                handle: new Server\Handle('Login', \Thesis\Auth\LoginRequest::class),
+                handler: new Server\UnaryHandler($this->server->login(...)),
+                type: Grpc\RpcType::Unary,
             ),
         ]);
     }
