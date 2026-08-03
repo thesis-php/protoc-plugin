@@ -15,6 +15,7 @@ namespace Test\Api\V1;
 use Amp\Cancellation;
 use Amp\NullCancellation;
 use Deprecated;
+use Thesis\Grpc;
 use Thesis\Grpc\Client;
 use Thesis\Grpc\Exception\ClientStreamIsClosed;
 use Thesis\Grpc\InvokeError;
@@ -46,7 +47,8 @@ final readonly class EchoServiceClient
         /** @var Client\Invoke<\Test\Api\V1\Request, \Test\Api\V1\Request> $invoke */
         $invoke = new Client\Invoke(
             method: '/test.api.v1.EchoService/Echo',
-            type: \Test\Api\V1\Request::class,
+            output: \Test\Api\V1\Request::class,
+            type: Grpc\RpcType::Unary,
         );
 
         return $this->client->invoke(

@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Test\Api\V1;
 
 use Override;
+use Thesis\Grpc;
 use Thesis\Grpc\Server;
 
 /**
@@ -29,9 +30,9 @@ final readonly class EchoServiceServerRegistry implements Server\ServiceRegistry
     {
         yield new Server\Service('test.api.v1.EchoService', [
             new Server\Rpc(
-                new Server\Handle('Echo', \Test\Api\V1\Request::class),
-                new Server\UnaryHandler($this->server->echo(...)),
-                Server\RpcType::Unary,
+                handle: new Server\Handle('Echo', \Test\Api\V1\Request::class),
+                handler: new Server\UnaryHandler($this->server->echo(...)),
+                type: Grpc\RpcType::Unary,
             ),
         ]);
     }

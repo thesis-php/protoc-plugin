@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Thesis\Queue\V1;
 
 use Override;
+use Thesis\Grpc;
 use Thesis\Grpc\Server;
 
 /**
@@ -29,19 +30,19 @@ final readonly class QueueServiceServerRegistry implements Server\ServiceRegistr
     {
         yield new Server\Service('Thesis.Queue.V1.QueueService', [
             new Server\Rpc(
-                new Server\Handle('Push', \Thesis\Queue\PushRequest\Message::class),
-                new Server\ClientStreamHandler($this->server->push(...)),
-                Server\RpcType::ClientStream,
+                handle: new Server\Handle('Push', \Thesis\Queue\PushRequest\Message::class),
+                handler: new Server\ClientStreamHandler($this->server->push(...)),
+                type: Grpc\RpcType::ClientStream,
             ),
             new Server\Rpc(
-                new Server\Handle('Pull', \Thesis\Queue\PullRequest::class),
-                new Server\ServerStreamHandler($this->server->pull(...)),
-                Server\RpcType::ServerStream,
+                handle: new Server\Handle('Pull', \Thesis\Queue\PullRequest::class),
+                handler: new Server\ServerStreamHandler($this->server->pull(...)),
+                type: Grpc\RpcType::ServerStream,
             ),
             new Server\Rpc(
-                new Server\Handle('Heartbeat', \Thesis\Queue\Heartbeat\FromClient\Ping::class),
-                new Server\BidirectionalStreamHandler($this->server->heartbeat(...)),
-                Server\RpcType::BidirectionalStream,
+                handle: new Server\Handle('Heartbeat', \Thesis\Queue\Heartbeat\FromClient\Ping::class),
+                handler: new Server\BidirectionalStreamHandler($this->server->heartbeat(...)),
+                type: Grpc\RpcType::BidirectionalStream,
             ),
         ]);
     }

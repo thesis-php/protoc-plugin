@@ -14,6 +14,7 @@ namespace Thesis\Queue\V1;
 
 use Amp\Cancellation;
 use Amp\NullCancellation;
+use Thesis\Grpc;
 use Thesis\Grpc\Client;
 use Thesis\Grpc\Metadata;
 
@@ -36,7 +37,8 @@ final readonly class QueueServiceClient
         /** @var Client\Invoke<\Thesis\Queue\PushRequest\Message, \Google\Protobuf\Empty_> $invoke */
         $invoke = new Client\Invoke(
             method: '/Thesis.Queue.V1.QueueService/Push',
-            type: \Google\Protobuf\Empty_::class,
+            output: \Google\Protobuf\Empty_::class,
+            type: Grpc\RpcType::ClientStream,
         );
 
         $stream = $this->client->createStream(
@@ -59,7 +61,8 @@ final readonly class QueueServiceClient
         /** @var Client\Invoke<\Thesis\Queue\PullRequest, \Thesis\Queue\PullRequest\Message> $invoke */
         $invoke = new Client\Invoke(
             method: '/Thesis.Queue.V1.QueueService/Pull',
-            type: \Thesis\Queue\PullRequest\Message::class,
+            output: \Thesis\Queue\PullRequest\Message::class,
+            type: Grpc\RpcType::ServerStream,
         );
 
         $stream = $this->client->createStream(
@@ -84,7 +87,8 @@ final readonly class QueueServiceClient
         /** @var Client\Invoke<\Thesis\Queue\Heartbeat\FromClient\Ping, \Thesis\Queue\Heartbeat\FromServer\Ping> $invoke */
         $invoke = new Client\Invoke(
             method: '/Thesis.Queue.V1.QueueService/Heartbeat',
-            type: \Thesis\Queue\Heartbeat\FromServer\Ping::class,
+            output: \Thesis\Queue\Heartbeat\FromServer\Ping::class,
+            type: Grpc\RpcType::BidirectionalStream,
         );
 
         $stream = $this->client->createStream(
