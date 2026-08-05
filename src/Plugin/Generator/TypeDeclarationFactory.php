@@ -60,18 +60,12 @@ final readonly class TypeDeclarationFactory
                 }),
                 default: 0,
             ),
-            Type::TYPE_INT64,
             Type::TYPE_UINT64,
-            Type::TYPE_FIXED64,
-            Type::TYPE_SFIXED64,
-            Type::TYPE_SINT64 => new TypeDeclaration(
+            Type::TYPE_FIXED64 => new TypeDeclaration(
                 phpType: '\BcMath\Number',
                 reflectionType: new Literal(match ($type) {
-                    Type::TYPE_INT64 => 'Reflection\Int64T::T',
                     Type::TYPE_UINT64 => 'Reflection\Uint64T::T',
                     Type::TYPE_FIXED64 => 'Reflection\Fixed64T::T',
-                    Type::TYPE_SFIXED64 => 'Reflection\SFixed64T::T',
-                    Type::TYPE_SINT64 => 'Reflection\SInt64T::T',
                 }),
                 default: Literal::new('\BcMath\Number', [0]),
             ),
@@ -79,7 +73,10 @@ final readonly class TypeDeclarationFactory
             Type::TYPE_UINT32,
             Type::TYPE_FIXED32,
             Type::TYPE_SFIXED32,
-            Type::TYPE_SINT32 => new TypeDeclaration(
+            Type::TYPE_SINT32,
+            Type::TYPE_INT64,
+            Type::TYPE_SFIXED64,
+            Type::TYPE_SINT64 => new TypeDeclaration(
                 phpType: 'int',
                 reflectionType: new Literal(match ($type) {
                     Type::TYPE_INT32 => 'Reflection\Int32T::T',
@@ -87,6 +84,9 @@ final readonly class TypeDeclarationFactory
                     Type::TYPE_UINT32 => 'Reflection\Uint32T::T',
                     Type::TYPE_SFIXED32 => 'Reflection\SFixed32T::T',
                     Type::TYPE_SINT32 => 'Reflection\SInt32T::T',
+                    Type::TYPE_INT64 => 'Reflection\Int64T::T',
+                    Type::TYPE_SFIXED64 => 'Reflection\SFixed64T::T',
+                    Type::TYPE_SINT64 => 'Reflection\SInt64T::T',
                 }),
                 default: 0,
             ),

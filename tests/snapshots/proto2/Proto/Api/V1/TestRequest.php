@@ -27,7 +27,7 @@ final readonly class TestRequest
      * @param bool $boolRequired another field comment.
      * @param list<bool> $boolRepeated
      * @param list<int> $int32Repeated
-     * @param list<\BcMath\Number> $int64Repeated
+     * @param list<int> $int64Repeated
      * @param list<int> $fixed32Repeated
      * @param list<\BcMath\Number> $fixed64Repeated
      * @param list<int> $uint32Repeated
@@ -37,12 +37,12 @@ final readonly class TestRequest
      * @param list<string> $stringRepeated
      * @param list<string> $bytesRepeated
      * @param list<int> $sint32Repeated
-     * @param list<\BcMath\Number> $sint64Repeated
+     * @param list<int> $sint64Repeated
      * @param list<int> $sfixed32Repeated
-     * @param list<\BcMath\Number> $sfixed64Repeated
+     * @param list<int> $sfixed64Repeated
      * @param list<bool> $boolRepeatedPacked
      * @param list<int> $int32RepeatedPacked
-     * @param list<\BcMath\Number> $int64RepeatedPacked
+     * @param list<int> $int64RepeatedPacked
      * @param list<int> $fixed32RepeatedPacked
      * @param list<\BcMath\Number> $fixed64RepeatedPacked
      * @param list<int> $uint32RepeatedPacked
@@ -50,9 +50,9 @@ final readonly class TestRequest
      * @param list<float> $floatRepeatedPacked
      * @param list<float> $doubleRepeatedPacked
      * @param list<int> $sint32RepeatedPacked
-     * @param list<\BcMath\Number> $sint64RepeatedPacked
+     * @param list<int> $sint64RepeatedPacked
      * @param list<int> $sfixed32RepeatedPacked
-     * @param list<\BcMath\Number> $sfixed64RepeatedPacked
+     * @param list<int> $sfixed64RepeatedPacked
      * @param Protobuf\Map<string, string> $mapStringString
      * @param ?string $lastField Maximum possible tag number.
      */
@@ -64,7 +64,7 @@ final readonly class TestRequest
         #[Reflection\Field(11, Reflection\Int32T::T)]
         public int $int32Required,
         #[Reflection\Field(12, Reflection\Int64T::T)]
-        public \BcMath\Number $int64Required,
+        public int $int64Required,
         #[Reflection\Field(13, Reflection\Fixed32T::T)]
         public int $fixed32Required,
         #[Reflection\Field(14, Reflection\Fixed64T::T)]
@@ -84,17 +84,17 @@ final readonly class TestRequest
         #[Reflection\Field(102, Reflection\SInt32T::T)]
         public int $sint32Required,
         #[Reflection\Field(103, Reflection\SInt64T::T)]
-        public \BcMath\Number $sint64Required,
+        public int $sint64Required,
         #[Reflection\Field(104, Reflection\SFixed32T::T)]
         public int $sfixed32Required,
         #[Reflection\Field(105, Reflection\SFixed64T::T)]
-        public \BcMath\Number $sfixed64Required,
+        public int $sfixed64Required,
         #[Reflection\Field(30, Reflection\BoolT::T)]
         public ?bool $boolOptional = null,
         #[Reflection\Field(31, Reflection\Int32T::T)]
         public ?int $int32Optional = null,
         #[Reflection\Field(32, Reflection\Int64T::T)]
-        public ?\BcMath\Number $int64Optional = null,
+        public ?int $int64Optional = null,
         #[Reflection\Field(33, Reflection\Fixed32T::T)]
         public ?int $fixed32Optional = null,
         #[Reflection\Field(34, Reflection\Fixed64T::T)]
@@ -114,11 +114,11 @@ final readonly class TestRequest
         #[Reflection\Field(302, Reflection\SInt32T::T)]
         public ?int $sint32Optional = null,
         #[Reflection\Field(303, Reflection\SInt64T::T)]
-        public ?\BcMath\Number $sint64Optional = null,
+        public ?int $sint64Optional = null,
         #[Reflection\Field(304, Reflection\SFixed32T::T)]
         public ?int $sfixed32Optional = null,
         #[Reflection\Field(305, Reflection\SFixed64T::T)]
-        public ?\BcMath\Number $sfixed64Optional = null,
+        public ?int $sfixed64Optional = null,
         #[Reflection\Field(20, new Reflection\ListT(Reflection\BoolT::T, false))]
         public array $boolRepeated = [],
         #[Reflection\Field(21, new Reflection\ListT(Reflection\Int32T::T, false))]
@@ -180,7 +180,7 @@ final readonly class TestRequest
         #[Reflection\Field(41, Reflection\Int32T::T)]
         public ?int $int32Defaulted = null,
         #[Reflection\Field(42, Reflection\Int64T::T)]
-        public ?\BcMath\Number $int64Defaulted = null,
+        public ?int $int64Defaulted = null,
         #[Reflection\Field(43, Reflection\Fixed32T::T)]
         public ?int $fixed32Defaulted = null,
         #[Reflection\Field(44, Reflection\Fixed64T::T)]
@@ -200,11 +200,11 @@ final readonly class TestRequest
         #[Reflection\Field(402, Reflection\SInt32T::T)]
         public ?int $sint32Defaulted = null,
         #[Reflection\Field(403, Reflection\SInt64T::T)]
-        public ?\BcMath\Number $sint64Defaulted = null,
+        public ?int $sint64Defaulted = null,
         #[Reflection\Field(404, Reflection\SFixed32T::T)]
         public ?int $sfixed32Defaulted = null,
         #[Reflection\Field(405, Reflection\SFixed64T::T)]
-        public ?\BcMath\Number $sfixed64Defaulted = null,
+        public ?int $sfixed64Defaulted = null,
         #[Reflection\Field(406, new Reflection\MapT(Reflection\StringT::T, Reflection\StringT::T))]
         public Protobuf\Map $mapStringString = new Protobuf\Map(),
         #[Reflection\Field(407, new Reflection\ObjectT(\Google\Protobuf\Timestamp::class))]
