@@ -156,7 +156,7 @@ PHP,
                     )
                     ->setReturnType('Client\ClientStreamChannel')
                     ->addComment("{$phpdocPrefix}@return Client\\ClientStreamChannel<{$in->fqcn}, {$out->fqcn}>");
-            } elseif (!$method->clientStreaming && $method->serverStreaming) {
+            } elseif (!$method->clientStreaming) {
                 $classMethod
                     ->setBody(
                         <<<'PHP'
@@ -281,7 +281,7 @@ PHP,
                     ])
                     ->setReturnType($out->fqcn)
                     ->addComment("{$phpdocPrefix}@param Server\\ClientStreamChannel<{$in->fqcn}, {$out->fqcn}> \$stream");
-            } elseif (!$method->clientStreaming && $method->serverStreaming) {
+            } elseif (!$method->clientStreaming) {
                 $interfaceMethod
                     ->setParameters([
                         new Parameter('request')->setType($in->fqcn),
@@ -357,7 +357,7 @@ PHP,
 PHP,
                     $args,
                 );
-            } elseif (!$method->clientStreaming && $method->serverStreaming) {
+            } elseif (!$method->clientStreaming) {
                 $handlers[] = new Literal(
                     <<<'PHP'
     new Server\Rpc(
