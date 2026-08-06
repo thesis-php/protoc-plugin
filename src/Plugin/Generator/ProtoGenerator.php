@@ -308,7 +308,7 @@ final readonly class ProtoGenerator
                                 '',
                                 $this->namespacer->namespace,
                                 $message->path,
-                                \sprintf("{$oneOfName}%s::class", Naming::pascalCase($variant->name)),
+                                \sprintf('%s::class', self::oneofVariantName($oneOfName, $variant)),
                             ]),
                         ),
                         $variants,
@@ -358,7 +358,7 @@ final readonly class ProtoGenerator
             ->addComment('@api')
             ->addComment('@phpstan-sealed (')
             ->addComment(implode(" |\n", array_map(
-                static fn(Parser\FieldDescriptor $variant) => \sprintf('  %s', self::oneofVariantName($oneof->name, $variant->name)),
+                static fn(Parser\FieldDescriptor $variant) => \sprintf('  %s', self::oneofVariantName($oneof->name, $variant)),
                 $variants,
             )))
             ->addComment(')');
@@ -381,7 +381,7 @@ final readonly class ProtoGenerator
         Parser\FieldDescriptor $variant,
     ): iterable {
         $interfaceName = Naming::pascalCase($oneof->name);
-        $className = self::oneofVariantName($oneof->name, $variant->name);
+        $className = self::oneofVariantName($oneof->name, $variant);
 
         $descriptor = new Parser\MessageDescriptor(
             name: $className,
@@ -449,8 +449,14 @@ final readonly class ProtoGenerator
         };
     }
 
-    private static function oneofVariantName(string $oneof, string $variant): string
+    private static function oneofVariantName(string $oneof, Parser\FieldDescriptor $variant): string
     {
-        return Naming::pascalCase("{$oneof} {$variant}");
+        if ($variant->jsonName !== null) {
+            $name = \sprintf('%s%s', Naming::pascalCase($oneof), Naming::jsonName($variant->jsonName));
+        } else {
+            $name = Naming::pascalCase("{$oneof} {$variant->name}");
+        }
+
+        return Naming::secure($name);
     }
 }

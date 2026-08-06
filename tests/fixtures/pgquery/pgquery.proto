@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package pg_query;
+
+message Node {
+    oneof node {
+        RTEPermissionInfo rtepermission_info = 99 [json_name="RTEPermissionInfo"];
+    }
+}
+
+message RTEPermissionInfo
+{
+    bool inh = 2 [json_name="inh"];
+}

@@ -131,6 +131,11 @@ enum Naming
         return self::secure(ucfirst(self::camelCase($name)));
     }
 
+    public static function jsonName(string $name): string
+    {
+        return ucfirst($name);
+    }
+
     public static function namespace(string $name): string
     {
         $name = implode('.', array_map(
