@@ -16,6 +16,9 @@ final readonly class CompilerOptions
     private const string OPTION_GRPC = 'grpc';
     private const string GRPC_OPTION_CLIENT = 'client';
     private const string GRPC_OPTION_SERVER = 'server';
+    private const string OPTION_METADATA = 'metadata';
+    private const string METADATA_EMIT = 'emit';
+    private const string METADATA_NONE = 'none';
 
     public static function fromRequest(CodeGeneratorRequest $request): self
     {
@@ -33,12 +36,19 @@ final readonly class CompilerOptions
             self::GRPC_OPTION_SERVER,
         ];
 
+        $metadata = self::doGetString($parameters, self::OPTION_METADATA);
+
+        if ($metadata !== self::METADATA_EMIT && $metadata !== self::METADATA_NONE) {
+            $metadata = self::METADATA_EMIT;
+        }
+
         $requireGrpcClient = array_any($grpc, static fn(string $target) => $target === self::GRPC_OPTION_CLIENT);
         $requireGrpcServer = array_any($grpc, static fn(string $target) => $target === self::GRPC_OPTION_SERVER);
 
         return new self(
             requireGrpcClient: $requireGrpcClient,
             requireGrpcServer: $requireGrpcServer,
+            emitMetadata: $metadata === self::METADATA_EMIT,
             phpNamespace: self::doGetString($parameters, self::OPTION_PHP_NAMESPACE),
             srcPath: self::doGetString($parameters, self::OPTION_SRC_PATH),
         );
@@ -51,6 +61,7 @@ final readonly class CompilerOptions
     private function __construct(
         public bool $requireGrpcClient,
         public bool $requireGrpcServer,
+        public bool $emitMetadata,
         public ?string $phpNamespace = null,
         public ?string $srcPath = null,
     ) {}

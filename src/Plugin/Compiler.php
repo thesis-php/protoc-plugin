@@ -113,7 +113,7 @@ final readonly class Compiler
                 yield from $this->doGenerateMessages($generator, $descriptor);
             }
 
-            if (!$index->empty()) {
+            if ($options->emitMetadata && !$index->empty()) {
                 $descriptorName = Naming::descriptorName($source);
 
                 yield $generator->generateDescriptorMetadataRegistry(
@@ -128,7 +128,7 @@ final readonly class Compiler
             }
         }
 
-        foreach ($descriptorPaths->groupByNamespace() as $ns => $descriptors) {
+        foreach ($options->emitMetadata ? $descriptorPaths->groupByNamespace() : [] as $ns => $descriptors) {
             $generator = new AutoloadFunctionGenerator(
                 new FileFactory(
                     self::createAutoloadFileGeneratedDoc($request),
