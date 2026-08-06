@@ -10,5 +10,5 @@
 declare(strict_types=1);
 
 \Thesis\Protobuf\Registry\Pool::get()->register(
-    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Tmp\NoPkg\TestDescriptorRegistry()),
+    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Tmp\NoPkg\DescriptorRegistry()),
 );

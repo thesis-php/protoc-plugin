@@ -10,5 +10,5 @@
 declare(strict_types=1);
 
 \Thesis\Protobuf\Registry\Pool::get()->register(
-    new \Thesis\Protobuf\Registry\OnceRegistrar(new \PgQuery\PgqueryDescriptorRegistry()),
+    new \Thesis\Protobuf\Registry\OnceRegistrar(new \PgQuery\DescriptorRegistry()),
 );

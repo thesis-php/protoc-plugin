@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package registry.collision;
+
+// A user message that already occupies the class name the descriptor registry
+// would otherwise take. Generation must succeed by renaming ours, not error.
+message DescriptorRegistry {
+    string value = 1;
+}

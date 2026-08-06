@@ -114,7 +114,9 @@ final readonly class Compiler
             }
 
             if ($options->emitMetadata && !$index->empty()) {
-                $descriptorName = Naming::descriptorName($source);
+                // A user message/enum may already occupy "DescriptorRegistry" in
+                // this namespace — that is not their fault, so rename ours instead.
+                $descriptorName = Naming::descriptorName(self::topLevelClassNames($proto));
 
                 yield $generator->generateDescriptorMetadataRegistry(
                     $index,
@@ -154,6 +156,27 @@ final readonly class Compiler
         foreach ($descriptor->messages as $message) {
             yield from $this->doGenerateMessages($generator, $message);
         }
+    }
+
+    /**
+     * The class names generated directly in the file's namespace — the top-level
+     * messages and enums the descriptor registry must not clash with.
+     *
+     * @return array<string, true>
+     */
+    private static function topLevelClassNames(FileDescriptor $proto): array
+    {
+        $names = [];
+
+        foreach ($proto->messages as $message) {
+            $names[Naming::pascalCase($message->name)] = true;
+        }
+
+        foreach ($proto->enums as $enum) {
+            $names[Naming::pascalCase($enum->name)] = true;
+        }
+
+        return $names;
     }
 
     /**

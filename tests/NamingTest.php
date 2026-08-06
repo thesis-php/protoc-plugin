@@ -12,15 +12,17 @@ use Thesis\Protoc\Plugin\Naming;
 #[CoversClass(Naming::class)]
 final class NamingTest extends TestCase
 {
-    #[TestWith(['pg_query.proto', 'PgQueryDescriptorRegistry'])]
-    #[TestWith(['protos/queue.proto', 'ProtosQueueDescriptorRegistry'])]
-    #[TestWith(['.build/libpg_query/protobuf/pg_query.proto', 'BuildLibpgQueryProtobufPgQueryDescriptorRegistry'])]
-    #[TestWith(['./api/v1/main.proto', 'ApiV1MainDescriptorRegistry'])]
-    #[TestWith(['pg-query.proto', 'PgQueryDescriptorRegistry'])]
-    #[TestWith(['api/v1.beta/main.proto', 'ApiV1BetaMainDescriptorRegistry'])]
-    public function testDescriptorName(string $actual, string $expected): void
+    public function testDescriptorName(): void
     {
-        self::assertSame($expected, Naming::descriptorName($actual));
+        self::assertSame('DescriptorRegistry', Naming::descriptorName());
+        self::assertSame('DescriptorRegistry', Naming::descriptorName(['SomeMessage' => true]));
+
+        // A user type already occupies the name — ours steps aside.
+        self::assertSame('DescriptorRegistry2', Naming::descriptorName(['DescriptorRegistry' => true]));
+        self::assertSame('DescriptorRegistry3', Naming::descriptorName([
+            'DescriptorRegistry' => true,
+            'DescriptorRegistry2' => true,
+        ]));
     }
 
     #[TestWith(['foo', 'foo'])]

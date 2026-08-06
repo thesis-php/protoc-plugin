@@ -10,8 +10,8 @@
 declare(strict_types=1);
 
 \Thesis\Protobuf\Registry\Pool::get()->register(
-    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Thesis\Auth\V1\AuthV1DescriptorRegistry()),
-    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Thesis\Auth\ProtosAuthDescriptorRegistry()),
-    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Thesis\Queue\ProtosQueueDescriptorRegistry()),
-    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Thesis\Queue\V1\QueueV1DescriptorRegistry()),
+    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Thesis\Auth\V1\DescriptorRegistry()),
+    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Thesis\Auth\DescriptorRegistry()),
+    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Thesis\Queue\DescriptorRegistry()),
+    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Thesis\Queue\V1\DescriptorRegistry()),
 );

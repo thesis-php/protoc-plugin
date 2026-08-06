@@ -102,14 +102,29 @@ enum Naming
         'class' => 1,
     ];
 
-    public static function descriptorName(string $file): string
+    /**
+     * The descriptor registry is normally `DescriptorRegistry`, but a user
+     * message or enum may already own that class name in the same namespace.
+     * That is not the user's fault, so we step aside with a numeric suffix — a
+     * digit survives the PascalCase/path normalisation an underscore would not.
+     *
+     * @param array<string, mixed> $taken class names already used in the namespace
+     */
+    public static function descriptorName(array $taken = []): string
     {
-        $info = pathinfo($file);
-        $dir = $info['dirname'] ?? '.';
-        $filename = $info['filename'];
-        $name = Naming::pascalCase(self::words(($dir !== '.' ? "{$dir} " : '') . $filename));
+        $base = 'DescriptorRegistry';
 
-        return "{$name}DescriptorRegistry";
+        if (!isset($taken[$base])) {
+            return $base;
+        }
+
+        $suffix = 2;
+
+        while (isset($taken[$base . $suffix])) {
+            ++$suffix;
+        }
+
+        return $base . $suffix;
     }
 
     public static function camelCase(string $name): string
@@ -129,11 +144,6 @@ enum Naming
     public static function pascalCase(string $name): string
     {
         return self::secure(ucfirst(self::camelCase($name)));
-    }
-
-    public static function jsonName(string $name): string
-    {
-        return ucfirst($name);
     }
 
     public static function namespace(string $name): string
@@ -171,11 +181,6 @@ enum Naming
             self::pascalCase(...),
             explode('.', $path),
         ));
-    }
-
-    private static function words(string $name): string
-    {
-        return trim((string) preg_replace('/[^a-zA-Z0-9]+/', ' ', $name));
     }
 
     public static function secure(string $name): string

@@ -19,7 +19,7 @@ use Thesis\Protobuf\Registry\File;
 /**
  * @api
  */
-final readonly class DepDescriptorRegistry implements Registry\Registrar
+final readonly class DescriptorRegistry implements Registry\Registrar
 {
     private const string DESCRIPTOR_BUFFER = 'CglkZXAucHJvdG8SCmRlcC5wa2cudjEiDAoKRGVwTWVzc2FnZUIVSAHKAhBUZXN0XERlcHNcQ3VzdG9tSkgKBhIEAAAFFQoICgEMEgMAABIKCAoBAhIDAgATCggKAQgSAwMALAoJCgIIKRIDAwAsCgkKAgQAEgMFABUKCgoDBAABEgMFCBJiBnByb3RvMw==';
 

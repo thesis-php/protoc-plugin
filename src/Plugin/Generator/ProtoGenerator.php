@@ -452,7 +452,7 @@ final readonly class ProtoGenerator
     private static function oneofVariantName(string $oneof, Parser\FieldDescriptor $variant): string
     {
         if ($variant->jsonName !== null) {
-            $name = \sprintf('%s%s', Naming::pascalCase($oneof), Naming::jsonName($variant->jsonName));
+            $name = \sprintf('%s%s', Naming::pascalCase($oneof), ucfirst($variant->jsonName));
         } else {
             $name = Naming::pascalCase("{$oneof} {$variant->name}");
         }

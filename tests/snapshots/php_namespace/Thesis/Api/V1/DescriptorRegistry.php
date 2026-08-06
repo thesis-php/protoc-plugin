@@ -19,7 +19,7 @@ use Thesis\Protobuf\Registry\File;
 /**
  * @api
  */
-final readonly class PhpNamespaceDescriptorRegistry implements Registry\Registrar
+final readonly class DescriptorRegistry implements Registry\Registrar
 {
     private const string DESCRIPTOR_BUFFER = 'ChNwaHBfbmFtZXNwYWNlLnByb3RvEgt0ZXN0LmFwaS52MSINCgtUZXN0UmVxdWVzdEIYSAHCAgNLZWvKAg1UaGVzaXNcQXBpXFYxSl0KBhIEAAAHFgoICgEMEgMAABIKCAoBCBIDAgApCgkKAggpEgMCACkKCAoBCBIDAwAgCgkKAggoEgMDACAKCAoBAhIDBQAUCgkKAgQAEgMHABYKCgoDBAABEgMHCBNiBnByb3RvMw==';
 

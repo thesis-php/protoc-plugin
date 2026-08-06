@@ -10,5 +10,5 @@
 declare(strict_types=1);
 
 \Thesis\Protobuf\Registry\Pool::get()->register(
-    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Thesis\Api\V1\PhpNamespaceDescriptorRegistry()),
+    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Thesis\Api\V1\DescriptorRegistry()),
 );

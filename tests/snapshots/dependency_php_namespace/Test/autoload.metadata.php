@@ -10,6 +10,6 @@
 declare(strict_types=1);
 
 \Thesis\Protobuf\Registry\Pool::get()->register(
-    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Test\Deps\Custom\DepDescriptorRegistry()),
-    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Test\Main\V1\MainDescriptorRegistry()),
+    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Test\Deps\Custom\DescriptorRegistry()),
+    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Test\Main\V1\DescriptorRegistry()),
 );
