@@ -29,4 +29,15 @@ final class CompilerOptionsTest extends TestCase
         $options = CompilerOptions::fromRequest(new CodeGeneratorRequest(parameter: $parameter));
         self::assertSame($namespace, $options->phpNamespace);
     }
+
+    #[TestWith(['metadata=none', false])]
+    #[TestWith(['metadata=emit', true])]
+    #[TestWith(['metadata=none,metadata=emit', false])]
+    #[TestWith(['grpc=client,metadata=emit,grpc=server', true])]
+    #[TestWith(['grpc=client,metadata=none,grpc=server', false])]
+    public function testMetadata(string $parameter, bool $emitMetadata): void
+    {
+        $options = CompilerOptions::fromRequest(new CodeGeneratorRequest(parameter: $parameter));
+        self::assertSame($emitMetadata, $options->emitMetadata);
+    }
 }
