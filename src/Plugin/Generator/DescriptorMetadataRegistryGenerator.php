@@ -11,7 +11,6 @@ use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\Parameter;
 use Nette\PhpGenerator\PhpNamespace;
 use Thesis\Protobuf\Registry\File;
-use Thesis\Protoc\Plugin\NameIndex;
 
 /**
  * @api
@@ -23,14 +22,11 @@ final readonly class DescriptorMetadataRegistryGenerator
     ) {}
 
     /**
-     * @param list<string> $dependencies
+     * @param list<DescriptorFile> $files the .proto files that share this package
      */
     public function generate(
-        NameIndex $index,
-        string $filename,
-        array $dependencies,
         string $className,
-        string $buffer,
+        array $files,
     ): PhpNamespace {
         $namespace = $this->namespacer->create($className);
 
@@ -40,13 +36,16 @@ final readonly class DescriptorMetadataRegistryGenerator
             ->addComment('@api')
             ->setImplements([
                 'Registry\Registrar',
-            ])
-            ->addMember(
-                new Constant('DESCRIPTOR_BUFFER')
+            ]);
+
+        foreach ($files as $file) {
+            $classType->addMember(
+                new Constant($file->constant)
                     ->setPrivate()
                     ->setType('string')
-                    ->setValue(base64_encode($buffer)),
+                    ->setValue(base64_encode($file->buffer)),
             );
+        }
 
         $namespace->add($classType);
 
@@ -63,25 +62,38 @@ final readonly class DescriptorMetadataRegistryGenerator
             ->setReturnType('void')
             ->addAttribute(\Override::class);
 
-        $method->addBody('$pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(');
-        $method->addBody('    name: ?,', [$filename]);
+        foreach ($files as $idx => $file) {
+            if ($idx > 0) {
+                $method->addBody('');
+            }
 
-        self::pushParameter($method, 'dependencies', $dependencies);
+            self::appendFile($method, $file);
+        }
+
+        return $namespace;
+    }
+
+    private static function appendFile(Method $method, DescriptorFile $file): void
+    {
+        $method->addBody(\sprintf('$pool->add(Registry\Descriptor::base64(self::%s), new File(', $file->constant));
+        $method->addBody('    name: ?,', [$file->name]);
+
+        self::pushParameter($method, 'dependencies', $file->dependencies);
         self::pushParameter(
             $method,
             'messages',
-            $index->messageTypes,
+            $file->index->messageTypes,
             static fn(File\MessageDescriptor $descriptor) => new Literal(
                 \sprintf("new File\\MessageDescriptor('%s', \\%s::class)", $descriptor->name, $descriptor->fqcn),
             ),
         );
-        self::pushParameter($method, 'enums', $index->enumTypes, static fn(File\EnumDescriptor $descriptor) => new Literal(
+        self::pushParameter($method, 'enums', $file->index->enumTypes, static fn(File\EnumDescriptor $descriptor) => new Literal(
             \sprintf("new File\\EnumDescriptor('%s', \\%s::class)", $descriptor->name, $descriptor->fqcn),
         ));
         self::pushParameter(
             $method,
             'services',
-            $index->services,
+            $file->index->services,
             static fn(File\ServiceDescriptor $descriptor) => new Literal(
                 <<<'PHP'
 new File\ServiceDescriptor(
@@ -110,8 +122,6 @@ PHP,
         );
 
         $method->addBody('));');
-
-        return $namespace;
     }
 
     /**

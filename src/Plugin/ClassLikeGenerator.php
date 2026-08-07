@@ -17,8 +17,6 @@ final readonly class ClassLikeGenerator
 
     private Generator\ProtoGenerator $proto;
 
-    private Generator\DescriptorMetadataRegistryGenerator $metadata;
-
     public function __construct(
         string $namespace,
         private FileFactory $files,
@@ -40,9 +38,6 @@ final readonly class ClassLikeGenerator
             $namespacer,
             $syntax,
             $edition,
-        );
-        $this->metadata = new Generator\DescriptorMetadataRegistryGenerator(
-            $namespacer,
         );
     }
 
@@ -76,27 +71,5 @@ final readonly class ClassLikeGenerator
         if ($service->methods !== []) {
             yield $this->files->create($this->grpc->generateServerRegistry($service), "{$service->path}ServerRegistry");
         }
-    }
-
-    /**
-     * @param list<string> $dependencies
-     */
-    public function generateDescriptorMetadataRegistry(
-        NameIndex $index,
-        string $filename,
-        array $dependencies,
-        string $descriptorName,
-        string $buffer,
-    ): CodeGeneratorResponse\File {
-        return $this->files->create(
-            $this->metadata->generate(
-                $index,
-                $filename,
-                $dependencies,
-                $descriptorName,
-                $buffer,
-            ),
-            $descriptorName,
-        );
     }
 }

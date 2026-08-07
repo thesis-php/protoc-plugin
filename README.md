@@ -598,11 +598,11 @@ final readonly class QueueServiceServerRegistry implements Server\ServiceRegistr
 
 #### autoload.metadata.php
 
-After generating the code, you may notice a strange file called `autoload.metadata.php` and classes named `*DescriptorRegistry.php`, which contain the original proto files stored as base64-encoded protobuf messages that the plugin used to generate your code.
+After generating the code, you may notice a strange file called `autoload.metadata.php` and classes named `DescriptorRegistry.php`, which contain the original proto files stored as base64-encoded protobuf messages that the plugin used to generate your code.
 Do not scare. These files are necessary for implementing [server-side reflection](https://github.com/grpc/grpc/tree/master/src/proto/grpc/reflection/v1) and (de) serialization of the [google.protobuf.Any](https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/any.proto) type,
 which contains the full message path within the schema. This approach is also used in other ecosystems.
 
-To avoid manually registering `*DescriptorRegistry.php` classes in the descriptor pool, it is recommended to add the path to `autoload.metadata.php` in your `composer.json` file.
+To avoid manually registering `DescriptorRegistry.php` classes in the descriptor pool, it is recommended to add the path to `autoload.metadata.php` in your `composer.json` file.
 In long-running applications for which the [thesis](https://github.com/thesis-php) project is designed, such a file will be loaded by `Composer` only once:
 ```json
 "autoload": {

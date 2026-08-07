@@ -5,7 +5,7 @@
  * Versions:
  *   thesis/protoc-plugin — v0.3.x-dev
  *   protoc               — v6.32.1
- * Source: pgquery.proto
+ * Source: pg_query.proto
  */
 
 declare(strict_types=1);

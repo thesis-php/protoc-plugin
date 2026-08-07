@@ -7,6 +7,7 @@ namespace Thesis\Protoc\Plugin\Parser;
 use Google\Protobuf\FileDescriptorProto;
 use Google\Protobuf\FileOptions;
 use Thesis\Protoc\Plugin\Comment;
+use Thesis\Protoc\Plugin\Naming;
 
 /**
  * @api
@@ -34,4 +35,25 @@ final readonly class FileDescriptor
         public ?Comment $editionComments = null,
         public ?string $syntax = null,
     ) {}
+
+    /**
+     * The class names generated directly in the file's namespace — the top-level
+     * messages and enums the descriptor registry must not clash with.
+     *
+     * @return array<string, true>
+     */
+    public function topLevelClassNames(): array
+    {
+        $names = [];
+
+        foreach ($this->messages as $message) {
+            $names[Naming::pascalCase($message->name)] = true;
+        }
+
+        foreach ($this->enums as $enum) {
+            $names[Naming::pascalCase($enum->name)] = true;
+        }
+
+        return $names;
+    }
 }

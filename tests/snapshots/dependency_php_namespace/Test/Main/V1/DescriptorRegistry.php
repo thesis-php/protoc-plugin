@@ -21,12 +21,12 @@ use Thesis\Protobuf\Registry\File;
  */
 final readonly class DescriptorRegistry implements Registry\Registrar
 {
-    private const string DESCRIPTOR_BUFFER = 'CgptYWluLnByb3RvEgx0ZXN0Lm1haW4udjEaCWRlcC5wcm90byI3CgtNYWluTWVzc2FnZRIoCgNkZXAYASABKAsyFi5kZXAucGtnLnYxLkRlcE1lc3NhZ2VSA2RlcEp2CgYSBAAACAEKCAoBDBIDAAASCggKAQISAwIAFQoJCgIDABIDBAATCgoKAgQAEgQGAAgBCgoKAwQAARIDBggTCgsKBAQAAgASAwcCIAoMCgUEAAIABhIDBwIXCgwKBQQAAgABEgMHGBsKDAoFBAACAAMSAwceH2IGcHJvdG8z';
+    private const string MAIN_DESCRIPTOR_BUFFER = 'CgptYWluLnByb3RvEgx0ZXN0Lm1haW4udjEaCWRlcC5wcm90byI3CgtNYWluTWVzc2FnZRIoCgNkZXAYASABKAsyFi5kZXAucGtnLnYxLkRlcE1lc3NhZ2VSA2RlcEp2CgYSBAAACAEKCAoBDBIDAAASCggKAQISAwIAFQoJCgIDABIDBAATCgoKAgQAEgQGAAgBCgoKAwQAARIDBggTCgsKBAQAAgASAwcCIAoMCgUEAAIABhIDBwIXCgwKBQQAAgABEgMHGBsKDAoFBAACAAMSAwceH2IGcHJvdG8z';
 
     #[Override]
     public function register(Registry\Pool $pool): void
     {
-        $pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+        $pool->add(Registry\Descriptor::base64(self::MAIN_DESCRIPTOR_BUFFER), new File(
             name: 'main.proto',
             dependencies: [
                 'dep.proto',
