@@ -102,6 +102,8 @@ message TestRequest {
     optional sint64 sint64_defaulted = 403 [default = -64];
     optional sfixed32 sfixed32_defaulted = 404 [default = -32];
     optional sfixed64 sfixed64_defaulted = 405 [default = -64];
+    // Optional enum with an explicit default: non-nullable, baked to the case.
+    optional Foo foo_defaulted = 60 [default = FOO_BAR];
     map<string, string> map_string_string = 406;
     optional google.protobuf.Timestamp known_timestamp = 407;
     optional google.protobuf.Duration known_duration = 408;

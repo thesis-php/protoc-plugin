@@ -53,12 +53,11 @@ final readonly class TestRequest
      * @param list<int> $sint64RepeatedPacked
      * @param list<int> $sfixed32RepeatedPacked
      * @param list<int> $sfixed64RepeatedPacked
+     * @param \Proto\Api\V1\Foo $fooDefaulted Optional enum with an explicit default: non-nullable, baked to the case.
      * @param Protobuf\Map<string, string> $mapStringString
      * @param ?string $lastField Maximum possible tag number.
      */
     public function __construct(
-        #[Reflection\Field(1, new Reflection\EnumT(\Proto\Api\V1\TestRequest\Kind::class))]
-        public \Proto\Api\V1\TestRequest\Kind $kind,
         #[Reflection\Field(10, Reflection\BoolT::T)]
         public bool $boolRequired,
         #[Reflection\Field(11, Reflection\Int32T::T)]
@@ -89,6 +88,8 @@ final readonly class TestRequest
         public int $sfixed32Required,
         #[Reflection\Field(105, Reflection\SFixed64T::T)]
         public int $sfixed64Required,
+        #[Reflection\Field(1, new Reflection\EnumT(\Proto\Api\V1\TestRequest\Kind::class))]
+        public \Proto\Api\V1\TestRequest\Kind $kind = \Proto\Api\V1\TestRequest\Kind::VOID,
         #[Reflection\Field(30, Reflection\BoolT::T)]
         public ?bool $boolOptional = null,
         #[Reflection\Field(31, Reflection\Int32T::T)]
@@ -205,6 +206,8 @@ final readonly class TestRequest
         public ?int $sfixed32Defaulted = null,
         #[Reflection\Field(405, Reflection\SFixed64T::T)]
         public ?int $sfixed64Defaulted = null,
+        #[Reflection\Field(60, new Reflection\EnumT(\Proto\Api\V1\Foo::class))]
+        public \Proto\Api\V1\Foo $fooDefaulted = \Proto\Api\V1\Foo::FOO_BAR,
         #[Reflection\Field(406, new Reflection\MapT(Reflection\StringT::T, Reflection\StringT::T))]
         public Protobuf\Map $mapStringString = new Protobuf\Map(),
         #[Reflection\Field(407, new Reflection\ObjectT(\Google\Protobuf\Timestamp::class))]

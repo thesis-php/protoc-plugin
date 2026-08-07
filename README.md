@@ -22,6 +22,7 @@ For this reason, we have written this plugin, which — in addition to addressin
     - [maps](#maps)
     - [oneof](#oneof)
     - [presence](#presence)
+    - [defaults](#defaults)
     - [grpc client](#grpc-client)
     - [grpc server](#grpc-server)
     - [autoload.metadata.php](#autoloadmetadataphp)
@@ -413,6 +414,61 @@ The generator decides nullable/default/required for each field using these rules
 8. Message/object fields are nullable by default and default to `null`; if such field is required (rule 1), it becomes a required constructor argument.
 
 For nullable fields, proto-defined defaults are intentionally not baked into constructor defaults, so "unset" can be distinguished from "set to proto default".
+
+#### defaults
+
+The PHP default of a constructor parameter follows from field presence and whether the schema declares one:
+
+- **required** (`required`, editions `LEGACY_REQUIRED`) — mandatory, no default, unless the schema declares `[default = ...]`.
+- **implicit presence** (proto3 singular, editions `IMPLICIT`) — the protobuf zero value.
+- **explicit presence** (`optional`, editions `EXPLICIT`, every message field) — `null`; a declared `[default = ...]` is not baked, so "unset" stays distinguishable — except enums, which become non-nullable with the declared case.
+- **repeated / map** — `[]` / `new \Thesis\Protobuf\Map()`.
+
+`Foo` is an enum whose first case is `FOO_UNSPECIFIED`, `Msg` is a message.
+
+**proto2**
+
+| protobuf                                  | php                                                    |
+|-------------------------------------------|--------------------------------------------------------|
+| `required int32 x = 1;`                   | `int $x`                                               |
+| `required uint64 x = 1;`                  | `\BcMath\Number $x`                                    |
+| `required string x = 1 [default = "hi"];` | `string $x = 'hi'`                                     |
+| `required Foo x = 1 [default = FOO_BAR];` | `Foo $x = Foo::FOO_BAR`                                |
+| `required Msg x = 1;`                     | `Msg $x`                                               |
+| `optional int32 x = 1;`                   | `?int $x = null`                                       |
+| `optional int32 x = 1 [default = 5];`     | `?int $x = null`                                       |
+| `optional Foo x = 1 [default = FOO_BAR];` | `Foo $x = Foo::FOO_BAR`                                |
+| `optional Msg x = 1;`                     | `?Msg $x = null`                                       |
+| `repeated int32 x = 1;`                   | `array $x = []`                                        |
+| `map<string, string> x = 1;`              | `\Thesis\Protobuf\Map $x = new \Thesis\Protobuf\Map()` |
+
+**proto3**
+
+| protobuf                | php                                         |
+|-------------------------|---------------------------------------------|
+| `int32 x = 1;`          | `int $x = 0`                                |
+| `string x = 1;`         | `string $x = ''`                            |
+| `bool x = 1;`           | `bool $x = false`                           |
+| `uint64 x = 1;`         | `\BcMath\Number $x = new \BcMath\Number(0)` |
+| `Foo x = 1;`            | `Foo $x = Foo::FOO_UNSPECIFIED`             |
+| `optional int32 x = 1;` | `?int $x = null`                            |
+| `optional Foo x = 1;`   | `?Foo $x = null`                            |
+| `Msg x = 1;`            | `?Msg $x = null`                            |
+| `repeated int32 x = 1;` | `array $x = []`                             |
+
+**edition 2023** (`features.field_presence`, default is `EXPLICIT`)
+
+| protobuf                                                                    | php                             |
+|-----------------------------------------------------------------------------|---------------------------------|
+| `int32 x = 1;`                                                              | `?int $x = null`                |
+| `int32 x = 1 [features.field_presence = IMPLICIT];`                         | `int $x = 0`                    |
+| `int32 x = 1 [features.field_presence = LEGACY_REQUIRED];`                  | `int $x`                        |
+| `string x = 1 [features.field_presence = LEGACY_REQUIRED, default = "hi"];` | `string $x = 'hi'`              |
+| `Foo x = 1 [default = FOO_BAR];`                                            | `Foo $x = Foo::FOO_BAR`         |
+| `Foo x = 1;`                                                                | `?Foo $x = null`                |
+| `Foo x = 1 [features.field_presence = IMPLICIT];`                           | `Foo $x = Foo::FOO_UNSPECIFIED` |
+| `Msg x = 1;`                                                                | `?Msg $x = null`                |
+| `repeated int32 x = 1;`                                                     | `array $x = []`                 |
 
 #### grpc client
 

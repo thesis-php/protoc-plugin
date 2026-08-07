@@ -10,5 +10,5 @@
 declare(strict_types=1);
 
 \Thesis\Protobuf\Registry\Pool::get()->register(
-    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Proto3\Scalars\V1\DescriptorRegistry()),
+    new \Thesis\Protobuf\Registry\OnceRegistrar(new \Int_\Scalars\V1\DescriptorRegistry()),
 );

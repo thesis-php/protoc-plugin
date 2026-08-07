@@ -252,7 +252,12 @@ final readonly class ProtoGenerator
                 ])
                 ->setNullable($nullable);
 
-            $hasDefault = !$required || ($this->edition !== null && $field->defaultValue !== null);
+            // A field becomes an optional constructor argument (gets a default) when it
+            // is not required, or when the schema declares an explicit default for it —
+            // in which case that declared default stands in for the value, as proto2 and
+            // editions do. A required field without a declared default stays mandatory:
+            // the caller must supply it. proto2 and editions behave identically here.
+            $hasDefault = !$required || $field->defaultValue !== null;
 
             if ($hasDefault) {
                 $parameter->setDefaultValue($repeated ? [] : $default);
@@ -434,12 +439,12 @@ final readonly class ProtoGenerator
             FieldDescriptorProto\Type::TYPE_SINT32,
             FieldDescriptorProto\Type::TYPE_UINT32,
             FieldDescriptorProto\Type::TYPE_FIXED32,
-            FieldDescriptorProto\Type::TYPE_SFIXED32 => filter_var($defaultValue, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE) ?? 0,
+            FieldDescriptorProto\Type::TYPE_SFIXED32,
             FieldDescriptorProto\Type::TYPE_INT64,
             FieldDescriptorProto\Type::TYPE_SINT64,
+            FieldDescriptorProto\Type::TYPE_SFIXED64 => filter_var($defaultValue, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE) ?? 0,
             FieldDescriptorProto\Type::TYPE_UINT64,
-            FieldDescriptorProto\Type::TYPE_FIXED64,
-            FieldDescriptorProto\Type::TYPE_SFIXED64 => Literal::new('\BcMath\Number', [
+            FieldDescriptorProto\Type::TYPE_FIXED64 => Literal::new('\BcMath\Number', [
                 filter_var($defaultValue, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE) ?? 0,
             ]),
             FieldDescriptorProto\Type::TYPE_BOOL => filter_var($defaultValue, FILTER_VALIDATE_BOOLEAN),

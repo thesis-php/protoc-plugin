@@ -27,4 +27,6 @@ message EditionsFeatures {
     Type default_type = 10;
     // Message fields always have presence (nullable) regardless of features.
     Inner inner = 11;
+    // Legacy required without a default: mandatory, no constructor default.
+    int32 legacy_required_bare = 12 [features.field_presence = LEGACY_REQUIRED];
 }

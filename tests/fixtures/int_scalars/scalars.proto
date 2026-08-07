@@ -1,18 +1,19 @@
-syntax = "proto3";
+syntax = "proto2";
 
-package proto3.scalars.v1;
+package int.scalars.v1;
 
 // Exercises the PHP type mapping of 64-bit scalar fields under proto3:
 // the signed types (int64, sint64, sfixed64) map to native `int`, while the
 // unsigned 64-bit types (uint64, fixed64) stay `\BcMath\Number`.
 message Scalars {
-    int64 int64_singular = 1;
-    sint64 sint64_singular = 2;
-    sfixed64 sfixed64_singular = 3;
-    uint64 uint64_singular = 4;
-    fixed64 fixed64_singular = 5;
+    required int64 int64_singular = 1 [default = 1];
+    required sint64 sint64_singular = 2 [default = 1];
+    required sfixed64 sfixed64_singular = 3 [default = 1];
+    required uint64 uint64_singular = 4 [default = 1];
+    required fixed64 fixed64_singular = 5 [default = 1];
 
-    optional int64 int64_optional = 11;
+    // Not be set.
+    optional int64 int64_optional = 11 [default = 1];
     optional sint64 sint64_optional = 12;
     optional sfixed64 sfixed64_optional = 13;
     optional uint64 uint64_optional = 14;

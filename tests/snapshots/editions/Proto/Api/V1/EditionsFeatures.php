@@ -26,8 +26,11 @@ final readonly class EditionsFeatures
      * @param list<int> $defaultEncoding
      * @param \Proto\Api\V1\Type $type Default type is TYPE_EDITIONS.
      * @param ?\Proto\Api\V1\Inner $inner Message fields always have presence (nullable) regardless of features.
+     * @param int $legacyRequiredBare Legacy required without a default: mandatory, no constructor default.
      */
     public function __construct(
+        #[Reflection\Field(12, Reflection\Int32T::T)]
+        public int $legacyRequiredBare,
         #[Reflection\Field(1, Reflection\StringT::T)]
         public string $implicit = '',
         #[Reflection\Field(2, Reflection\StringT::T)]

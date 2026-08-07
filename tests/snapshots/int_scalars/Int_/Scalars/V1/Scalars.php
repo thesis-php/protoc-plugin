@@ -5,12 +5,12 @@
  * Versions:
  *   thesis/protoc-plugin — v0.3.x-dev
  *   protoc               — v6.32.1
- * Source: proto3_scalars.proto
+ * Source: scalars.proto
  */
 
 declare(strict_types=1);
 
-namespace Proto3\Scalars\V1;
+namespace Int_\Scalars\V1;
 
 use Thesis\Protobuf\Reflection;
 
@@ -24,6 +24,7 @@ use Thesis\Protobuf\Reflection;
 final readonly class Scalars
 {
     /**
+     * @param ?int $int64Optional Not be set.
      * @param list<int> $int64Repeated
      * @param list<int> $sint64Repeated
      * @param list<int> $sfixed64Repeated
@@ -32,15 +33,15 @@ final readonly class Scalars
      */
     public function __construct(
         #[Reflection\Field(1, Reflection\Int64T::T)]
-        public int $int64Singular = 0,
+        public int $int64Singular = 1,
         #[Reflection\Field(2, Reflection\SInt64T::T)]
-        public int $sint64Singular = 0,
+        public int $sint64Singular = 1,
         #[Reflection\Field(3, Reflection\SFixed64T::T)]
-        public int $sfixed64Singular = 0,
+        public int $sfixed64Singular = 1,
         #[Reflection\Field(4, Reflection\Uint64T::T)]
-        public \BcMath\Number $uint64Singular = new \BcMath\Number(0),
+        public \BcMath\Number $uint64Singular = new \BcMath\Number(1),
         #[Reflection\Field(5, Reflection\Fixed64T::T)]
-        public \BcMath\Number $fixed64Singular = new \BcMath\Number(0),
+        public \BcMath\Number $fixed64Singular = new \BcMath\Number(1),
         #[Reflection\Field(11, Reflection\Int64T::T)]
         public ?int $int64Optional = null,
         #[Reflection\Field(12, Reflection\SInt64T::T)]
@@ -51,15 +52,15 @@ final readonly class Scalars
         public ?\BcMath\Number $uint64Optional = null,
         #[Reflection\Field(15, Reflection\Fixed64T::T)]
         public ?\BcMath\Number $fixed64Optional = null,
-        #[Reflection\Field(21, new Reflection\ListT(Reflection\Int64T::T))]
+        #[Reflection\Field(21, new Reflection\ListT(Reflection\Int64T::T, false))]
         public array $int64Repeated = [],
-        #[Reflection\Field(22, new Reflection\ListT(Reflection\SInt64T::T))]
+        #[Reflection\Field(22, new Reflection\ListT(Reflection\SInt64T::T, false))]
         public array $sint64Repeated = [],
-        #[Reflection\Field(23, new Reflection\ListT(Reflection\SFixed64T::T))]
+        #[Reflection\Field(23, new Reflection\ListT(Reflection\SFixed64T::T, false))]
         public array $sfixed64Repeated = [],
-        #[Reflection\Field(24, new Reflection\ListT(Reflection\Uint64T::T))]
+        #[Reflection\Field(24, new Reflection\ListT(Reflection\Uint64T::T, false))]
         public array $uint64Repeated = [],
-        #[Reflection\Field(25, new Reflection\ListT(Reflection\Fixed64T::T))]
+        #[Reflection\Field(25, new Reflection\ListT(Reflection\Fixed64T::T, false))]
         public array $fixed64Repeated = [],
     ) {}
 }
