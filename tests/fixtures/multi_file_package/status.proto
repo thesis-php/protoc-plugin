@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package multi.pkg.v1;
+
+import "code.proto";
+
+message Status {
+    string message = 1;
+    Code code = 2;
+}

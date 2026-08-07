@@ -21,12 +21,12 @@ use Thesis\Protobuf\Registry\File;
  */
 final readonly class DescriptorRegistry implements Registry\Registrar
 {
-    private const string DESCRIPTOR_BUFFER = 'CglkZXAucHJvdG8SCmRlcC5wa2cudjEiDAoKRGVwTWVzc2FnZUIVSAHKAhBUZXN0XERlcHNcQ3VzdG9tSkgKBhIEAAAFFQoICgEMEgMAABIKCAoBAhIDAgATCggKAQgSAwMALAoJCgIIKRIDAwAsCgkKAgQAEgMFABUKCgoDBAABEgMFCBJiBnByb3RvMw==';
+    private const string DEP_DESCRIPTOR_BUFFER = 'CglkZXAucHJvdG8SCmRlcC5wa2cudjEiDAoKRGVwTWVzc2FnZUIVSAHKAhBUZXN0XERlcHNcQ3VzdG9tSkgKBhIEAAAFFQoICgEMEgMAABIKCAoBAhIDAgATCggKAQgSAwMALAoJCgIIKRIDAwAsCgkKAgQAEgMFABUKCgoDBAABEgMFCBJiBnByb3RvMw==';
 
     #[Override]
     public function register(Registry\Pool $pool): void
     {
-        $pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+        $pool->add(Registry\Descriptor::base64(self::DEP_DESCRIPTOR_BUFFER), new File(
             name: 'dep.proto',
             messages: [
                 new File\MessageDescriptor('dep.pkg.v1.DepMessage', \Test\Deps\Custom\DepMessage::class),

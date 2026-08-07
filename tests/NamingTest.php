@@ -15,14 +15,21 @@ final class NamingTest extends TestCase
     public function testDescriptorName(): void
     {
         self::assertSame('DescriptorRegistry', Naming::descriptorName());
-        self::assertSame('DescriptorRegistry', Naming::descriptorName(['SomeMessage' => true]));
-
-        // A user type already occupies the name — ours steps aside.
+        self::assertSame('DescriptorRegistry', Naming::descriptorName(['Foo' => true, 'Bar' => true]));
         self::assertSame('DescriptorRegistry2', Naming::descriptorName(['DescriptorRegistry' => true]));
         self::assertSame('DescriptorRegistry3', Naming::descriptorName([
             'DescriptorRegistry' => true,
             'DescriptorRegistry2' => true,
         ]));
+    }
+
+    #[TestWith(['code.proto', 'CODE_DESCRIPTOR_BUFFER'])]
+    #[TestWith(['pg_query.proto', 'PG_QUERY_DESCRIPTOR_BUFFER'])]
+    #[TestWith(['google/rpc/code.proto', 'CODE_DESCRIPTOR_BUFFER'])]
+    #[TestWith(['google/rpc/status.proto', 'STATUS_DESCRIPTOR_BUFFER'])]
+    public function testDescriptorBuffer(string $file, string $expected): void
+    {
+        self::assertSame($expected, Naming::descriptorBuffer($file));
     }
 
     #[TestWith(['foo', 'foo'])]

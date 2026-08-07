@@ -11,7 +11,10 @@ use Thesis\Protobuf\Encoder;
 use Thesis\Protobuf\Registry\File;
 use Thesis\Protoc\Exception\CodeCannotBeGenerated;
 use Thesis\Protoc\Plugin\Generator\AutoloadFunctionGenerator;
+use Thesis\Protoc\Plugin\Generator\DescriptorFile;
+use Thesis\Protoc\Plugin\Generator\DescriptorMetadataRegistryGenerator;
 use Thesis\Protoc\Plugin\Generator\FileFactory;
+use Thesis\Protoc\Plugin\Generator\PhpNamespacer;
 use Thesis\Protoc\Plugin\Parser\FileDescriptor;
 use Thesis\Protoc\Plugin\Parser\MessageDescriptor;
 use Thesis\Protoc\Plugin\Parser\ServiceMethodDescriptor;
@@ -61,16 +64,20 @@ final readonly class Compiler
 
         $descriptorPaths = new PathTable();
 
+        $registries = new DescriptorTable();
+
         foreach ($request as $source => $proto) {
             $phpNamespace = self::determinePhpNamespace($proto, $options);
 
             $index = new NameIndex();
 
+            $path = $options->srcPath ?? str_replace('\\', '/', $phpNamespace);
+
             $generator = new ClassLikeGenerator(
                 namespace: $phpNamespace,
                 files: new FileFactory(
                     self::createClassLikeGeneratedDoc($request, $source),
-                    $path = $options->srcPath ?? str_replace('\\', '/', $phpNamespace),
+                    $path,
                 ),
                 graph: $registry->graph($source),
                 index: $index,
@@ -114,20 +121,40 @@ final readonly class Compiler
             }
 
             if ($options->emitMetadata && !$index->empty()) {
-                // A user message/enum may already occupy "DescriptorRegistry" in
-                // this namespace — that is not their fault, so rename ours instead.
-                $descriptorName = Naming::descriptorName(self::topLevelClassNames($proto));
+                $group = $registries->add($path, $phpNamespace);
 
-                yield $generator->generateDescriptorMetadataRegistry(
-                    $index,
-                    $proto->name,
-                    $proto->dependencies,
-                    $descriptorName,
-                    $this->encoder->encode($proto->file),
+                $group->add(
+                    $source,
+                    $proto->topLevelClassNames(),
+                    new DescriptorFile(
+                        constant: Naming::descriptorBuffer($proto->name),
+                        name: $proto->name,
+                        dependencies: $proto->dependencies,
+                        index: $index,
+                        buffer: $this->encoder->encode($proto->file),
+                    ),
                 );
-
-                $descriptorPaths->addRelation("{$phpNamespace}\\{$descriptorName}", $path);
             }
+        }
+
+        foreach ($registries as $group) {
+            // A user message/enum may already occupy "DescriptorRegistry" in this
+            // namespace. That is not their fault, so rename ours instead.
+            $descriptorName = Naming::descriptorName($group->taken);
+
+            $descriptorPaths->addRelation("{$group->namespace}\\{$descriptorName}", $group->path);
+
+            $factory = new FileFactory(
+                self::createClassLikeGeneratedDoc($request, implode(', ', $group->sources)),
+                $group->path,
+            );
+
+            $registryGenerator = new DescriptorMetadataRegistryGenerator(new PhpNamespacer($group->namespace));
+
+            yield $factory->create(
+                $registryGenerator->generate($descriptorName, $group->files),
+                $descriptorName,
+            );
         }
 
         foreach ($options->emitMetadata ? $descriptorPaths->groupByNamespace() : [] as $ns => $descriptors) {
@@ -156,27 +183,6 @@ final readonly class Compiler
         foreach ($descriptor->messages as $message) {
             yield from $this->doGenerateMessages($generator, $message);
         }
-    }
-
-    /**
-     * The class names generated directly in the file's namespace — the top-level
-     * messages and enums the descriptor registry must not clash with.
-     *
-     * @return array<string, true>
-     */
-    private static function topLevelClassNames(FileDescriptor $proto): array
-    {
-        $names = [];
-
-        foreach ($proto->messages as $message) {
-            $names[Naming::pascalCase($message->name)] = true;
-        }
-
-        foreach ($proto->enums as $enum) {
-            $names[Naming::pascalCase($enum->name)] = true;
-        }
-
-        return $names;
     }
 
     /**

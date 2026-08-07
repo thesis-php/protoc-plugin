@@ -21,12 +21,12 @@ use Thesis\Protobuf\Registry\File;
  */
 final readonly class DescriptorRegistry implements Registry\Registrar
 {
-    private const string DESCRIPTOR_BUFFER = 'ChNwaHBfbmFtZXNwYWNlLnByb3RvEgt0ZXN0LmFwaS52MSINCgtUZXN0UmVxdWVzdEIYSAHCAgNLZWvKAg1UaGVzaXNcQXBpXFYxSl0KBhIEAAAHFgoICgEMEgMAABIKCAoBCBIDAgApCgkKAggpEgMCACkKCAoBCBIDAwAgCgkKAggoEgMDACAKCAoBAhIDBQAUCgkKAgQAEgMHABYKCgoDBAABEgMHCBNiBnByb3RvMw==';
+    private const string PHP_NAMESPACE_DESCRIPTOR_BUFFER = 'ChNwaHBfbmFtZXNwYWNlLnByb3RvEgt0ZXN0LmFwaS52MSINCgtUZXN0UmVxdWVzdEIYSAHCAgNLZWvKAg1UaGVzaXNcQXBpXFYxSl0KBhIEAAAHFgoICgEMEgMAABIKCAoBCBIDAgApCgkKAggpEgMCACkKCAoBCBIDAwAgCgkKAggoEgMDACAKCAoBAhIDBQAUCgkKAgQAEgMHABYKCgoDBAABEgMHCBNiBnByb3RvMw==';
 
     #[Override]
     public function register(Registry\Pool $pool): void
     {
-        $pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+        $pool->add(Registry\Descriptor::base64(self::PHP_NAMESPACE_DESCRIPTOR_BUFFER), new File(
             name: 'php_namespace.proto',
             messages: [
                 new File\MessageDescriptor('test.api.v1.TestRequest', \Thesis\Api\V1\TestRequest::class),

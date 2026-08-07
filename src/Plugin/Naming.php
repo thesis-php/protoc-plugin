@@ -127,6 +127,21 @@ enum Naming
         return $base . $suffix;
     }
 
+    /**
+     * Name of the private constant holding a single .proto file's descriptor
+     * buffer inside the per-package registry, e.g. "google/rpc/code.proto" =>
+     * "CODE_DESCRIPTOR_BUFFER". File names are unique within a package, so the
+     * constants never collide.
+     *
+     * @return non-empty-string
+     */
+    public static function descriptorBuffer(string $file): string
+    {
+        $name = strtoupper(trim((string) preg_replace('/[^a-zA-Z0-9]+/', '_', pathinfo($file, PATHINFO_FILENAME)), '_'));
+
+        return "{$name}_DESCRIPTOR_BUFFER";
+    }
+
     public static function camelCase(string $name): string
     {
         return lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $name))));

@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package multi.pkg.v1;
+
+// Two files share one package, so the plugin must emit a single
+// DescriptorRegistry with a CODE_DESCRIPTOR_BUFFER / STATUS_DESCRIPTOR_BUFFER
+// constant per file instead of two colliding DescriptorRegistry.php.
+message Code {
+    int32 value = 1;
+}

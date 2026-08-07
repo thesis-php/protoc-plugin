@@ -21,12 +21,12 @@ use Thesis\Protobuf\Registry\File;
  */
 final readonly class DescriptorRegistry2 implements Registry\Registrar
 {
-    private const string DESCRIPTOR_BUFFER = 'ChhyZWdpc3RyeV9jb2xsaXNpb24ucHJvdG8SEnJlZ2lzdHJ5LmNvbGxpc2lvbiIqChJEZXNjcmlwdG9yUmVnaXN0cnkSFAoFdmFsdWUYASABKAlSBXZhbHVlSogCCgYSBAAACAEKCAoBDBIDAAASCggKAQISAwIAGwqmAQoCBAASBAYACAEamQEgQSB1c2VyIG1lc3NhZ2UgdGhhdCBhbHJlYWR5IG9jY3VwaWVzIHRoZSBjbGFzcyBuYW1lIHRoZSBkZXNjcmlwdG9yIHJlZ2lzdHJ5CiB3b3VsZCBvdGhlcndpc2UgdGFrZS4gR2VuZXJhdGlvbiBtdXN0IHN1Y2NlZWQgYnkgcmVuYW1pbmcgb3Vycywgbm90IGVycm9yLgoKCgoDBAABEgMGCBoKCwoEBAACABIDBwQVCgwKBQQAAgAFEgMHBAoKDAoFBAACAAESAwcLEAoMCgUEAAIAAxIDBxMUYgZwcm90bzM=';
+    private const string REGISTRY_COLLISION_DESCRIPTOR_BUFFER = 'ChhyZWdpc3RyeV9jb2xsaXNpb24ucHJvdG8SEnJlZ2lzdHJ5LmNvbGxpc2lvbiIqChJEZXNjcmlwdG9yUmVnaXN0cnkSFAoFdmFsdWUYASABKAlSBXZhbHVlSogCCgYSBAAACAEKCAoBDBIDAAASCggKAQISAwIAGwqmAQoCBAASBAYACAEamQEgQSB1c2VyIG1lc3NhZ2UgdGhhdCBhbHJlYWR5IG9jY3VwaWVzIHRoZSBjbGFzcyBuYW1lIHRoZSBkZXNjcmlwdG9yIHJlZ2lzdHJ5CiB3b3VsZCBvdGhlcndpc2UgdGFrZS4gR2VuZXJhdGlvbiBtdXN0IHN1Y2NlZWQgYnkgcmVuYW1pbmcgb3Vycywgbm90IGVycm9yLgoKCgoDBAABEgMGCBoKCwoEBAACABIDBwQVCgwKBQQAAgAFEgMHBAoKDAoFBAACAAESAwcLEAoMCgUEAAIAAxIDBxMUYgZwcm90bzM=';
 
     #[Override]
     public function register(Registry\Pool $pool): void
     {
-        $pool->add(Registry\Descriptor::base64(self::DESCRIPTOR_BUFFER), new File(
+        $pool->add(Registry\Descriptor::base64(self::REGISTRY_COLLISION_DESCRIPTOR_BUFFER), new File(
             name: 'registry_collision.proto',
             messages: [
                 new File\MessageDescriptor('registry.collision.DescriptorRegistry', \Registry\Collision\DescriptorRegistry::class),
