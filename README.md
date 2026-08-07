@@ -14,6 +14,7 @@ For this reason, we have written this plugin, which — in addition to addressin
   - [src_path](#src_path)
   - [grpc](#grpc)
   - [memory limit](#memory-limit)
+  - [metadata limit](#metadata)
   - [multiple options](#multiple-options)
 - [Generated code guide](#generated-code-guide)
     - [numbers](#numbers)
@@ -197,6 +198,32 @@ docker run --rm \
   -v "$(PWD):/workspace" \
   -w /workspace \
   ghcr.io/thesis-php/protoc-plugin:latest \
+  --php-plugin_out=genproto \
+  protos/*.proto
+```
+
+### `metadata`
+
+To reject emitting [metadata](#autoloadmetadataphp) use `metadata` plugin option.
+
+When using a locally installed plugin:
+```shell
+THESIS_PLUGIN_MEMORY_LIMIT=1G protoc \
+  --plugin=protoc-gen-php-plugin=/usr/local/bin/protoc-gen-php \
+  --php-plugin_opt=metadata=none \
+  --php-plugin_out=genproto \
+  protos/*.proto
+```
+
+When using the Docker image:
+```shell
+docker run --rm \
+  --user $(id -u):$(id -g) \
+  -e THESIS_PLUGIN_MEMORY_LIMIT=1G \
+  -v "$(PWD):/workspace" \
+  -w /workspace \
+  ghcr.io/thesis-php/protoc-plugin:latest \
+  --php-plugin_opt=metadata=none \
   --php-plugin_out=genproto \
   protos/*.proto
 ```
