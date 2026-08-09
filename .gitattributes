@@ -10,4 +10,5 @@
 /CHANGELOG.md -export-ignore
 /composer.json -export-ignore
 /LICENSE -export-ignore
+/map.json -export-ignore
 /README.md -export-ignore
