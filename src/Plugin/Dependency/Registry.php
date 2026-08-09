@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Dependency;
 
-use Thesis\Protoc\Plugin\CompilerOptions;
+use Thesis\Protoc\Plugin\NamespaceResolver;
 use Thesis\Protoc\Plugin\Naming;
 use Thesis\Protoc\Plugin\Parser;
 
@@ -22,9 +22,11 @@ final class Registry
     /** @var array<string, list<Index>> */
     private array $fileIndexes = [];
 
-    public function __construct(Parser\Request $request, CompilerOptions $options)
-    {
-        $this->createIndex($request, $options);
+    public function __construct(
+        Parser\Request $request,
+        private readonly NamespaceResolver $namespaces,
+    ) {
+        $this->createIndex($request, $namespaces);
         $this->mergeIndex($request);
         $this->createDependencyGraph($request);
     }
@@ -34,7 +36,7 @@ final class Registry
         return $this->graph[$name] ?? throw new \RuntimeException("Graph for file {$name} does not exist.");
     }
 
-    private function createIndex(Parser\Request $request, CompilerOptions $options): void
+    private function createIndex(Parser\Request $request, NamespaceResolver $namespaces): void
     {
         foreach ($request->descriptors as $name => $descriptor) {
             $types = iterator_to_array(
@@ -45,7 +47,7 @@ final class Registry
             );
 
             $package = $descriptor->package ?? '.';
-            $namespace = $options->phpNamespace ?? $descriptor->options->phpNamespace ?? Naming::namespace($package);
+            $namespace = $namespaces->file($descriptor) ?? Naming::namespace($package);
 
             $this->index[$name] = new Index(
                 $types,
@@ -191,6 +193,10 @@ final class Registry
 
                 $class = Naming::namespace(substr($typeName, \strlen($prefix)));
                 $fqcn = "\\{$index->namespace}\\{$class}";
+
+                // A type relocated by an exact rule leaves the namespace of its own
+                // package behind, so its name is resolved from the rule alone.
+                $fqcn = $this->namespaces->type($typeName) ?? $fqcn;
 
                 yield $typeName => new Type(
                     $fqcn,

@@ -25,8 +25,9 @@ final readonly class ClassLikeGenerator
         ?string $package = null,
         ?string $syntax = null,
         ?Edition $edition = null,
+        Mapping\TypeMap $types = new Mapping\TypeMap(),
     ) {
-        $namespacer = new Generator\PhpNamespacer($namespace);
+        $namespacer = new Generator\PhpNamespacer($namespace, $types, $package);
         $this->grpc = new Generator\GrpcGenerator(
             $namespacer,
             $graph,

@@ -29,13 +29,13 @@ final readonly class ProtoGenerator
     private TypeDeclarationFactory $types;
 
     public function __construct(
-        Dependency\Graph $graph,
+        private Dependency\Graph $graph,
         private NameIndex $index,
         private PhpNamespacer $namespacer,
         private ?string $syntax = null,
         private ?Edition $edition = null,
     ) {
-        $this->types = new TypeDeclarationFactory($graph);
+        $this->types = new TypeDeclarationFactory($this->graph);
     }
 
     public function generateEnum(Parser\EnumDescriptor $enum): PhpNamespace
@@ -298,23 +298,18 @@ final readonly class ProtoGenerator
 
             $constructor
                 ->addPromotedParameter(Naming::propertyName($oneOf->name))
-                ->setType(Naming::joinNamespace([
-                    '',
-                    $this->namespacer->namespace,
-                    $message->path,
-                    $oneOfName,
-                ]))
+                ->setType($this->namespacer->fqcn("{$message->path}.{$oneOfName}"))
                 ->setNullable()
                 ->setDefaultValue(null)
                 ->addAttribute('Reflection\OneOf', [
                     array_map(
                         fn(Parser\FieldDescriptor $variant) => new Literal(
-                            Naming::joinNamespace([
-                                '',
-                                $this->namespacer->namespace,
-                                $message->path,
-                                \sprintf('%s::class', self::oneofVariantName($oneOfName, $variant)),
-                            ]),
+                            \sprintf(
+                                '%s::class',
+                                $this->namespacer->fqcn(
+                                    "{$message->path}." . self::oneofVariantName($oneOfName, $variant),
+                                ),
+                            ),
                         ),
                         $variants,
                     ),
@@ -413,12 +408,7 @@ final readonly class ProtoGenerator
             Naming::pascalCase($className),
             $descriptor,
             [
-                Naming::joinNamespace([
-                    '',
-                    $this->namespacer->namespace,
-                    $message->path,
-                    $interfaceName,
-                ]),
+                $this->namespacer->fqcn("{$message->path}.{$interfaceName}"),
             ],
         );
     }
@@ -429,7 +419,9 @@ final readonly class ProtoGenerator
         ?string $typename = null,
     ): mixed {
         if ($type === FieldDescriptorProto\Type::TYPE_ENUM && $typename !== null) {
-            return new Literal(\sprintf("%s::{$defaultValue}", Naming::namespace($typename)));
+            // Resolved through the graph, so that a relocated enum is referenced
+            // under the very namespace it is generated into.
+            return new Literal(\sprintf("%s::{$defaultValue}", $this->graph->get($typename)->fqcn));
         }
 
         return match ($type) {

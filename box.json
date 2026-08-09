@@ -5,6 +5,9 @@
     "src",
     "vendor"
   ],
+  "files": [
+    "map.json"
+  ],
   "main": "bin/compiler.php",
   "output": "protoc-gen-php",
   "shebang": "#!/usr/bin/env php"

@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Thesis\Protobuf\Decoder;
 use Thesis\Protobuf\Encoder;
 use Thesis\Protoc\Plugin\Compiler;
+use Thesis\Protoc\Plugin\Mapping\TypeMap;
 
 #[CoversClass(Compiler::class)]
 final class CompilerTest extends TestCase
@@ -30,7 +31,9 @@ final class CompilerTest extends TestCase
 
         $request = $decoder->decode($bytes, CodeGeneratorRequest::class);
 
-        $actual = self::collectFiles(new Compiler($encoder)->compile($request));
+        $types = TypeMap::fromFile(__DIR__ . '/../map.json');
+
+        $actual = self::collectFiles(new Compiler($encoder, $types)->compile($request));
         $expected = self::collectSnapshots(__DIR__ . '/snapshots/' . \dirname($file));
 
         self::assertSame(

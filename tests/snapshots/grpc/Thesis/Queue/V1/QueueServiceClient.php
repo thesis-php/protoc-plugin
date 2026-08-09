@@ -28,16 +28,16 @@ final readonly class QueueServiceClient
     ) {}
 
     /**
-     * @return Client\ClientStreamChannel<\Thesis\Queue\PushRequest\Message, \Google\Protobuf\Empty_>
+     * @return Client\ClientStreamChannel<\Thesis\Queue\PushRequest\Message, \Thesis\Google\Protobuf\Empty_>
      */
     public function push(
         Metadata $md = new Metadata(),
         Cancellation $cancellation = new NullCancellation(),
     ): Client\ClientStreamChannel {
-        /** @var Client\Invoke<\Thesis\Queue\PushRequest\Message, \Google\Protobuf\Empty_> $invoke */
+        /** @var Client\Invoke<\Thesis\Queue\PushRequest\Message, \Thesis\Google\Protobuf\Empty_> $invoke */
         $invoke = new Client\Invoke(
             method: '/Thesis.Queue.V1.QueueService/Push',
-            output: \Google\Protobuf\Empty_::class,
+            output: \Thesis\Google\Protobuf\Empty_::class,
             type: Grpc\RpcType::ClientStream,
         );
 

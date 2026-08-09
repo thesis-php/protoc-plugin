@@ -15,7 +15,6 @@ use Thesis\Protoc\Plugin\Generator\DescriptorFile;
 use Thesis\Protoc\Plugin\Generator\DescriptorMetadataRegistryGenerator;
 use Thesis\Protoc\Plugin\Generator\FileFactory;
 use Thesis\Protoc\Plugin\Generator\PhpNamespacer;
-use Thesis\Protoc\Plugin\Parser\FileDescriptor;
 use Thesis\Protoc\Plugin\Parser\MessageDescriptor;
 use Thesis\Protoc\Plugin\Parser\ServiceMethodDescriptor;
 use Thesis\Protoc\ProtocException;
@@ -31,6 +30,7 @@ final readonly class Compiler
 
     public function __construct(
         private Encoder $encoder,
+        private Mapping\TypeMap $types,
     ) {
         $this->parser = new Parser();
     }
@@ -60,14 +60,16 @@ final readonly class Compiler
     ): iterable {
         $request = $this->parser->parse($request);
 
-        $registry = new Dependency\Registry($request, $options);
+        $namespaces = new NamespaceResolver($this->types, $options);
+
+        $registry = new Dependency\Registry($request, $namespaces);
 
         $descriptorPaths = new PathTable();
 
         $registries = new DescriptorTable();
 
         foreach ($request as $source => $proto) {
-            $phpNamespace = self::determinePhpNamespace($proto, $options);
+            $phpNamespace = $namespaces->file($proto) ?? throw self::namespaceCannotBeDetermined();
 
             $index = new NameIndex();
 
@@ -78,12 +80,14 @@ final readonly class Compiler
                 files: new FileFactory(
                     self::createClassLikeGeneratedDoc($request, $source),
                     $path,
+                    $phpNamespace,
                 ),
                 graph: $registry->graph($source),
                 index: $index,
                 package: $proto->package,
                 syntax: $proto->syntax,
                 edition: $proto->file->edition,
+                types: $this->types,
             );
 
             foreach ($proto->services as $service) {
@@ -185,30 +189,9 @@ final readonly class Compiler
         }
     }
 
-    /**
-     * @return non-empty-string
-     * @throws CodeCannotBeGenerated
-     */
-    private static function determinePhpNamespace(
-        FileDescriptor $descriptor,
-        CompilerOptions $options,
-    ): string {
-        if ($options->phpNamespace !== null) {
-            return $options->phpNamespace;
-        }
-
-        $phpNamespace = $descriptor->options?->phpNamespace;
-        if ($phpNamespace !== null && $phpNamespace !== '') {
-            return $phpNamespace;
-        }
-
-        $package = $descriptor->package;
-        if ($package !== null && $package !== '') {
-            /** @var non-empty-string */
-            return Naming::joinNamespace(explode('.', $package));
-        }
-
-        throw new CodeCannotBeGenerated('neither "package" nor "php_namespace" option was specified in the provided proto files, therefore I cannot determine the namespace under which the PHP files should be created.
+    private static function namespaceCannotBeDetermined(): CodeCannotBeGenerated
+    {
+        return new CodeCannotBeGenerated('neither "package" nor "php_namespace" option was specified in the provided proto files, therefore I cannot determine the namespace under which the PHP files should be created.
 If you cannot modify the proto files, please pass the namespace via command-line arguments as follows:
 --custom-plugin_out=php_namespace=App\\\Service\\\V1:path/to/generated');
     }
