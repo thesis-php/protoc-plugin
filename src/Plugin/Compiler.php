@@ -28,9 +28,12 @@ final readonly class Compiler
 
     private Parser $parser;
 
+    /**
+     * @param non-empty-string $mappingPath
+     */
     public function __construct(
         private Encoder $encoder,
-        private Mapping\TypeMap $types,
+        private string $mappingPath,
     ) {
         $this->parser = new Parser();
     }
@@ -58,9 +61,11 @@ final readonly class Compiler
         CodeGeneratorRequest $request,
         CompilerOptions $options,
     ): iterable {
+        $types = Mapping\TypeMap::fromFile($this->mappingPath);
+
         $request = $this->parser->parse($request);
 
-        $namespaces = new NamespaceResolver($this->types, $options);
+        $namespaces = new NamespaceResolver($types, $options);
 
         $registry = new Dependency\Registry($request, $namespaces);
 
@@ -87,7 +92,7 @@ final readonly class Compiler
                 package: $proto->package,
                 syntax: $proto->syntax,
                 edition: $proto->file->edition,
-                types: $this->types,
+                types: $types,
             );
 
             foreach ($proto->services as $service) {

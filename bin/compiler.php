@@ -25,18 +25,8 @@ use Thesis\Protoc\Plugin;
 $encoder = Encoder\Builder::buildDefault();
 $decoder = Decoder\Builder::buildDefault();
 
-try {
-    // The relocation table shipped with the plugin: it tells under which php namespaces
-    // the well known packages are generated and referenced.
-    $types = Plugin\Mapping\TypeMap::fromFile(__DIR__ . '/../map.json');
-} catch (Protoc\ProtocException $e) {
-    fwrite(STDERR, "{$e->getMessage()}\n");
-
-    exit(1);
-}
-
 $entrypoint = new Protoc\Entrypoint(
-    new Plugin\Compiler($encoder, $types),
+    new Plugin\Compiler($encoder, __DIR__ . '/../map.json'),
     $encoder,
     $decoder,
 );
