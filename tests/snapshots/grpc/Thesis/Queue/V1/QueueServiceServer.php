@@ -22,13 +22,13 @@ use Thesis\Grpc\Server;
 interface QueueServiceServer
 {
     /**
-     * @param Server\ClientStreamChannel<\Thesis\Queue\PushRequest\Message, \Google\Protobuf\Empty_> $stream
+     * @param Server\ClientStreamChannel<\Thesis\Queue\PushRequest\Message, \Thesis\Google\Protobuf\Empty_> $stream
      */
     public function push(
         Server\ClientStreamChannel $stream,
         Metadata $md,
         Cancellation $cancellation,
-    ): \Google\Protobuf\Empty_;
+    ): \Thesis\Google\Protobuf\Empty_;
 
     /**
      * @return iterable<array-key, \Thesis\Queue\PullRequest\Message>

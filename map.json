@@ -1,0 +1,11 @@
+{
+    "rules": [
+        {"from": "google.protobuf.*", "to": "thesis.google.protobuf.*"},
+        {"from": "google.rpc.*", "to": "thesis.google.rpc.*"},
+        {"from": "google.api.*", "to": "thesis.google.api.*"},
+        {"from": "google.type.*", "to": "thesis.google.type.*"},
+        {"from": "grpc.health.v1.*", "to": "thesis.grpc.health.v1.*"},
+        {"from": "grpc.reflection.v1.*", "to": "thesis.grpc.reflection.v1.*"},
+        {"from": "grpc.reflection.v1alpha.*", "to": "thesis.grpc.reflection.v1alpha.*"}
+    ]
+}

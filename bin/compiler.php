@@ -26,7 +26,7 @@ $encoder = Encoder\Builder::buildDefault();
 $decoder = Decoder\Builder::buildDefault();
 
 $entrypoint = new Protoc\Entrypoint(
-    new Plugin\Compiler($encoder),
+    new Plugin\Compiler($encoder, __DIR__ . '/../map.json'),
     $encoder,
     $decoder,
 );

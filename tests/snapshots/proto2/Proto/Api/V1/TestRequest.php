@@ -210,16 +210,16 @@ final readonly class TestRequest
         public \Proto\Api\V1\Foo $fooDefaulted = \Proto\Api\V1\Foo::FOO_BAR,
         #[Reflection\Field(406, new Reflection\MapT(Reflection\StringT::T, Reflection\StringT::T))]
         public Protobuf\Map $mapStringString = new Protobuf\Map(),
-        #[Reflection\Field(407, new Reflection\ObjectT(\Google\Protobuf\Timestamp::class))]
-        public ?\Google\Protobuf\Timestamp $knownTimestamp = null,
-        #[Reflection\Field(408, new Reflection\ObjectT(\Google\Protobuf\Duration::class))]
-        public ?\Google\Protobuf\Duration $knownDuration = null,
-        #[Reflection\Field(409, new Reflection\ObjectT(\Google\Protobuf\Struct::class))]
-        public ?\Google\Protobuf\Struct $knownStruct = null,
-        #[Reflection\Field(410, new Reflection\ObjectT(\Google\Protobuf\Empty_::class))]
-        public ?\Google\Protobuf\Empty_ $knownEmpty = null,
-        #[Reflection\Field(411, new Reflection\ObjectT(\Google\Protobuf\Any::class))]
-        public ?\Google\Protobuf\Any $knownAny = null,
+        #[Reflection\Field(407, new Reflection\ObjectT(\Thesis\Google\Protobuf\Timestamp::class))]
+        public ?\Thesis\Google\Protobuf\Timestamp $knownTimestamp = null,
+        #[Reflection\Field(408, new Reflection\ObjectT(\Thesis\Google\Protobuf\Duration::class))]
+        public ?\Thesis\Google\Protobuf\Duration $knownDuration = null,
+        #[Reflection\Field(409, new Reflection\ObjectT(\Thesis\Google\Protobuf\Struct::class))]
+        public ?\Thesis\Google\Protobuf\Struct $knownStruct = null,
+        #[Reflection\Field(410, new Reflection\ObjectT(\Thesis\Google\Protobuf\Empty_::class))]
+        public ?\Thesis\Google\Protobuf\Empty_ $knownEmpty = null,
+        #[Reflection\Field(411, new Reflection\ObjectT(\Thesis\Google\Protobuf\Any::class))]
+        public ?\Thesis\Google\Protobuf\Any $knownAny = null,
         #[Reflection\Field(412, new Reflection\ObjectT(\Proto\Api\V1\TestRequest\Nested::class))]
         public ?\Proto\Api\V1\TestRequest\Nested $nested = null,
         #[Reflection\Field(413, new Reflection\ObjectT(\Proto\Api\V1\TestRequest\Nested\Deep::class))]

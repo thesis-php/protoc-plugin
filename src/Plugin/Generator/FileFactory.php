@@ -18,9 +18,14 @@ final readonly class FileFactory
 {
     private PsrPrinter $printer;
 
+    /**
+     * @param string $path directory the $namespace maps onto
+     * @param ?string $namespace namespace the file the code belongs to is generated into
+     */
     public function __construct(
         private string $generatedDoc,
         private string $path,
+        private ?string $namespace = null,
     ) {
         $this->printer = new Printer()->setTypeResolving(false);
     }
@@ -52,8 +57,30 @@ PHP,
         };
 
         return new CodeGeneratorResponse\File(
-            name: \sprintf('%s/%s.php', $this->path, $code instanceof  PhpNamespace ? Naming::path($path) : $path),
+            name: $code instanceof PhpNamespace
+                ? $this->resolvePath($code->getName(), $path)
+                : \sprintf('%s/%s.php', $this->path, $path),
             content: $content,
+        );
+    }
+
+    /**
+     * Types normally live under the namespace of their file, so the path they are written
+     * to is the one configured for that file. A type moved elsewhere by a relocation rule
+     * no longer belongs there and is written under its own namespace instead.
+     */
+    private function resolvePath(string $namespace, string $path): string
+    {
+        if ($this->namespace === null || $namespace === $this->namespace || str_starts_with($namespace, "{$this->namespace}\\")) {
+            return \sprintf('%s/%s.php', $this->path, Naming::path($path));
+        }
+
+        $paths = explode('.', $path);
+
+        return \sprintf(
+            '%s/%s.php',
+            str_replace('\\', '/', $namespace),
+            Naming::pascalCase($paths[\count($paths) - 1]),
         );
     }
 }
