@@ -58,7 +58,7 @@ final readonly class TypeMap
     /**
      * @throws InvalidNamespaceMapping
      */
-    public static function fromJson(string $json, string $source = 'namespace mapping'): self
+    public static function fromJson(string $json, string $source): self
     {
         try {
             $mapping = json_decode($json, associative: true, flags: JSON_THROW_ON_ERROR);
@@ -79,7 +79,6 @@ final readonly class TypeMap
         $parsed = [];
         $seen = [];
 
-        /** @var mixed $rule */
         foreach ($rules as $index => $rule) {
             $parsed[] = $parsedRule = self::parseRule($rule, $source, $index);
 

@@ -104,7 +104,7 @@ final class TypeMapTest extends TestCase
 
     public function testDescriptionIsAllowed(): void
     {
-        $map = TypeMap::fromJson('{"rules": [{"from": "a.*", "to": "b.*"}]}');
+        $map = TypeMap::fromJson('{"rules": [{"from": "a.*", "to": "b.*"}]}', 'test.json');
 
         self::assertSame('b.C', $map->rewriteType('a.C'));
     }
@@ -123,6 +123,7 @@ final class TypeMapTest extends TestCase
               ]
             }
             JSON,
+            'test.json',
         );
     }
 }
