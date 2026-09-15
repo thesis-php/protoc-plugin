@@ -32,7 +32,7 @@ final class CompilerMemoryLimitTest extends TestCase
     private static function runCompilerScript(string $initialMemoryLimit, ?string $envMemoryLimit = null): string
     {
         $code = <<<'PHP'
-require 'bin/compiler.php';
+require 'protoc-gen-php';
 fwrite(STDERR, "\nMEMORY_LIMIT=" . ini_get('memory_limit') . "\n");
 PHP;
 
