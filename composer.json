@@ -42,6 +42,9 @@
             "Thesis\\Protoc\\": "tests/"
         }
     },
+    "bin": [
+        "bin/compiler.php"
+    ],
     "config": {
         "lock": false,
         "sort-packages": true
