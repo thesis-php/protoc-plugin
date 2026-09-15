@@ -3,7 +3,7 @@ set -euo pipefail
 
 FIXTURES_ROOT="tests/fixtures"
 SNAPSHOTS_ROOT="tests/snapshots"
-PLUGIN="$(realpath "$(pwd)/bin/compiler.php")"
+PLUGIN="$(realpath "$(pwd)/protoc-gen-php")"
 
 if [[ ! -x "$PLUGIN" ]]; then
   echo "Plugin not executable: $PLUGIN" >&2
