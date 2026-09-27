@@ -7,7 +7,6 @@ parameters:
     level: max
     paths:
         - src
-        - bin
         - tests
     excludePaths:
         - tests/snapshots

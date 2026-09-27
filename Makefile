@@ -144,11 +144,11 @@ check: fixer-check rector-check composer-validate composer-normalize-check deps-
 .PHONY: check
 
 executable:
-	chmod +x bin/compiler.php
+	chmod +x protoc-gen-php
 
 generate: executable
 	rm -rf compiled/*
-	protoc -I./protos --plugin=protoc-gen-php-plugin=./bin/compiler.php ./protos/*.proto --php-plugin_out=compiled
+	protoc -I./protos --plugin=protoc-gen-php-plugin=./protoc-gen-php ./protos/*.proto --php-plugin_out=compiled
 .PHONY: generate
 
 # -----------------------

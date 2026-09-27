@@ -1,14 +1,13 @@
 {
   "chmod": "0755",
   "directories": [
-    "bin",
     "src",
     "vendor"
   ],
   "files": [
-    "map.json"
+    "protoc-gen-php"
   ],
-  "main": "bin/compiler.php",
+  "main": "protoc-gen-php",
   "output": "protoc-gen-php",
   "shebang": "#!/usr/bin/env php"
 }
