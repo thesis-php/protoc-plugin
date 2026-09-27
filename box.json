@@ -5,7 +5,8 @@
     "vendor"
   ],
   "files": [
-    "protoc-gen-php"
+    "protoc-gen-php",
+    "map.json"
   ],
   "main": "protoc-gen-php",
   "output": "protoc-gen-php",
