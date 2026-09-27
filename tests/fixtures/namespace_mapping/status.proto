@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package google.rpc;
+
+import "google/protobuf/timestamp.proto";
+
+// The package is relocated into Thesis\Google\Rpc by map.json, while the protobuf
+// name of every type stays google.rpc.*.
+message Status {
+    enum Kind {
+        KIND_UNSPECIFIED = 0;
+        KIND_RETRYABLE = 1;
+    }
+
+    message Detail {
+        string reason = 1;
+    }
+
+    int32 code = 1;
+    Kind kind = 2;
+    Detail detail = 3;
+    google.protobuf.Timestamp created_at = 4;
+
+    oneof payload {
+        string text = 5;
+        Detail structured = 6;
+    }
+}
+
+service StatusService {
+    rpc Get(Status) returns (Status);
+}
