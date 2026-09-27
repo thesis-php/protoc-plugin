@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Generator;
 
-use Google\Protobuf\Compiler\CodeGeneratorResponse;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
+use Thesis\Google\Protobuf\Compiler\CodeGeneratorResponse;
 use Thesis\Protoc\Plugin\Naming;
 use Thesis\Protoc\Plugin\Printer;
 

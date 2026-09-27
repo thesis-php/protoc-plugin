@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Thesis\Protoc;
 
 use BcMath\Number;
-use Google\Protobuf\Compiler\CodeGeneratorRequest;
-use Google\Protobuf\Compiler\CodeGeneratorResponse;
-use Google\Protobuf\Edition;
+use Thesis\Google\Protobuf\Compiler\CodeGeneratorRequest;
+use Thesis\Google\Protobuf\Compiler\CodeGeneratorResponse;
+use Thesis\Google\Protobuf\Edition;
 use Thesis\Protobuf\Decoder;
 use Thesis\Protobuf\Encoder;
 

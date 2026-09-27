@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc;
 
-use Google\Protobuf\Compiler\CodeGeneratorRequest;
-use Google\Protobuf\Compiler\CodeGeneratorResponse\File;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Thesis\Google\Protobuf\Compiler\CodeGeneratorRequest;
+use Thesis\Google\Protobuf\Compiler\CodeGeneratorResponse\File;
 use Thesis\Protobuf\Decoder;
 use Thesis\Protobuf\Encoder;
 use Thesis\Protoc\Plugin\Compiler;

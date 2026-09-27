@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Parser;
 
-use Google\Protobuf\FeatureSet;
-use Google\Protobuf\FieldDescriptorProto\Label;
-use Google\Protobuf\FieldDescriptorProto\Type;
-use Google\Protobuf\FieldOptions;
+use Thesis\Google\Protobuf\FeatureSet;
+use Thesis\Google\Protobuf\FieldDescriptorProto\Label;
+use Thesis\Google\Protobuf\FieldDescriptorProto\Type;
+use Thesis\Google\Protobuf\FieldOptions;
 use Thesis\Protoc\Plugin\Comment;
 
 /**

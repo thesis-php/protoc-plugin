@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin;
 
-use Google\Protobuf\FileDescriptorProto;
+use Thesis\Google\Protobuf\FileDescriptorProto;
 
 /**
  * @api

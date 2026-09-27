@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Parser;
 
-use Google\Protobuf\FileDescriptorProto;
-use Google\Protobuf\FileOptions;
+use Thesis\Google\Protobuf\FileDescriptorProto;
+use Thesis\Google\Protobuf\FileOptions;
 use Thesis\Protoc\Plugin\Comment;
 use Thesis\Protoc\Plugin\Naming;
 

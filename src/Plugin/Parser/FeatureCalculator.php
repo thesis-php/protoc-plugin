@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Parser;
 
-use Google\Protobuf\Edition;
-use Google\Protobuf\FeatureSet;
+use Thesis\Google\Protobuf\Edition;
+use Thesis\Google\Protobuf\FeatureSet;
 
 /**
  * Calculates a {@see FeatureSet} for a given edition by merging edition defaults

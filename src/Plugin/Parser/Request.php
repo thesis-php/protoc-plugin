@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Parser;
 
-use Google\Protobuf\Compiler\CodeGeneratorRequest;
+use Thesis\Google\Protobuf\Compiler\CodeGeneratorRequest;
 
 /**
  * @api

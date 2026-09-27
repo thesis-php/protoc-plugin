@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin;
 
-use Google\Protobuf\Compiler\CodeGeneratorResponse;
-use Google\Protobuf\Edition;
+use Thesis\Google\Protobuf\Compiler\CodeGeneratorResponse;
+use Thesis\Google\Protobuf\Edition;
 use Thesis\Protoc\Plugin\Generator\FileFactory;
 
 /**

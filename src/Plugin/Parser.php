@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin;
 
-use Google\Protobuf\Compiler\CodeGeneratorRequest;
-use Google\Protobuf\DescriptorProto;
-use Google\Protobuf\Edition;
-use Google\Protobuf\EnumDescriptorProto;
-use Google\Protobuf\EnumValueDescriptorProto;
-use Google\Protobuf\FeatureSet;
-use Google\Protobuf\FieldDescriptorProto;
-use Google\Protobuf\FileDescriptorProto;
-use Google\Protobuf\MethodDescriptorProto;
-use Google\Protobuf\ServiceDescriptorProto;
+use Thesis\Google\Protobuf\Compiler\CodeGeneratorRequest;
+use Thesis\Google\Protobuf\DescriptorProto;
+use Thesis\Google\Protobuf\Edition;
+use Thesis\Google\Protobuf\EnumDescriptorProto;
+use Thesis\Google\Protobuf\EnumValueDescriptorProto;
+use Thesis\Google\Protobuf\FeatureSet;
+use Thesis\Google\Protobuf\FieldDescriptorProto;
+use Thesis\Google\Protobuf\FileDescriptorProto;
+use Thesis\Google\Protobuf\MethodDescriptorProto;
+use Thesis\Google\Protobuf\ServiceDescriptorProto;
 
 /**
  * @api

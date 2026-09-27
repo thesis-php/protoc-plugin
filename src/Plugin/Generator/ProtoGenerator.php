@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\Plugin\Generator;
 
-use Google\Protobuf\Edition;
-use Google\Protobuf\FeatureSet;
-use Google\Protobuf\FieldDescriptorProto;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\EnumCase;
 use Nette\PhpGenerator\EnumType;
@@ -14,6 +11,9 @@ use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
+use Thesis\Google\Protobuf\Edition;
+use Thesis\Google\Protobuf\FeatureSet;
+use Thesis\Google\Protobuf\FieldDescriptorProto;
 use Thesis\Protobuf\Registry\File;
 use Thesis\Protoc\Exception\CodeCannotBeGenerated;
 use Thesis\Protoc\Plugin\Dependency;
