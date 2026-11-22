@@ -38,13 +38,18 @@ final readonly class ProtoGenerator
         $this->types = new TypeDeclarationFactory($this->graph);
     }
 
+    /**
+     * @throws CodeCannotBeGenerated
+     */
     public function generateEnum(Parser\EnumDescriptor $enum): PhpNamespace
     {
         $namespace = $this->namespacer->create($enum->path);
 
         $enumName = Naming::pascalCase($enum->name);
 
-        \assert($enum->fqcn !== '');
+        if ($enum->fqcn === '') {
+            throw new CodeCannotBeGenerated('Enum name must not be empty.');
+        }
 
         /** @var class-string $enumFqcn */
         $enumFqcn = "{$namespace->getName()}\\{$enumName}";
@@ -88,7 +93,9 @@ final readonly class ProtoGenerator
 
         $className = Naming::pascalCase($message->name);
 
-        \assert($message->fqcn !== '');
+        if ($message->fqcn === '') {
+            throw new CodeCannotBeGenerated('Message name must not be empty.');
+        }
 
         /** @var class-string $messageFqcn */
         $messageFqcn = "{$namespace->getName()}\\{$className}";

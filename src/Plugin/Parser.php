@@ -14,12 +14,16 @@ use Thesis\Google\Protobuf\FieldDescriptorProto;
 use Thesis\Google\Protobuf\FileDescriptorProto;
 use Thesis\Google\Protobuf\MethodDescriptorProto;
 use Thesis\Google\Protobuf\ServiceDescriptorProto;
+use Thesis\Protoc\Exception\CodeCannotBeGenerated;
 
 /**
  * @api
  */
 final readonly class Parser
 {
+    /**
+     * @throws CodeCannotBeGenerated
+     */
     public function parse(CodeGeneratorRequest $request): Parser\Request
     {
         $protos = [];
@@ -36,6 +40,7 @@ final readonly class Parser
 
     /**
      * @param non-empty-string $name
+     * @throws CodeCannotBeGenerated
      */
     private static function parseFileDescriptor(FileDescriptorProto $descriptor, string $name): Parser\FileDescriptor
     {
@@ -85,6 +90,7 @@ final readonly class Parser
      * @param list<DescriptorProto> $descriptors
      * @param list<FeatureSet> $parentFeatures
      * @return list<Parser\MessageDescriptor>
+     * @throws CodeCannotBeGenerated
      */
     public static function parseMessages(
         FileDescriptorProto $file,
@@ -167,6 +173,7 @@ final readonly class Parser
      * @param list<FieldDescriptorProto> $descriptors
      * @param list<FeatureSet> $parentFeatures
      * @return list<Parser\FieldDescriptor>
+     * @throws CodeCannotBeGenerated
      */
     private static function parseMessageFields(
         DescriptorProto $message,
@@ -194,7 +201,9 @@ final readonly class Parser
                     $typename = ($file->package !== null ? ".{$file->package}." : '.') . "{$path}.{$nestedType->name}";
 
                     if ($typename === $descriptor->typeName && $nestedType->options?->mapEntry === true) {
-                        \assert(\count($nestedType->field) === 2, 'Each MapEntry must have exactly 2 fields.');
+                        if (\count($nestedType->field) !== 2) {
+                            throw new CodeCannotBeGenerated("Map entry '{$typename}' must have exactly 2 fields, got " . \count($nestedType->field) . '.');
+                        }
 
                         $entryFeatures = array_values(
                             array_filter(
@@ -359,6 +368,7 @@ final readonly class Parser
 
     /**
      * @param list<FeatureSet> $parentFeatures
+     * @throws CodeCannotBeGenerated
      */
     private static function createFieldDescriptor(
         FieldDescriptorProto $descriptor,
@@ -368,8 +378,13 @@ final readonly class Parser
         ?Parser\MapDescriptor $map = null,
         array $parentFeatures = [],
     ): Parser\FieldDescriptor {
-        \assert($descriptor->name !== null, 'Field name must not be null.');
-        \assert($descriptor->number !== null, 'Field number must not be null.');
+        if ($descriptor->name === null) {
+            throw new CodeCannotBeGenerated("Field name must not be null in the file '{$file->name}'.");
+        }
+
+        if ($descriptor->number === null) {
+            throw new CodeCannotBeGenerated("Field '{$descriptor->name}' number must not be null in the file '{$file->name}'.");
+        }
 
         $features = Parser\FeatureCalculator::calculate(
             $edition,
