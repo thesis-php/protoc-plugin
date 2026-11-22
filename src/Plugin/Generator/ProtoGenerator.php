@@ -375,7 +375,8 @@ final readonly class ProtoGenerator
                     $parameters[] = $field->options?->packed === true;
                 } elseif ($this->edition !== null) {
                     // In editions, PACKED is the default for eligible types unless explicitly set to EXPANDED.
-                    $parameters[] = $features?->repeatedFieldEncoding === null || $features->repeatedFieldEncoding === FeatureSet\RepeatedFieldEncoding::PACKED;
+                    // The feature resolves to PACKED for any field, but only packable types are packed.
+                    $parameters[] = $type->packable && ($features?->repeatedFieldEncoding === null || $features->repeatedFieldEncoding === FeatureSet\RepeatedFieldEncoding::PACKED);
                 } elseif ($field->options?->packed === false) {
                     // In proto3, packable fields are packed by default, which is also what the runtime does
                     // when packed is not given; only an explicit [packed = false] needs to be spelled out.

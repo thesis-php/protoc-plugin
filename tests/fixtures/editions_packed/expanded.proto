@@ -1,0 +1,20 @@
+edition = "2023";
+
+package editions.packed.v1;
+
+import "packed.proto";
+
+option features.repeated_field_encoding = EXPANDED;
+
+// The file default is EXPANDED: packable fields are packed only when set to PACKED.
+message RepeatedExpanded {
+    repeated int32 int32_default = 1;
+    repeated int32 int32_packed = 2 [features.repeated_field_encoding = PACKED];
+    repeated Color enum_default = 3;
+    repeated Color enum_packed = 4 [features.repeated_field_encoding = PACKED];
+    repeated double double_default = 5;
+    repeated double double_packed = 6 [features.repeated_field_encoding = PACKED];
+    repeated string string_default = 7;
+    repeated bytes bytes_default = 8;
+    repeated Inner message_default = 9;
+}

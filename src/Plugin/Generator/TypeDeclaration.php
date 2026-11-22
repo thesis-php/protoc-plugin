@@ -18,6 +18,11 @@ final readonly class TypeDeclaration
         public bool $isMap = false,
         public ?string $docType = null,
         public mixed $default = null,
+        /**
+         * Whether repeated values of the type can be packed into one length-delimited record:
+         * only scalar numeric, bool and enum types can, as in protobuf and the runtime (ListT).
+         */
+        public bool $packable = false,
     ) {}
 
     public function resolvedType(): string

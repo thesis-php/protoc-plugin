@@ -1,0 +1,35 @@
+edition = "2023";
+
+package editions.packed.v1;
+
+enum Color {
+    COLOR_UNSPECIFIED = 0;
+    COLOR_RED = 1;
+    COLOR_GREEN = 2;
+}
+
+message Inner {
+    int32 value = 1;
+}
+
+// features.repeated_field_encoding is PACKED by default: packable fields are packed unless set to EXPANDED.
+message Repeated {
+    repeated int32 int32_default = 1;
+    repeated int32 int32_expanded = 2 [features.repeated_field_encoding = EXPANDED];
+    repeated Color enum_default = 3;
+    repeated Color enum_expanded = 4 [features.repeated_field_encoding = EXPANDED];
+    repeated bool bool_default = 5;
+    repeated bool bool_expanded = 6 [features.repeated_field_encoding = EXPANDED];
+    repeated sint64 sint64_default = 7;
+    repeated fixed32 fixed32_default = 8;
+    repeated double double_default = 9;
+    repeated uint64 uint64_default = 10;
+    repeated uint64 uint64_expanded = 11 [features.repeated_field_encoding = EXPANDED];
+    // Non-packable types are never packed, although the feature resolves to PACKED for them too.
+    repeated string string_default = 12;
+    repeated string string_expanded = 13 [features.repeated_field_encoding = EXPANDED];
+    repeated bytes bytes_default = 14;
+    repeated bytes bytes_expanded = 15 [features.repeated_field_encoding = EXPANDED];
+    repeated Inner message_default = 16;
+    repeated Inner message_expanded = 17 [features.repeated_field_encoding = EXPANDED];
+}
