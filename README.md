@@ -511,19 +511,22 @@ The PHP default of a constructor parameter follows from field presence and wheth
 
 **proto2**
 
-| protobuf                                  | php                                                    |
-|-------------------------------------------|--------------------------------------------------------|
-| `required int32 x = 1;`                   | `int $x`                                               |
-| `required uint64 x = 1;`                  | `\BcMath\Number $x`                                    |
-| `required string x = 1 [default = "hi"];` | `string $x = 'hi'`                                     |
-| `required Foo x = 1 [default = FOO_BAR];` | `Foo $x = Foo::FOO_BAR`                                |
-| `required Msg x = 1;`                     | `Msg $x`                                               |
-| `optional int32 x = 1;`                   | `?int $x = null`                                       |
-| `optional int32 x = 1 [default = 5];`     | `?int $x = null`                                       |
-| `optional Foo x = 1 [default = FOO_BAR];` | `Foo $x = Foo::FOO_BAR`                                |
-| `optional Msg x = 1;`                     | `?Msg $x = null`                                       |
-| `repeated int32 x = 1;`                   | `array $x = []`                                        |
-| `map<string, string> x = 1;`              | `\Thesis\Protobuf\Map $x = new \Thesis\Protobuf\Map()` |
+| protobuf                                                  | php                                                              |
+|-----------------------------------------------------------|------------------------------------------------------------------|
+| `required int32 x = 1;`                                   | `int $x`                                                         |
+| `required uint64 x = 1;`                                  | `\BcMath\Number $x`                                              |
+| `required string x = 1 [default = "hi"];`                 | `string $x = 'hi'`                                               |
+| `required Foo x = 1 [default = FOO_BAR];`                 | `Foo $x = Foo::FOO_BAR`                                          |
+| `required double x = 1 [default = inf];`                  | `float $x = \INF` (`-inf` → `-\INF`, `nan` → `\NAN`)             |
+| `required uint64 x = 1 [default = 18446744073709551615];` | `\BcMath\Number $x = new \BcMath\Number('18446744073709551615')` |
+| `required bytes x = 1 [default = "\001\377"];`            | `string $x = "\x01\xFF"`                                         |
+| `required Msg x = 1;`                                     | `Msg $x`                                                         |
+| `optional int32 x = 1;`                                   | `?int $x = null`                                                 |
+| `optional int32 x = 1 [default = 5];`                     | `?int $x = null`                                                 |
+| `optional Foo x = 1 [default = FOO_BAR];`                 | `Foo $x = Foo::FOO_BAR`                                          |
+| `optional Msg x = 1;`                                     | `?Msg $x = null`                                                 |
+| `repeated int32 x = 1;`                                   | `array $x = []`                                                  |
+| `map<string, string> x = 1;`                              | `\Thesis\Protobuf\Map $x = new \Thesis\Protobuf\Map()`           |
 
 **proto3**
 

@@ -131,12 +131,21 @@ final class SnapshotValidator
                 $objects = require $samples;
 
                 if (!\is_array($objects) || $objects === []) {
-                    throw new \LogicException('The samples file must return a non-empty array of messages keyed by label.');
+                    throw new \LogicException('The samples file must return a non-empty array of messages (or checks) keyed by label.');
                 }
 
                 foreach ($objects as $label => $object) {
                     if (!\is_string($label) || !\is_object($object)) {
-                        throw new \LogicException("Sample {$label} must be a message keyed by a string label.");
+                        throw new \LogicException("Sample {$label} must be a message (or a check) keyed by a string label.");
+                    }
+
+                    // A check inspects values of the generated code, e.g. the defaults of a message, and throws on a mismatch.
+                    if ($object instanceof \Closure) {
+                        $this->attempt("check sample '{$label}'", static function () use ($object): void {
+                            $object();
+                        });
+
+                        continue;
                     }
 
                     $this->attempt("round-trip sample '{$label}'", fn() => $this->roundTrip($object));
@@ -337,7 +346,7 @@ final class SnapshotValidator
     }
 
     /**
-     * Strict structural comparison: unlike ==, it tells null from '' and 0, and 1 from 1.0.
+     * Strict structural comparison: unlike ==, it tells null from '' and 0, and 1 from 1.0; only NaN equals NaN.
      */
     private static function difference(mixed $expected, mixed $actual, string $path): ?string
     {
@@ -384,6 +393,11 @@ final class SnapshotValidator
                 }
             }
 
+            return null;
+        }
+
+        // NAN !== NAN, yet a NaN that came back as a NaN is the same value.
+        if (\is_float($expected) && \is_float($actual) && is_nan($expected) && is_nan($actual)) {
             return null;
         }
 
