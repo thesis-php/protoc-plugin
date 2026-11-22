@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package proto3.packed.v1;
+
+enum Color {
+    COLOR_UNSPECIFIED = 0;
+    COLOR_RED = 1;
+    COLOR_GREEN = 2;
+}
+
+message Inner {
+    int32 value = 1;
+}
+
+// Repeated packable fields are packed by default in proto3; [packed = false] makes them expanded.
+message Repeated {
+    repeated int32 int32_default = 1;
+    repeated int32 int32_packed = 2 [packed = true];
+    repeated int32 int32_unpacked = 3 [packed = false];
+    repeated Color enum_default = 4;
+    repeated Color enum_packed = 5 [packed = true];
+    repeated Color enum_unpacked = 6 [packed = false];
+    repeated bool bool_default = 7;
+    repeated bool bool_packed = 8 [packed = true];
+    repeated bool bool_unpacked = 9 [packed = false];
+    repeated sint64 sint64_unpacked = 10 [packed = false];
+    repeated fixed32 fixed32_unpacked = 11 [packed = false];
+    repeated double double_unpacked = 12 [packed = false];
+    repeated uint64 uint64_unpacked = 13 [packed = false];
+    // Non-packable types are never packed: [packed = false] changes nothing for them.
+    repeated string string_default = 14;
+    repeated string string_unpacked = 15 [packed = false];
+    repeated bytes bytes_unpacked = 16 [packed = false];
+    repeated Inner message_unpacked = 17 [packed = false];
+}
