@@ -215,6 +215,23 @@ enum Naming
         return isset(self::CLASS_NAMES_RESERVED_WORDS[strtolower($name)]) ? "{$name}_" : $name;
     }
 
+    /**
+     * Whether $name can be the name of a PHP variable, and so of a promoted constructor parameter:
+     * a PHP identifier, where every byte from 0x80 up counts as a letter (so a non-ASCII UTF-8 name is valid).
+     */
+    public static function isVariableName(string $name): bool
+    {
+        return preg_match('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$/D', $name) === 1;
+    }
+
+    /**
+     * Reserved words are valid property and parameter names, `$this` is the only one PHP rejects for a parameter.
+     */
+    public static function secureVariable(string $name): string
+    {
+        return $name === 'this' ? 'this_' : $name;
+    }
+
     public static function secureEnumCase(string $name): string
     {
         return isset(self::ENUM_CASE_RESERVED_WORDS[strtolower($name)]) ? "{$name}_" : $name;

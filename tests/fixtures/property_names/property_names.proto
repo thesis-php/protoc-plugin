@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package property.names;
+
+// The property of a field is named after its json_name while that is a valid PHP variable name,
+// otherwise after the field name in camelCase; `this` becomes `this_`.
+message Fields {
+    string this = 1;
+    string dashed = 2 [json_name = "my-field"];
+    string with_space = 3 [json_name = "with space"];
+    string first = 4 [json_name = "1st"];
+    string type_url = 5 [json_name = "@type"];
+    string greeting = 6 [json_name = "привет"];
+    string custom = 7 [json_name = "renamed"];
+    string keyword = 8 [json_name = "class"];
+    string list = 9;
+    string static = 10;
+    // The comment of a field with an invalid json_name.
+    string commented_field = 11 [json_name = "commented-field"];
+    repeated int32 repeated_values = 12 [json_name = "repeated values"];
+    string _1st_place = 13;
+}
+
+message ThisOneof {
+    oneof this {
+        string text = 1;
+        int32 number = 2 [json_name = "the-number"];
+    }
+}
+
+message Variants {
+    oneof payload {
+        string this = 1;
+        string raw_value = 2 [json_name = "raw-value"];
+        string kept = 3 [json_name = "Kept"];
+    }
+}

@@ -18,6 +18,7 @@ For this reason, we have written this plugin, which — in addition to addressin
   - [multiple options](#multiple-options)
 - [Namespace mapping](#namespace-mapping)
 - [Generated code guide](#generated-code-guide)
+    - [property names](#property-names)
     - [numbers](#numbers)
     - [repeated](#repeated)
     - [maps](#maps)
@@ -296,6 +297,13 @@ That is what keeps `Any` type urls and server reflection interoperable: other la
 ### Generated code guide
 
 As mentioned above, the plugin generates simple DTOs without setters, getters, or inheritance. All metadata for protobuf serialization is stored in attribute `Thesis\Protobuf\Reflection\*`, and the generated DTOs only have a constructor with promoted properties.
+
+#### property names
+
+A property is named after the field's `json_name`: by default it is the field name in lowerCamelCase (`chat_id` → `$chatId`), a custom `[json_name = "..."]` renames the property.
+When the `json_name` is not a valid PHP variable name (`"my-field"`, `"@type"`, `"1st"`), the property is named after the field name in camelCase instead, and the variant class of a `oneof` likewise.
+`this` (a field or a `oneof`) becomes `$this_`; other reserved words stay as they are (`$class`, `$list`). The property of a `oneof` is named after the `oneof`.
+Two fields or `oneof`s of a message that end up with the same property name (for example, field `fooBar` and `oneof foo_bar`) fail the generation with an error naming both.
 
 #### numbers
 
