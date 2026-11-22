@@ -104,7 +104,10 @@ final readonly class Compiler
                     yield from $generator->generateGrpcServer($service);
                 }
 
-                \assert(($serviceName = ($proto->package !== null ? "{$proto->package}." : '') . $service->path) !== '');
+                $serviceName = ($proto->package !== null ? "{$proto->package}." : '') . $service->path;
+                if ($serviceName === '') {
+                    throw new CodeCannotBeGenerated("Service name must not be empty in the file '{$proto->name}'.");
+                }
 
                 $index->addService(new File\ServiceDescriptor(
                     name: $serviceName,
