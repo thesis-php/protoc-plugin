@@ -307,7 +307,7 @@ final readonly class ProtoGenerator
             return $namespace;
         }
 
-        $namespace->addUse('Thesis\Protobuf\Reflection');
+        $runtime = new RuntimeImports($namespace);
 
         $constructor = $classType->addMethod('__construct');
 
@@ -338,25 +338,21 @@ final readonly class ProtoGenerator
             $type = null;
 
             if ($field->map !== null) {
-                $keyType = $this->types->create($field->map->key);
-                $valueType = $this->types->create($field->map->value);
+                $keyType = $this->types->create($field->map->key, $runtime);
+                $valueType = $this->types->create($field->map->value, $runtime);
+                $map = $runtime->protobuf('Map');
 
                 $type = new TypeDeclaration(
-                    phpType: 'Protobuf\Map',
-                    reflectionType: Literal::new('Reflection\MapT', [$keyType->reflectionType, $valueType->reflectionType]),
+                    phpType: $map,
+                    reflectionType: Literal::new($runtime->reflection('MapT'), [$keyType->reflectionType, $valueType->reflectionType]),
                     nullable: false,
                     isMap: true,
-                    docType: "Protobuf\\Map<{$keyType->resolvedType()}, {$valueType->resolvedType()}>",
-                    default: Literal::new('Protobuf\Map'),
-                    uses: ['Thesis\Protobuf'],
+                    docType: "{$map}<{$keyType->resolvedType()}, {$valueType->resolvedType()}>",
+                    default: Literal::new($map),
                 );
             }
 
-            $type ??= $this->types->create($field);
-
-            foreach ($type->uses as $use) {
-                $namespace->addUse($use);
-            }
+            $type ??= $this->types->create($field, $runtime);
 
             $repeated = $field->label === FieldDescriptorProto\Label::LABEL_REPEATED && !$type->isMap;
             $required = $field->label === FieldDescriptorProto\Label::LABEL_REQUIRED || $features?->fieldPresence === FeatureSet\FieldPresence::LEGACY_REQUIRED;
@@ -382,7 +378,7 @@ final readonly class ProtoGenerator
                     $parameters[] = $features?->repeatedFieldEncoding === null || $features->repeatedFieldEncoding === FeatureSet\RepeatedFieldEncoding::PACKED;
                 }
 
-                $reflectionType = Literal::new('Reflection\ListT', $parameters);
+                $reflectionType = Literal::new($runtime->reflection('ListT'), $parameters);
             }
 
             $default = $nullable ? null : $type->default;
@@ -396,7 +392,7 @@ final readonly class ProtoGenerator
 
             $parameter
                 ->setType($phpType)
-                ->addAttribute('Reflection\Field', [
+                ->addAttribute($runtime->reflection('Field'), [
                     $field->number,
                     $reflectionType,
                 ])
@@ -456,7 +452,7 @@ final readonly class ProtoGenerator
                 ->setType($this->namespacer->fqcn("{$message->path}.{$oneofInterfaces[$idx]}"))
                 ->setNullable()
                 ->setDefaultValue(null)
-                ->addAttribute('Reflection\OneOf', [
+                ->addAttribute($runtime->reflection('OneOf'), [
                     array_map(
                         fn(Parser\FieldDescriptor $variant) => new Literal(
                             \sprintf(

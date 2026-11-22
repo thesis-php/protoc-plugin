@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package runtime.alias;
+
+// The generated classes import the runtime as `use Thesis\Protobuf\Reflection;` (and `use Thesis\Protobuf;` for
+// map fields) and refer to it through that alias. A class with the same short name takes the alias, so the import
+// gets another one, and the references have to follow it.
+
+enum Kind {
+    KIND_UNSPECIFIED = 0;
+    KIND_ONE = 1;
+}
+
+message Item {
+    string name = 1;
+}
+
+// Takes the short name of `use Thesis\Protobuf\Reflection`.
+message Reflection {
+    string scalar = 1;
+    repeated int32 numbers = 2;
+    Kind kind = 3;
+    Item item = 4;
+    map<string, Item> items = 5;
+
+    oneof choice {
+        string text = 6;
+        Item object = 7;
+    }
+}
+
+// Takes the short name of `use Thesis\Protobuf`, which only map fields import.
+message Protobuf {
+    map<string, int32> counts = 1;
+    string name = 2;
+}
+
+// A nested class is declared in a namespace of its own, the parent keeps the plain import.
+message Outer {
+    message Reflection {
+        string a = 1;
+        map<int32, string> m = 2;
+    }
+
+    Reflection inner = 1;
+}
+
+// The variant class ReflectIon differs from the alias Reflection only in case, which PHP does not tell apart.
+message Variants {
+    oneof reflect {
+        string ion = 1;
+        int32 other = 2;
+    }
+}
+
+// Named after classes referred to through the alias, not after the alias itself: no conflict.
+message Field {
+    string a = 1;
+}
+
+message Map {
+    map<string, string> m = 1;
+}
+
+message OneOf {
+    oneof value {
+        string s = 1;
+        int32 i = 2;
+    }
+}
+
+message StringT {
+    string s = 1;
+}
+
+// Refers to the messages above as field types, by fully qualified name.
+message Holder {
+    Reflection reflection = 1;
+    Protobuf protobuf = 2;
+    Outer.Reflection nested = 3;
+    Field field = 4;
+    Map map = 5;
+    OneOf one_of = 6;
+    StringT string_t = 7;
+    repeated Reflection list = 8;
+    map<string, Reflection> by_name = 9;
+}
