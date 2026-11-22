@@ -3,6 +3,9 @@
 
 declare(strict_types=1);
 
+// STDOUT carries the binary CodeGeneratorResponse, so PHP diagnostics must never be displayed there.
+ini_set('display_errors', 'stderr');
+
 require_once $_composer_autoload_path ?? __DIR__ . '/vendor/autoload.php';
 
 if (is_string($configuredMemoryLimit = getenv('THESIS_PLUGIN_MEMORY_LIMIT'))) {
