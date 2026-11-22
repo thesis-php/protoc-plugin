@@ -25,7 +25,7 @@ final class CompilerAssertionsDisabledTest extends TestCase
         self::assertIsString($request);
 
         $process = proc_open(
-            [PHP_BINARY, '-d', 'zend.assertions=-1', '-d', 'display_errors=stderr', 'protoc-gen-php'],
+            [PHP_BINARY, '-d', 'zend.assertions=-1', '-d', 'display_errors=1', 'protoc-gen-php'],
             [
                 0 => ['pipe', 'r'],
                 1 => ['pipe', 'w'],
