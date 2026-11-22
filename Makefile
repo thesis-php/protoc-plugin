@@ -117,6 +117,10 @@ test: var vendor generate-testdata generate-snapshots ## Run tests using PHPUnit
 	$(RUN) env TESTDATA_DIR=$(TESTDATA_DIR) vendor/bin/phpunit $(ARGS) --colors
 .PHONY: generate-snapshots test
 
+snapshots-check: vendor generate-snapshots ## Check that committed tests/snapshots match the generator output
+	./tests/tools/check-snapshots.sh
+.PHONY: snapshots-check
+
 test-no-assertions: var vendor generate-testdata ## Run tests using PHPUnit with zend.assertions=-1 (as in php.ini-production)
 	$(RUN) env TESTDATA_DIR=$(TESTDATA_DIR) php -d zend.assertions=-1 vendor/bin/phpunit $(ARGS) --colors
 .PHONY: test-no-assertions
@@ -144,7 +148,7 @@ composer-normalize-check: ## Check that composer.json is normalized
 fix: fixer rector composer-normalize ## Run all fixing recipes
 .PHONY: fix
 
-check: fixer-check rector-check composer-validate composer-normalize-check deps-analyze phpstan test test-no-assertions  ## Run all project checks
+check: fixer-check rector-check composer-validate composer-normalize-check deps-analyze phpstan test snapshots-check test-no-assertions  ## Run all project checks
 .PHONY: check
 
 executable:
