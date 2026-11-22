@@ -1,0 +1,39 @@
+syntax = "proto2";
+
+package test.alias.v1;
+
+// Status of a job, several values share a number.
+enum Status {
+    option allow_alias = true;
+
+    STATUS_UNKNOWN = 0;
+    // Alias of the zero value.
+    STATUS_UNSPECIFIED = 0;
+    STATUS_STARTED = 1;
+    // RUNNING is the same as STARTED.
+    STATUS_RUNNING = 1;
+    // Deprecated spelling of STARTED.
+    STATUS_IN_PROGRESS = 1 [deprecated = true];
+    STATUS_DONE = 2;
+}
+
+message Job {
+    enum Kind {
+        option allow_alias = true;
+
+        object = 0;
+        // Reserved word as an alias name.
+        class = 0;
+        // Becomes class_ in PHP as well, so it is the same member as class.
+        class_ = 0;
+        KIND_BATCH = 1;
+        KIND_BULK = 1;
+    }
+
+    optional Status status = 1;
+    optional Status aliased = 2 [default = STATUS_RUNNING];
+    required Status required_aliased = 3 [default = STATUS_IN_PROGRESS];
+    optional Kind kind = 4;
+    optional Kind kind_aliased = 5 [default = KIND_BULK];
+    repeated Status history = 6;
+}

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Thesis\Protoc\Plugin\Generator;
 
 use Nette\PhpGenerator\ClassType;
-use Nette\PhpGenerator\EnumCase;
 use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Literal;
@@ -61,14 +60,44 @@ final readonly class ProtoGenerator
 
         $enumType = new EnumType($enumName)
             ->setType('int')
-            ->setCases(array_map(
-                static fn(Parser\EnumCaseDescriptor $case) => new EnumCase(Naming::secureEnumCase($case->name))
-                    ->setValue($case->value)
-                    ->addComment(($deprecated = $case->options?->deprecated) === true ? '@deprecated' : '')
-                    ->addComment(($deprecated === true ? "\n" : '') . (string) $case->comment),
-                $enum->cases,
-            ))
             ->addComment('@api');
+
+        // With `option allow_alias = true` several values may share a number, while a PHP enum
+        // cannot have two cases with the same value. The first value declared with a number becomes
+        // the case, every later one becomes a constant referring to that case.
+        /** @var array<int, string> $caseNames */
+        $caseNames = [];
+        /** @var array<string, int> $memberValues */
+        $memberValues = [];
+
+        foreach ($enum->cases as $case) {
+            $name = Naming::secureEnumCase($case->name);
+
+            // `class` and `class_` both end up as `class_`. protoc lets such names coexist only
+            // as aliases of one number, so the second one is the very same member and is dropped.
+            if (isset($memberValues[$name])) {
+                if ($memberValues[$name] !== $case->value) {
+                    throw new CodeCannotBeGenerated("Enum {$enum->fqcn} has several values named {$name} with different numbers.");
+                }
+
+                continue;
+            }
+
+            $memberValues[$name] = $case->value;
+
+            if (isset($caseNames[$case->value])) {
+                $member = $enumType
+                    ->addConstant($name, new Literal("self::{$caseNames[$case->value]}"))
+                    ->setType('self');
+            } else {
+                $member = $enumType->addCase($name, $case->value);
+                $caseNames[$case->value] = $name;
+            }
+
+            $member
+                ->addComment(($deprecated = $case->options?->deprecated) === true ? '@deprecated' : '')
+                ->addComment(($deprecated === true ? "\n" : '') . (string) $case->comment);
+        }
 
         if ($enum->options?->deprecated === true) {
             $enumType = $enumType->addComment('@deprecated');
