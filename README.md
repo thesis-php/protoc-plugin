@@ -772,6 +772,7 @@ To avoid having to generate these types each time, it is recommended to use libr
 
 Note: intermediate protoc requests are generated into `var/testdata` during test run and are not stored in git.
 You can override this path via `TESTDATA_DIR` in `.env.local`.
+`GeneratedCodeTest` also compiles and loads the generated PHP of every case and round-trips its messages through `thesis/protobuf` (optional populated samples: `tests/GeneratedCode/samples/<case>.php`).
 
 #### Code quality checks
 - `make test` — regenerates fixtures/snapshots and runs PHPUnit.

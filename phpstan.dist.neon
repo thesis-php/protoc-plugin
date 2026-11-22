@@ -10,6 +10,8 @@ parameters:
         - tests
     excludePaths:
         - tests/snapshots
+        # samples build messages of the snapshot classes, which are not analysed (different cases declare the same classes)
+        - tests/GeneratedCode/samples
     tmpDir: var/phpstan
     editorUrl: ''
     editorUrlTitle: '%%relFile%%:%%line%%'
