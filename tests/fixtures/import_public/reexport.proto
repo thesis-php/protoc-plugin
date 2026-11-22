@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package t.pub.re;
+
+// A file that re-exports ns and c and also uses their types itself.
+import public "ns.proto";
+import public "c.proto";
+
+message Wrapper {
+  t.pub.ns.Box box = 1;
+  t.pub.ns.Color color = 2;
+  t.pub.c.C c = 3;
+  t.pub.d.D d = 4;
+}

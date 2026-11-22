@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+package t.pub.b;
+
+// A file that declares nothing and only re-exports c (and, through c, d).
+import public "c.proto";

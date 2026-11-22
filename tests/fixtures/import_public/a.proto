@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package t.pub.a;
+
+// Neither import is public, and a uses no type of b or reexport itself:
+// every type below is visible only through "import public".
+// c and d are reached twice (via b and via reexport), a diamond.
+import "b.proto";
+import "reexport.proto";
+
+message A {
+  t.pub.c.C c = 1;
+  t.pub.d.D d = 2;
+  t.pub.ns.Box box = 3;
+  t.pub.ns.Box.Item item = 4;
+  t.pub.ns.Color color = 5;
+  map<string, t.pub.d.D> by_name = 6;
+  map<int32, t.pub.ns.Color> colors = 7;
+  repeated t.pub.c.C list = 8;
+  optional t.pub.ns.Color maybe_color = 9;
+}
+
+service Lookup {
+  rpc Get(t.pub.c.C) returns (t.pub.d.D);
+  rpc Pack(t.pub.ns.Box.Item) returns (t.pub.ns.Box);
+}

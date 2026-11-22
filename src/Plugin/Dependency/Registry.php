@@ -60,9 +60,16 @@ final class Registry
     private function mergeIndex(Parser\Request $request): void
     {
         foreach ($request as $name => $descriptor) {
+            $visible = [$name];
+            $seen = [$name => true];
+
+            foreach ($descriptor->dependencies as $dep) {
+                $this->collectExported($request, $dep, $visible, $seen);
+            }
+
             $indexes = [];
 
-            foreach ([$name, ...$descriptor->dependencies] as $dep) {
+            foreach ($visible as $dep) {
                 if (isset($this->index[$dep])) {
                     $indexes = [
                         ...$indexes,
@@ -72,6 +79,36 @@ final class Registry
             }
 
             $this->fileIndexes[$name] = $indexes;
+        }
+    }
+
+    /**
+     * Collects an imported file along with everything it re-exports through "import public",
+     * at any depth. A plain import of the imported file is not re-exported.
+     *
+     * @param list<string> $visible
+     * @param array<string, true> $seen
+     * @param-out list<string> $visible
+     */
+    private function collectExported(Parser\Request $request, string $file, array &$visible, array &$seen): void
+    {
+        if (isset($seen[$file])) {
+            return;
+        }
+
+        $seen[$file] = true;
+        $visible[] = $file;
+
+        $descriptor = $request->descriptors[$file] ?? null;
+
+        if ($descriptor === null) {
+            return;
+        }
+
+        foreach ($descriptor->file->publicDependency as $idx) {
+            if (isset($descriptor->dependencies[$idx])) {
+                $this->collectExported($request, $descriptor->dependencies[$idx], $visible, $seen);
+            }
         }
     }
 
