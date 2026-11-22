@@ -11,9 +11,6 @@ use Nette\PhpGenerator\Literal;
  */
 final readonly class TypeDeclaration
 {
-    /**
-     * @param list<non-empty-string> $uses
-     */
     public function __construct(
         public string $phpType,
         public Literal $reflectionType,
@@ -21,7 +18,6 @@ final readonly class TypeDeclaration
         public bool $isMap = false,
         public ?string $docType = null,
         public mixed $default = null,
-        public array $uses = [],
     ) {}
 
     public function resolvedType(): string
