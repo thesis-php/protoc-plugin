@@ -443,6 +443,38 @@ final readonly class ContactPhone implements \Thesis\Api\Request\Contact
 }
 ```
 
+The interface shares the namespace with the nested messages and enums, so a nested type may already own its name.
+A common case is a oneof named after the nested message it carries:
+```protobuf
+message Event {
+    message Payload {
+        string text = 1;
+    }
+
+    oneof payload {
+        Payload parsed = 1;
+        string raw = 2;
+    }
+}
+```
+
+The nested type keeps its name, and the interface gets the `Oneof` suffix: `Event\PayloadOneof` (if that name is taken too — `Event\PayloadOneof2`, `Event\PayloadOneof3`, and so on).
+Names are compared as PHP compares class names, case-insensitively and after normalization: `oneof my_payload` clashes with `message MyPayload` as well.
+Nothing else changes: the variants are still `Event\PayloadParsed` and `Event\PayloadRaw`, the property is still `$payload`:
+```php
+namespace Thesis\Api;
+
+final readonly class Event
+{
+    public function __construct(
+        #[Reflection\OneOf([\Thesis\Api\Event\PayloadParsed::class, \Thesis\Api\Event\PayloadRaw::class])]
+        public ?\Thesis\Api\Event\PayloadOneof $payload = null,
+    ) {}
+}
+```
+
+A oneof without such a clash keeps its plain name. A variant class that clashes with another class of the message (for example, `oneof payload { string text = 1; }` next to `message PayloadText`) is not renamed: generation fails with an error naming the message, the oneof and the class.
+
 #### presence
 
 The plugin resolves effective field presence from syntax/edition features and generates constructor signatures accordingly.

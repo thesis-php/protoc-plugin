@@ -134,18 +134,21 @@ final readonly class ProtoGenerator
             $messageFqcn,
         ));
 
-        yield $message->path => $this->generateMessage($namespace, $className, $message);
+        $interfaces = self::oneofInterfaceNames($message);
+
+        yield $message->path => $this->generateMessage($namespace, $className, $message, oneofInterfaces: $interfaces);
 
         $oneofByIndex = [];
 
         foreach ($message->fields as $field) {
             if ($field->oneOfIndex !== null && $field->proto3Optional === null) {
-                if (isset($message->oneofs[$field->oneOfIndex])) {
+                if (isset($message->oneofs[$field->oneOfIndex], $interfaces[$field->oneOfIndex])) {
                     $oneOf = $message->oneofs[$field->oneOfIndex];
 
                     yield from $this->generateOneofVariant(
                         $message,
                         $oneOf,
+                        $interfaces[$field->oneOfIndex],
                         $field,
                     );
 
@@ -157,18 +160,132 @@ final readonly class ProtoGenerator
         foreach ($message->oneofs as $idx => $oneof) {
             $variants = $oneofByIndex[$idx] ?? [];
 
-            if ($variants !== []) {
-                yield from $this->generateOneof($message, $oneof, $variants);
+            if ($variants !== [] && isset($interfaces[$idx])) {
+                yield from $this->generateOneof($message, $oneof, $interfaces[$idx], $variants);
             }
         }
     }
 
     /**
-     * @param list<string> $implements
+     * Names of the sealed interfaces generated for the oneofs of $message, keyed by oneof index. The only place
+     * the name is decided: the interface itself, the `implements` of its variants and the oneof property all take it from here.
+     *
+     * An interface is named after its oneof. When a nested message or enum already owns that class name, the
+     * interface steps aside to "{Name}Oneof" (then "{Name}Oneof2", ...), the nested type keeps its name.
+     * The variant classes are named after the oneof as before, a clash of theirs is reported, not resolved.
+     * Synthetic oneofs of proto3 `optional` fields have no interface and take no part in this.
+     *
+     * @return array<int, string>
      * @throws CodeCannotBeGenerated
      */
-    private function generateMessage(PhpNamespace $namespace, string $className, Parser\MessageDescriptor $message, array $implements = []): PhpNamespace
+    private static function oneofInterfaceNames(Parser\MessageDescriptor $message): array
     {
+        // PHP class names are case-insensitive, so all of them are compared lowercased.
+        /** @var array<string, string> $owners lowercased class name => what generates it */
+        $owners = [];
+
+        foreach ($message->messages as $nested) {
+            // Map entries are not generated, see Compiler::doGenerateMessages().
+            if ($nested->options?->mapEntry !== true) {
+                $owners[strtolower(Naming::pascalCase($nested->name))] ??= "nested message {$nested->name}";
+            }
+        }
+
+        foreach ($message->enums as $nested) {
+            $owners[strtolower(Naming::pascalCase($nested->name))] ??= "nested enum {$nested->name}";
+        }
+
+        /** @var array<int, Parser\OneOfDescriptor> $oneofs oneofs with an interface, i.e. with non-synthetic variants */
+        $oneofs = [];
+        /** @var array<int, list<Parser\FieldDescriptor>> $variants */
+        $variants = [];
+
+        foreach ($message->fields as $field) {
+            if ($field->oneOfIndex !== null && $field->proto3Optional === null && isset($message->oneofs[$field->oneOfIndex])) {
+                $oneofs[$field->oneOfIndex] = $message->oneofs[$field->oneOfIndex];
+                $variants[$field->oneOfIndex][] = $field;
+            }
+        }
+
+        ksort($oneofs);
+
+        /** @var array<string, true> $taken */
+        $taken = [];
+
+        foreach ($oneofs as $idx => $oneof) {
+            foreach ($variants[$idx] ?? [] as $field) {
+                $taken[strtolower(self::oneofVariantClassName($oneof, $field))] = true;
+            }
+        }
+
+        $names = [];
+        $renamed = [];
+
+        foreach ($oneofs as $idx => $oneof) {
+            $name = Naming::pascalCase($oneof->name);
+
+            if (isset($owners[strtolower($name)])) {
+                $renamed[$idx] = $oneof;
+            } else {
+                $names[$idx] = $name;
+                $taken[strtolower($name)] = true;
+                self::claimClassName($owners, $message, $name, "interface of the oneof {$oneof->name}");
+            }
+        }
+
+        // All variants and the names kept by the other oneofs are reserved above; the renamed oneofs
+        // then take free names in the declaration order, so the outcome is fixed by the schema.
+        foreach ($renamed as $idx => $oneof) {
+            $name = Naming::unique(Naming::pascalCase(Naming::pascalCase($oneof->name) . 'Oneof'), $owners + $taken, ignoreCase: true);
+
+            $names[$idx] = $name;
+            $taken[strtolower($name)] = true;
+            self::claimClassName($owners, $message, $name, "interface of the oneof {$oneof->name}");
+        }
+
+        ksort($names);
+
+        foreach ($oneofs as $idx => $oneof) {
+            foreach ($variants[$idx] ?? [] as $field) {
+                self::claimClassName(
+                    $owners,
+                    $message,
+                    self::oneofVariantClassName($oneof, $field),
+                    "variant {$field->name} of the oneof {$oneof->name}",
+                );
+            }
+        }
+
+        return $names;
+    }
+
+    /**
+     * @param array<string, string> $owners
+     * @throws CodeCannotBeGenerated
+     */
+    private static function claimClassName(array &$owners, Parser\MessageDescriptor $message, string $className, string $owner): void
+    {
+        $key = strtolower($className);
+
+        if (isset($owners[$key])) {
+            throw new CodeCannotBeGenerated("Message {$message->fqcn}: class {$className} for the {$owner} conflicts with the {$owners[$key]}.");
+        }
+
+        $owners[$key] = $owner;
+    }
+
+    /**
+     * @param list<string> $implements
+     * @param array<int, string> $oneofInterfaces names of the oneof interfaces, see oneofInterfaceNames()
+     * @throws CodeCannotBeGenerated
+     */
+    private function generateMessage(
+        PhpNamespace $namespace,
+        string $className,
+        Parser\MessageDescriptor $message,
+        array $implements = [],
+        array $oneofInterfaces = [],
+    ): PhpNamespace {
         $classType = new ClassType($className)
             ->setFinal()
             ->setReadOnly()
@@ -324,17 +441,18 @@ final readonly class ProtoGenerator
         }
 
         foreach ($oneOfByIndex as $idx => $variants) {
-            if (!isset($message->oneofs[$idx])) {
+            if (!isset($message->oneofs[$idx], $oneofInterfaces[$idx])) {
                 continue;
             }
 
             $oneOf = $message->oneofs[$idx];
 
+            // Variants are named after the oneof itself, even when its interface has been renamed.
             $oneOfName = Naming::pascalCase($oneOf->name);
 
             $constructor
                 ->addPromotedParameter(Naming::propertyName($oneOf->name))
-                ->setType($this->namespacer->fqcn("{$message->path}.{$oneOfName}"))
+                ->setType($this->namespacer->fqcn("{$message->path}.{$oneofInterfaces[$idx]}"))
                 ->setNullable()
                 ->setDefaultValue(null)
                 ->addAttribute('Reflection\OneOf', [
@@ -386,10 +504,9 @@ final readonly class ProtoGenerator
     private function generateOneof(
         Parser\MessageDescriptor $message,
         Parser\OneOfDescriptor $oneof,
+        string $interfaceName,
         array $variants,
     ): iterable {
-        $interfaceName = Naming::pascalCase($oneof->name);
-
         $interfaceType = new InterfaceType($interfaceName)
             ->addComment('@api')
             ->addComment('@phpstan-sealed (')
@@ -414,9 +531,9 @@ final readonly class ProtoGenerator
     private function generateOneofVariant(
         Parser\MessageDescriptor $message,
         Parser\OneOfDescriptor $oneof,
+        string $interfaceName,
         Parser\FieldDescriptor $variant,
     ): iterable {
-        $interfaceName = Naming::pascalCase($oneof->name);
         $className = self::oneofVariantName($oneof->name, $variant);
 
         $descriptor = new Parser\MessageDescriptor(
@@ -491,5 +608,13 @@ final readonly class ProtoGenerator
         }
 
         return Naming::secure($name);
+    }
+
+    /**
+     * The name the variant class is declared with, see generateOneofVariant().
+     */
+    private static function oneofVariantClassName(Parser\OneOfDescriptor $oneof, Parser\FieldDescriptor $variant): string
+    {
+        return Naming::pascalCase(self::oneofVariantName($oneof->name, $variant));
     }
 }

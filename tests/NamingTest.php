@@ -23,6 +23,16 @@ final class NamingTest extends TestCase
         ]));
     }
 
+    public function testUnique(): void
+    {
+        self::assertSame('PayloadOneof', Naming::unique('PayloadOneof', []));
+        self::assertSame('PayloadOneof2', Naming::unique('PayloadOneof', ['PayloadOneof' => true]));
+        self::assertSame('PayloadOneof3', Naming::unique('PayloadOneof', ['PayloadOneof' => true, 'PayloadOneof2' => true]));
+        self::assertSame('PayloadOneof', Naming::unique('PayloadOneof', ['payloadoneof' => true]));
+        self::assertSame('PayloadOneof2', Naming::unique('PayloadOneof', ['payloadoneof' => true], ignoreCase: true));
+        self::assertSame('PayloadOneof3', Naming::unique('PayloadOneof', ['payloadoneof' => true, 'payloadoneof2' => true], ignoreCase: true));
+    }
+
     #[TestWith(['code.proto', 'CODE_DESCRIPTOR_BUFFER'])]
     #[TestWith(['pg_query.proto', 'PG_QUERY_DESCRIPTOR_BUFFER'])]
     #[TestWith(['google/rpc/code.proto', 'CODE_DESCRIPTOR_BUFFER'])]
