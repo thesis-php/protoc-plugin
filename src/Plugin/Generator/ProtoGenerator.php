@@ -313,6 +313,9 @@ final readonly class ProtoGenerator
 
         $oneOfByIndex = [];
 
+        /** @var array<string, string> $properties property name => what generates it */
+        $properties = [];
+
         foreach ($message->fields as $field) {
             if ($field->oneOfIndex !== null && $field->proto3Optional === null) {
                 $oneOfByIndex[$field->oneOfIndex][] = $field;
@@ -326,11 +329,9 @@ final readonly class ProtoGenerator
                 throw new CodeCannotBeGenerated('DELIMITED message encoding are not supported');
             }
 
-            $parameterName = $field->jsonName;
+            $parameterName = self::fieldPropertyName($field);
 
-            if ($parameterName === null || $parameterName === '') {
-                $parameterName = Naming::propertyName($field->name);
-            }
+            self::claimPropertyName($properties, $message, $parameterName, "field {$field->name}");
 
             $parameter = $constructor->addPromotedParameter($parameterName);
 
@@ -446,8 +447,12 @@ final readonly class ProtoGenerator
             // Variants are named after the oneof itself, even when its interface has been renamed.
             $oneOfName = Naming::pascalCase($oneOf->name);
 
+            $propertyName = self::oneofPropertyName($oneOf);
+
+            self::claimPropertyName($properties, $message, $propertyName, "oneof {$oneOf->name}");
+
             $constructor
-                ->addPromotedParameter(Naming::propertyName($oneOf->name))
+                ->addPromotedParameter($propertyName)
                 ->setType($this->namespacer->fqcn("{$message->path}.{$oneofInterfaces[$idx]}"))
                 ->setNullable()
                 ->setDefaultValue(null)
@@ -469,6 +474,23 @@ final readonly class ProtoGenerator
         $this->reorderRequiredFirst($constructor);
 
         return $namespace;
+    }
+
+    /**
+     * Two fields or oneofs of one message must not end up with the same property, which would silently drop one of them.
+     * protoc rejects only clashing JSON names, and in proto2 merely warns about them, while a property name
+     * also comes from a oneof name or from the fallback of fieldBaseName(). PHP variable names are case-sensitive.
+     *
+     * @param array<string, string> $properties
+     * @throws CodeCannotBeGenerated
+     */
+    private static function claimPropertyName(array &$properties, Parser\MessageDescriptor $message, string $name, string $owner): void
+    {
+        if (isset($properties[$name])) {
+            throw new CodeCannotBeGenerated("Message {$message->fqcn}: the {$properties[$name]} and the {$owner} both become the property \${$name}.");
+        }
+
+        $properties[$name] = $owner;
     }
 
     private function reorderRequiredFirst(Method $constructor): void
@@ -738,15 +760,51 @@ final readonly class ProtoGenerator
         return $valid ? $bytes : null;
     }
 
-    private static function oneofVariantName(string $oneof, Parser\FieldDescriptor $variant): string
+    /**
+     * The name the property of $field and the class of a oneof variant holding $field are built from. It is the
+     * json_name of the field while that is a valid PHP variable name, so a custom json_name names the property.
+     * A json_name that is not ("my-field", "@type", "1st") gives way to the field name in camelCase, which for
+     * an ordinary field name is what protoc puts into json_name by default. protoc always fills json_name,
+     * the fallback also covers descriptors without it.
+     */
+    private static function fieldBaseName(Parser\FieldDescriptor $field): string
     {
-        if ($variant->jsonName !== null) {
-            $name = \sprintf('%s%s', Naming::pascalCase($oneof), ucfirst($variant->jsonName));
-        } else {
-            $name = Naming::pascalCase("{$oneof} {$variant->name}");
+        if ($field->jsonName !== null && Naming::isVariableName($field->jsonName)) {
+            return $field->jsonName;
         }
 
-        return Naming::secure($name);
+        return Naming::propertyName($field->name);
+    }
+
+    /**
+     * The name of the property, i.e. of the promoted constructor parameter, generated for $field, see fieldBaseName().
+     * The only place it is decided: the parameter, its `@param` tag and the property of a oneof variant class take it from here.
+     */
+    private static function fieldPropertyName(Parser\FieldDescriptor $field): string
+    {
+        return self::variableName(self::fieldBaseName($field), $field->name);
+    }
+
+    /**
+     * The name of the property generated for $oneof.
+     */
+    private static function oneofPropertyName(Parser\OneOfDescriptor $oneof): string
+    {
+        return self::variableName(Naming::propertyName($oneof->name), $oneof->name);
+    }
+
+    /**
+     * $name with `this` escaped. Only a proto name like `_1st` turns into a camelCase that is not a variable name ("1st"):
+     * then the proto name itself is used, a proto identifier always being a valid PHP one.
+     */
+    private static function variableName(string $name, string $protoName): string
+    {
+        return Naming::secureVariable(Naming::isVariableName($name) ? $name : $protoName);
+    }
+
+    private static function oneofVariantName(string $oneof, Parser\FieldDescriptor $variant): string
+    {
+        return Naming::secure(\sprintf('%s%s', Naming::pascalCase($oneof), ucfirst(self::fieldBaseName($variant))));
     }
 
     /**

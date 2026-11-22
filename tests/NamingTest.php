@@ -93,4 +93,32 @@ final class NamingTest extends TestCase
     {
         self::assertSame($expected, Naming::secure($actual));
     }
+
+    #[TestWith(['foo', true])]
+    #[TestWith(['fooBar', true])]
+    #[TestWith(['_1st', true])]
+    #[TestWith(['_', true])]
+    #[TestWith(['class', true])]
+    #[TestWith(['this', true])]
+    #[TestWith(['привет', true])]
+    #[TestWith(['', false])]
+    #[TestWith(['1st', false])]
+    #[TestWith(['my-field', false])]
+    #[TestWith(['with space', false])]
+    #[TestWith(['@type', false])]
+    #[TestWith(["foo\n", false])]
+    public function testIsVariableName(string $name, bool $expected): void
+    {
+        self::assertSame($expected, Naming::isVariableName($name));
+    }
+
+    #[TestWith(['this', 'this_'])]
+    #[TestWith(['This', 'This'])]
+    #[TestWith(['this_', 'this_'])]
+    #[TestWith(['class', 'class'])]
+    #[TestWith(['static', 'static'])]
+    public function testSecureVariable(string $name, string $expected): void
+    {
+        self::assertSame($expected, Naming::secureVariable($name));
+    }
 }
