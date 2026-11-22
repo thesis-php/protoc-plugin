@@ -779,6 +779,7 @@ To avoid having to generate these types each time, it is recommended to use libr
 - [ ] `extensions`
 - [ ] `groups`
 - [x] `nested types`
+- [x] `import public`
 - [x] `packed repeated`
 - [x] `oneof`
 - [x] `grpc`

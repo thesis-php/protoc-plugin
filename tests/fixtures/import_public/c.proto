@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package t.pub.c;
+
+// Re-exported to the importers of c, and through b to the importers of b.
+import public "d.proto";
+
+message C {
+  string a = 1;
+  t.pub.d.D d = 2;
+}

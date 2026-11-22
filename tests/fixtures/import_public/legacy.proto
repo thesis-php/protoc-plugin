@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package t.pub.legacy;
+
+// A proto2 importer: the default of an enum field names a case of an enum
+// visible only through "import public".
+import "reexport.proto";
+
+message Legacy {
+  optional t.pub.ns.Color color = 1 [default = COLOR_GREEN];
+  required t.pub.ns.Color required_color = 2 [default = COLOR_RED];
+}

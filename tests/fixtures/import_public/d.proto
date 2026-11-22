@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package t.pub.d;
+
+// The end of the chain a -> b =public=> c =public=> d.
+message D {
+  string value = 1;
+}
