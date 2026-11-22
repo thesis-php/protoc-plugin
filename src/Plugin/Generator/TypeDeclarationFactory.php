@@ -47,6 +47,7 @@ final readonly class TypeDeclarationFactory
                 nullable: !$isEnum,
                 docType: $fieldType->fqcn,
                 default: $default,
+                packable: $isEnum,
             );
         }
 
@@ -59,6 +60,7 @@ final readonly class TypeDeclarationFactory
                     Type::TYPE_DOUBLE => $runtime->reflection('DoubleT::T'),
                 }),
                 default: 0,
+                packable: true,
             ),
             Type::TYPE_UINT64,
             Type::TYPE_FIXED64 => new TypeDeclaration(
@@ -68,6 +70,7 @@ final readonly class TypeDeclarationFactory
                     Type::TYPE_FIXED64 => $runtime->reflection('Fixed64T::T'),
                 }),
                 default: Literal::new('\BcMath\Number', [0]),
+                packable: true,
             ),
             Type::TYPE_INT32,
             Type::TYPE_UINT32,
@@ -89,11 +92,13 @@ final readonly class TypeDeclarationFactory
                     Type::TYPE_SINT64 => $runtime->reflection('SInt64T::T'),
                 }),
                 default: 0,
+                packable: true,
             ),
             Type::TYPE_BOOL => new TypeDeclaration(
                 phpType: 'bool',
                 reflectionType: new Literal($runtime->reflection('BoolT::T')),
                 default: false,
+                packable: true,
             ),
             Type::TYPE_STRING,
             Type::TYPE_BYTES => new TypeDeclaration(
