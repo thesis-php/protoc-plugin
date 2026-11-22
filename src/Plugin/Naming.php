@@ -112,15 +112,27 @@ enum Naming
      */
     public static function descriptorName(array $taken = []): string
     {
-        $base = 'DescriptorRegistry';
+        return self::unique('DescriptorRegistry', $taken);
+    }
 
-        if (!isset($taken[$base])) {
+    /**
+     * Returns $base when it is free, otherwise $base followed by the smallest numeric suffix,
+     * starting from 2, that is free: "Foo", "Foo2", "Foo3", ...
+     *
+     * @param array<string, mixed> $taken names already in use
+     * @param bool $ignoreCase compare names case-insensitively, as PHP compares class names; the keys of $taken must then be lowercase
+     */
+    public static function unique(string $base, array $taken, bool $ignoreCase = false): string
+    {
+        $isTaken = static fn(string $name): bool => isset($taken[$ignoreCase ? strtolower($name) : $name]);
+
+        if (!$isTaken($base)) {
             return $base;
         }
 
         $suffix = 2;
 
-        while (isset($taken[$base . $suffix])) {
+        while ($isTaken($base . $suffix)) {
             ++$suffix;
         }
 

@@ -1,0 +1,106 @@
+syntax = "proto3";
+
+package oneof.collision;
+
+// The oneof interface would take the name of the nested message (Event\Payload),
+// so it becomes Event\PayloadOneof. The other oneof of the message keeps its name.
+// The synthetic oneof of the proto3 optional field (_payload_oneof) generates nothing and takes no name.
+message Event {
+    message Payload {
+        string a = 1;
+    }
+
+    oneof payload {
+        Payload p = 1;
+        string s = 2;
+    }
+
+    oneof kind {
+        int32 number = 3;
+        bool flag = 4;
+    }
+
+    optional string payload_oneof = 5;
+}
+
+// The same with a nested enum.
+message Task {
+    enum State {
+        STATE_UNSPECIFIED = 0;
+        STATE_DONE = 1;
+    }
+
+    oneof state {
+        State known = 1;
+        string custom = 2;
+    }
+}
+
+// The fallback name Envelope\BodyOneof is a nested message too, so the interface is Envelope\BodyOneof2.
+message Envelope {
+    message Body {
+        string text = 1;
+    }
+
+    message BodyOneof {
+        string text = 1;
+    }
+
+    oneof body {
+        Body plain = 1;
+        BodyOneof wrapped = 2;
+    }
+}
+
+// The fallback name Document\ContentOneof is the class of the variant `oneof`, so the interface is Document\ContentOneof2.
+message Document {
+    message Content {
+        string text = 1;
+    }
+
+    oneof content {
+        Content oneof = 1;
+        string raw = 2;
+    }
+}
+
+// Names are compared after normalisation and case-insensitively, as PHP compares class names.
+message Wrapper {
+    message MyPayload {
+        string a = 1;
+    }
+
+    message KIND {
+        string a = 1;
+    }
+
+    oneof my_payload {
+        MyPayload value = 1;
+        int32 code = 2;
+    }
+
+    oneof kind {
+        KIND typed = 3;
+        string untyped = 4;
+    }
+}
+
+// Synthetic oneofs of proto3 optional fields generate no interface: `_note` would be Note.
+message Annotated {
+    message Note {
+        string text = 1;
+    }
+
+    optional string note = 1;
+    Note details = 2;
+}
+
+// Map entries are not generated, so the entry of `items` (ItemsEntry) leaves the name to the oneof interface.
+message Catalog {
+    map<string, string> items = 1;
+
+    oneof items_entry {
+        string name = 2;
+        int32 id = 3;
+    }
+}
