@@ -39,7 +39,7 @@ jobs:
     strategy: *strategy
     steps:
       - uses: actions/checkout@v6
-      - run: PHP_IMAGE_VERSION=${{ matrix.php }} make ${{ matrix.deps == 'lowest' && 'install-lowest' || '' }} test test-no-assertions
+      - run: PHP_IMAGE_VERSION=${{ matrix.php }} make ${{ matrix.deps == 'lowest' && 'install-lowest' || '' }} test snapshots-check test-no-assertions
 
   # infect:
   #   runs-on: ubuntu-latest

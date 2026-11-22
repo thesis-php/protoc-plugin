@@ -765,7 +765,7 @@ To avoid having to generate these types each time, it is recommended to use libr
 #### Adding new codegen fixtures
 
 1. Add a new `.proto` fixture under `tests/fixtures/<case>/`.
-2. Run `make test` to regenerate snapshots from fixtures.
+2. Run `make test` to regenerate snapshots from fixtures (`make snapshots-check` verifies that nothing is left uncommitted).
 3. Commit updated fixture inputs and snapshots:
    - `tests/fixtures/*`
    - `tests/snapshots/*`
@@ -775,6 +775,7 @@ You can override this path via `TESTDATA_DIR` in `.env.local`.
 
 #### Code quality checks
 - `make test` — regenerates fixtures/snapshots and runs PHPUnit.
+- `make snapshots-check` — regenerates snapshots and fails if `tests/snapshots` differ from the committed ones (modified, deleted or new files; the plugin version line is ignored). Runs in CI and in `make check`.
 - `make phpstan` — runs PHPStan.
 - `make fix` — applies code style fixes.
 - `make check` — runs the full quality suite (`test`, `phpstan`, `cs`). In most cases, this command is enough on its own.
