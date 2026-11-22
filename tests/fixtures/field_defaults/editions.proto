@@ -1,0 +1,18 @@
+edition = "2023";
+
+package field.defaults.v1;
+
+import "field_defaults.proto";
+
+// Editions declare defaults the same way, they are baked for LEGACY_REQUIRED fields and enums.
+message EditionDefaults {
+    double double_nan = 1 [features.field_presence = LEGACY_REQUIRED, default = nan];
+    float float_neg_inf = 2 [features.field_presence = LEGACY_REQUIRED, default = -inf];
+    uint64 uint64_max = 3 [features.field_presence = LEGACY_REQUIRED, default = 18446744073709551615];
+    int64 int64_min = 4 [features.field_presence = LEGACY_REQUIRED, default = -9223372036854775808];
+    bytes bytes_escaped = 5 [features.field_presence = LEGACY_REQUIRED, default = "\000\\\xff"];
+    // Explicit presence: nullable, the declared default is not baked.
+    double double_inf_explicit = 6 [default = inf];
+    // Explicit presence, but an enum with a default is baked.
+    Keyword keyword_reserved = 7 [default = class];
+}

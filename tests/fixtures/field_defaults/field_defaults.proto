@@ -1,0 +1,69 @@
+syntax = "proto2";
+
+package field.defaults.v1;
+
+// The default of a field names a value of this enum.
+enum Keyword {
+    option allow_alias = true;
+
+    // A reserved word, the case becomes class_.
+    class = 0;
+    // Becomes class_ as well, so it is dropped as the very same member.
+    class_ = 0;
+    other = 1;
+    // Generated as a constant referring to the other case.
+    other_alias = 1;
+}
+
+// Every field is required, so that its declared default is baked into the constructor.
+message Defaults {
+    // Floating point specials.
+    required double double_inf = 1 [default = inf];
+    required double double_neg_inf = 2 [default = -inf];
+    required double double_nan = 3 [default = nan];
+    required float float_inf = 4 [default = inf];
+    required float float_neg_inf = 5 [default = -inf];
+    required float float_nan = 6 [default = nan];
+
+    // Finite floating point values.
+    required double double_exponent = 7 [default = 1.5e300];
+    required float float_exponent = 8 [default = -1.220703125E-4];
+    required double double_integral = 9 [default = 42];
+    required double double_max = 10 [default = 1.7976931348623157e308];
+    required float float_fraction = 11 [default = 314159.];
+
+    // Unsigned 64-bit integers, beyond PHP_INT_MAX too.
+    required uint64 uint64_max = 20 [default = 18446744073709551615];
+    required fixed64 fixed64_max = 21 [default = 18446744073709551615];
+    required uint64 uint64_above_int = 22 [default = 9223372036854775808];
+    required uint64 uint64_int_max = 23 [default = 9223372036854775807];
+    required fixed64 fixed64_small = 24 [default = 6400];
+
+    // Bounds of the signed 64-bit and of the 32-bit integers.
+    required int64 int64_min = 30 [default = -9223372036854775808];
+    required int64 int64_max = 31 [default = 9223372036854775807];
+    required sint64 sint64_min = 32 [default = -9223372036854775808];
+    required sfixed64 sfixed64_min = 33 [default = -9223372036854775808];
+    required sfixed64 sfixed64_max = 34 [default = 9223372036854775807];
+    required int32 int32_min = 35 [default = -2147483648];
+    required int32 int32_max = 36 [default = 2147483647];
+    required sint32 sint32_min = 37 [default = -2147483648];
+    required sfixed32 sfixed32_min = 38 [default = -2147483648];
+    required uint32 uint32_max = 39 [default = 4294967295];
+    required fixed32 fixed32_max = 40 [default = 4294967295];
+
+    required bool bool_true = 50 [default = true];
+
+    // Bytes are passed C-escaped by protoc.
+    required bytes bytes_octal = 60 [default = "\001\002\xff"];
+    required bytes bytes_special = 61 [default = "q\"uote'\\back\000nul\x80\xfe\n\r\t$x"];
+
+    // Strings are passed as is: PHP specials and an escape-like sequence stay literal.
+    required string string_php = 70 [default = "$var {$x} \\ \"q\" 'a' \n"];
+    required string string_escape_like = 71 [default = "a\\001b"];
+    required string string_unicode = 72 [default = "привет"];
+
+    required Keyword keyword_reserved = 80 [default = class];
+    required Keyword keyword_dropped = 81 [default = class_];
+    required Keyword keyword_alias = 82 [default = other_alias];
+}

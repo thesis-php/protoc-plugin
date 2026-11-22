@@ -15,7 +15,8 @@ use PHPUnit\Framework\TestCase;
  *  2. every class, interface and enum loads, enums give their cases, messages without required constructor
  *     parameters are instantiated, autoload.metadata.php registers every DescriptorRegistry in the pool;
  *  3. messages survive an encode/decode round-trip through thesis/protobuf: the instantiated ones and the
- *     populated samples from samples/<case>.php.
+ *     populated samples from samples/<case>.php. A sample may also be a closure, a check of values of the
+ *     generated code (e.g. the defaults a message is created with), which throws on a mismatch.
  *
  * Each case runs in its own PHP process (see SnapshotValidator): cases declare classes with the same names,
  * and a broken snapshot may end the process with a fatal error.

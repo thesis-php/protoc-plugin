@@ -390,11 +390,7 @@ final readonly class ProtoGenerator
             // is non-nullable. For nullable fields we keep `null` so that presence
             // round-trips: the user can distinguish "field unset" from "field set to its proto default".
             if (!$nullable && $field->defaultValue !== null && $field->type !== null) {
-                $default = $this->parseDefaultValue(
-                    $field->type,
-                    $field->defaultValue,
-                    $field->typeName,
-                );
+                $default = $this->parseDefaultValue($message, $field, $field->type, $field->defaultValue);
             }
 
             $parameter
@@ -566,37 +562,180 @@ final readonly class ProtoGenerator
         );
     }
 
+    /**
+     * Turns FieldDescriptorProto.default_value into the PHP default of the constructor parameter. The value comes
+     * as text: numbers as written in the schema (floats may be inf, -inf, nan), bools as true/false, strings as is,
+     * bytes C-escaped, enums as the name of the value.
+     *
+     * @throws CodeCannotBeGenerated
+     */
     private function parseDefaultValue(
+        Parser\MessageDescriptor $message,
+        Parser\FieldDescriptor $field,
         FieldDescriptorProto\Type $type,
         string $defaultValue,
-        ?string $typename = null,
     ): mixed {
-        if ($type === FieldDescriptorProto\Type::TYPE_ENUM && $typename !== null) {
-            // Resolved through the graph, so that a relocated enum is referenced
-            // under the very namespace it is generated into.
-            return new Literal(\sprintf("%s::{$defaultValue}", $this->graph->get($typename)->fqcn));
-        }
-
-        return match ($type) {
-            FieldDescriptorProto\Type::TYPE_STRING,
-            FieldDescriptorProto\Type::TYPE_BYTES => $defaultValue,
+        $value = match ($type) {
+            FieldDescriptorProto\Type::TYPE_ENUM => $this->enumDefault($field, $defaultValue),
+            FieldDescriptorProto\Type::TYPE_STRING => $defaultValue,
+            FieldDescriptorProto\Type::TYPE_BYTES => self::unescapeBytes($defaultValue),
             FieldDescriptorProto\Type::TYPE_INT32,
             FieldDescriptorProto\Type::TYPE_SINT32,
+            FieldDescriptorProto\Type::TYPE_SFIXED32 => self::integerDefault($defaultValue, -2_147_483_648, 2_147_483_647),
             FieldDescriptorProto\Type::TYPE_UINT32,
-            FieldDescriptorProto\Type::TYPE_FIXED32,
-            FieldDescriptorProto\Type::TYPE_SFIXED32,
+            FieldDescriptorProto\Type::TYPE_FIXED32 => self::integerDefault($defaultValue, 0, 4_294_967_295),
+            // var_export(), and so Nette, prints PHP_INT_MIN as -9223372036854775807-1: the literal
+            // -9223372036854775808 would be a float.
             FieldDescriptorProto\Type::TYPE_INT64,
             FieldDescriptorProto\Type::TYPE_SINT64,
-            FieldDescriptorProto\Type::TYPE_SFIXED64 => filter_var($defaultValue, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE) ?? 0,
+            FieldDescriptorProto\Type::TYPE_SFIXED64 => self::integerDefault($defaultValue, PHP_INT_MIN, PHP_INT_MAX),
             FieldDescriptorProto\Type::TYPE_UINT64,
-            FieldDescriptorProto\Type::TYPE_FIXED64 => Literal::new('\BcMath\Number', [
-                filter_var($defaultValue, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE) ?? 0,
-            ]),
-            FieldDescriptorProto\Type::TYPE_BOOL => filter_var($defaultValue, FILTER_VALIDATE_BOOLEAN),
-            FieldDescriptorProto\Type::TYPE_FLOAT,
-            FieldDescriptorProto\Type::TYPE_DOUBLE => filter_var($defaultValue, FILTER_VALIDATE_FLOAT),
+            FieldDescriptorProto\Type::TYPE_FIXED64 => self::unsignedInteger64Default($defaultValue),
+            FieldDescriptorProto\Type::TYPE_BOOL => match ($defaultValue) {
+                'true' => true,
+                'false' => false,
+                default => null,
+            },
+            FieldDescriptorProto\Type::TYPE_FLOAT => self::floatDefault($defaultValue, single: true),
+            FieldDescriptorProto\Type::TYPE_DOUBLE => self::floatDefault($defaultValue, single: false),
             default => null,
         };
+
+        return $value ?? throw new CodeCannotBeGenerated(\sprintf(
+            'Message %s: field %s has the default value "%s" that is not valid for %s.',
+            $message->fqcn,
+            $field->name,
+            addcslashes($defaultValue, "\0..\37\"\\\177..\377"),
+            $type->name,
+        ));
+    }
+
+    private function enumDefault(Parser\FieldDescriptor $field, string $defaultValue): ?Literal
+    {
+        if ($field->typeName === null) {
+            return null;
+        }
+
+        // Resolved through the graph, so that a relocated enum is referenced
+        // under the very namespace it is generated into.
+        $enum = $this->graph->get($field->typeName);
+
+        if (!$enum->container instanceof Parser\EnumDescriptor) {
+            return null;
+        }
+
+        foreach ($enum->container->cases as $case) {
+            // Every value has a member of the generated enum under its secured name: a case, a constant of an alias,
+            // or, for a value dropped by generateEnum() as a duplicate of that name, the member it duplicates.
+            if ($case->name === $defaultValue) {
+                return new Literal(\sprintf('%s::%s', $enum->fqcn, Naming::secureEnumCase($case->name)));
+            }
+        }
+
+        return null;
+    }
+
+    private static function integerDefault(string $value, int $min, int $max): ?int
+    {
+        if (preg_match('/^-?(?:0|[1-9][0-9]*)$/D', $value) !== 1) {
+            return null;
+        }
+
+        $integer = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => $min, 'max_range' => $max]]);
+
+        return \is_int($integer) ? $integer : null;
+    }
+
+    /**
+     * new \BcMath\Number(int) for values that fit PHP int, so that the output of the usual ones is unchanged,
+     * and new \BcMath\Number(string) beyond PHP_INT_MAX.
+     */
+    private static function unsignedInteger64Default(string $value): ?Literal
+    {
+        if (preg_match('/^(?:0|[1-9][0-9]*)$/D', $value) !== 1) {
+            return null;
+        }
+
+        $integer = filter_var($value, FILTER_VALIDATE_INT);
+
+        if (\is_int($integer)) {
+            return Literal::new('\BcMath\Number', [$integer]);
+        }
+
+        // Without leading zeros, a longer number is a greater one.
+        $max = '18446744073709551615';
+
+        if (\strlen($value) > \strlen($max) || (\strlen($value) === \strlen($max) && strcmp($value, $max) > 0)) {
+            return null;
+        }
+
+        return Literal::new('\BcMath\Number', [$value]);
+    }
+
+    /**
+     * @param bool $single whether the field is a 32-bit float: protoc gives its default with the precision of float,
+     *                     the value is rounded to float, so that the PHP default is the one the field holds on the wire
+     */
+    private static function floatDefault(string $value, bool $single): null|float|Literal
+    {
+        $special = match (strtolower($value)) {
+            'inf', '+inf', 'infinity', '+infinity' => '\INF',
+            '-inf', '-infinity' => '-\INF',
+            'nan', '+nan', '-nan' => '\NAN',
+            default => null,
+        };
+
+        if ($special !== null) {
+            return new Literal($special);
+        }
+
+        if (preg_match('/^[+-]?(?:[0-9]+\.?[0-9]*|\.[0-9]+)(?:[eE][+-]?[0-9]+)?$/D', $value) !== 1) {
+            return null;
+        }
+
+        $float = filter_var($value, FILTER_VALIDATE_FLOAT);
+
+        if ($single && \is_float($float)) {
+            $float = unpack('g', pack('g', $float))[1] ?? null;
+        }
+
+        return \is_float($float) && is_finite($float) ? $float : null;
+    }
+
+    /**
+     * Decodes the C-escaped value protoc gives for bytes: octal \NNN (every byte >= 0x80 and other
+     * non-printable ones), \n, \r, \t, \", \', \\; also the rest of the C escapes and hex \xHH.
+     */
+    private static function unescapeBytes(string $value): ?string
+    {
+        $simple = ['n' => "\n", 'r' => "\r", 't' => "\t", 'a' => "\x07", 'b' => "\x08", 'f' => "\f", 'v' => "\v", '\\' => '\\', "'" => "'", '"' => '"', '?' => '?'];
+
+        $valid = true;
+
+        $bytes = preg_replace_callback(
+            '/\\\(?:([0-7]{1,3})|[xX]([0-9a-fA-F]{1,2})|(.)|$)/sD',
+            static function (array $matches) use ($simple, &$valid): string {
+                if ($matches[1] !== null && ($code = octdec($matches[1])) <= 0xFF) {
+                    return \chr((int) $code);
+                }
+
+                if ($matches[2] !== null) {
+                    return \chr((int) hexdec($matches[2]));
+                }
+
+                if ($matches[3] !== null && isset($simple[$matches[3]])) {
+                    return $simple[$matches[3]];
+                }
+
+                $valid = false;
+
+                return $matches[0];
+            },
+            $value,
+            flags: PREG_UNMATCHED_AS_NULL,
+        );
+
+        return $valid ? $bytes : null;
     }
 
     private static function oneofVariantName(string $oneof, Parser\FieldDescriptor $variant): string
