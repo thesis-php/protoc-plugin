@@ -21,6 +21,6 @@ final readonly class XFieldDeepEnum implements \Proto\Api\V1\TestRequest\XField
 {
     public function __construct(
         #[Reflection\Field(4, new Reflection\EnumT(\Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum::class))]
-        public ?\Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum $deepEnum = null,
+        public \Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum $deepEnum = \Proto\Api\V1\TestRequest\Nested\Deep\DeepEnum::DEEP_ENUM_UNSPECIFIED,
     ) {}
 }

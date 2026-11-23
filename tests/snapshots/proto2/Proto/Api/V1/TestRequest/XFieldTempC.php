@@ -21,6 +21,6 @@ final readonly class XFieldTempC implements \Proto\Api\V1\TestRequest\XField
 {
     public function __construct(
         #[Reflection\Field(8, Reflection\DoubleT::T)]
-        public ?float $tempC = null,
+        public float $tempC = 0,
     ) {}
 }

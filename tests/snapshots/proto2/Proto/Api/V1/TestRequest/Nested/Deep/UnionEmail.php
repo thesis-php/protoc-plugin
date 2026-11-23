@@ -21,6 +21,6 @@ final readonly class UnionEmail implements \Proto\Api\V1\TestRequest\Nested\Deep
 {
     public function __construct(
         #[Reflection\Field(3, Reflection\StringT::T)]
-        public ?string $email = null,
+        public string $email = '',
     ) {}
 }

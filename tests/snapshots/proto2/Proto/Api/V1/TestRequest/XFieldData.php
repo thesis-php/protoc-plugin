@@ -21,6 +21,6 @@ final readonly class XFieldData implements \Proto\Api\V1\TestRequest\XField
 {
     public function __construct(
         #[Reflection\Field(7, Reflection\BytesT::T)]
-        public ?string $data = null,
+        public string $data = '',
     ) {}
 }
