@@ -21,6 +21,6 @@ final readonly class XFieldName implements \Proto\Api\V1\TestRequest\XField
 {
     public function __construct(
         #[Reflection\Field(6, Reflection\StringT::T)]
-        public ?string $name = null,
+        public string $name = '',
     ) {}
 }

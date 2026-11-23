@@ -1,0 +1,37 @@
+syntax = "proto2";
+
+package oneof.variants.proto2;
+
+// A closed enum without a zero value: the default of a variant is its first value.
+enum Level {
+    LEVEL_LOW = 1;
+    LEVEL_HIGH = 2;
+}
+
+message Inner {
+    optional int32 value = 1;
+}
+
+// A variant class exists only once the oneof is set to it, so its field is not nullable,
+// the same as in proto3 and editions. A message variant stays nullable, as everywhere.
+message Choice {
+    oneof value {
+        int32 number = 1;
+        string text = 2;
+        bytes raw = 3;
+        bool flag = 4;
+        uint64 big = 5;
+        double ratio = 6;
+        Level level = 7;
+        Inner inner = 8;
+    }
+
+    // The declared default becomes the default of the variant.
+    oneof defaulted {
+        int32 number_default = 11 [default = 42];
+        string text_default = 12 [default = "hello"];
+        bytes raw_default = 13 [default = "\001\377"];
+        double ratio_default = 14 [default = inf];
+        Level level_default = 15 [default = LEVEL_HIGH];
+    }
+}

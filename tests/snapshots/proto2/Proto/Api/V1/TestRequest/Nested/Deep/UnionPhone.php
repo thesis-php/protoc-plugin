@@ -21,6 +21,6 @@ final readonly class UnionPhone implements \Proto\Api\V1\TestRequest\Nested\Deep
 {
     public function __construct(
         #[Reflection\Field(2, Reflection\StringT::T)]
-        public ?string $phone = null,
+        public string $phone = '',
     ) {}
 }

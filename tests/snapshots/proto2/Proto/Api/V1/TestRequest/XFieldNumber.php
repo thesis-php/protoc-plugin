@@ -21,6 +21,6 @@ final readonly class XFieldNumber implements \Proto\Api\V1\TestRequest\XField
 {
     public function __construct(
         #[Reflection\Field(5, Reflection\Int32T::T)]
-        public ?int $number = null,
+        public int $number = 0,
     ) {}
 }

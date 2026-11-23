@@ -277,6 +277,7 @@ final readonly class ProtoGenerator
     /**
      * @param list<string> $implements
      * @param array<int, string> $oneofInterfaces names of the oneof interfaces, see oneofInterfaceNames()
+     * @param bool $oneofVariant whether $message is the class of a oneof variant, see generateOneofVariant()
      * @throws CodeCannotBeGenerated
      */
     private function generateMessage(
@@ -285,6 +286,7 @@ final readonly class ProtoGenerator
         Parser\MessageDescriptor $message,
         array $implements = [],
         array $oneofInterfaces = [],
+        bool $oneofVariant = false,
     ): PhpNamespace {
         $classType = new ClassType($className)
             ->setFinal()
@@ -364,9 +366,12 @@ final readonly class ProtoGenerator
             $repeated = $field->label === FieldDescriptorProto\Label::LABEL_REPEATED && !$type->isMap;
             $required = $field->label === FieldDescriptorProto\Label::LABEL_REQUIRED || $features?->fieldPresence === FeatureSet\FieldPresence::LEGACY_REQUIRED;
 
-            $presence = $this->edition !== null
+            // The field of a oneof variant is not made nullable for presence in any syntax: the variant class exists
+            // only once the oneof is set to it, and the runtime writes its value even when that is the default one.
+            // A null inside a variant would only be a variant without a value, which is not written at all.
+            $presence = !$oneofVariant && ($this->edition !== null
                 ? $features?->fieldPresence === FeatureSet\FieldPresence::EXPLICIT
-                : $field->optional;
+                : $field->optional);
 
             $nullable = ($type->nullable || $presence) && !$repeated && !$required && !($field->type === FieldDescriptorProto\Type::TYPE_ENUM && $field->defaultValue !== null);
 
@@ -567,7 +572,7 @@ final readonly class ProtoGenerator
             fqcn: $message->fqcn,
             path: $path = "{$message->path}.{$className}",
             fields: [
-                // Remove oneof index.
+                // The field as declared, only without the oneof index, so that it is generated as a plain field.
                 new Parser\FieldDescriptor(
                     name: $variant->name,
                     number: $variant->number,
@@ -577,6 +582,10 @@ final readonly class ProtoGenerator
                     comment: $variant->comment,
                     options: $variant->options,
                     optional: $variant->optional,
+                    proto3Optional: $variant->proto3Optional,
+                    defaultValue: $variant->defaultValue,
+                    map: $variant->map,
+                    features: $variant->features,
                     jsonName: $variant->jsonName,
                 ),
             ],
@@ -589,6 +598,7 @@ final readonly class ProtoGenerator
             [
                 $this->namespacer->fqcn("{$message->path}.{$interfaceName}"),
             ],
+            oneofVariant: true,
         );
     }
 
