@@ -73,6 +73,8 @@ final readonly class Compiler
 
         $registries = new DescriptorTable();
 
+        $outputs = new OutputTable($options);
+
         foreach ($request as $source => $proto) {
             $phpNamespace = $namespaces->file($proto) ?? throw self::namespaceCannotBeDetermined();
 
@@ -97,11 +99,11 @@ final readonly class Compiler
 
             foreach ($proto->services as $service) {
                 if ($options->requireGrpcClient) {
-                    yield $generator->generateGrpcClient($service);
+                    yield from $outputs->claim([$generator->generateGrpcClient($service)], $source, $proto, $phpNamespace);
                 }
 
                 if ($options->requireGrpcServer) {
-                    yield from $generator->generateGrpcServer($service);
+                    yield from $outputs->claim($generator->generateGrpcServer($service), $source, $proto, $phpNamespace);
                 }
 
                 $serviceName = ($proto->package !== null ? "{$proto->package}." : '') . $service->path;
@@ -126,10 +128,10 @@ final readonly class Compiler
                 ));
             }
 
-            yield from array_map($generator->generateEnum(...), $proto->enums);
+            yield from $outputs->claim(array_map($generator->generateEnum(...), $proto->enums), $source, $proto, $phpNamespace);
 
             foreach ($proto->messages as $descriptor) {
-                yield from $this->doGenerateMessages($generator, $descriptor);
+                yield from $outputs->claim($this->doGenerateMessages($generator, $descriptor), $source, $proto, $phpNamespace);
             }
 
             if ($options->emitMetadata && !$index->empty()) {

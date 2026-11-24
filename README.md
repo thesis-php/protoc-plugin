@@ -138,6 +138,10 @@ protoc \
   --php-plugin_out=src
 ```
 
+The namespace applies to every file of the run, whatever its package. If two packages declare a class with the same name
+(say, both have a message `User`), the plugin reports an error instead of writing both into one file: generate such packages
+in separate `protoc` runs, each with its own `php_namespace`.
+
 ### `src_path`
 
 If you are generating code within an application, you most likely want to place it in the `genproto/` or `generated/` folder
@@ -155,6 +159,10 @@ protoc \
   --php-plugin_opt=src_path=. \
   --php-plugin_out=src
 ```
+
+All the classes of the run are placed directly into this folder, whatever their namespace, so it is meant for files of one namespace.
+If files of different namespaces declare a class with the same name, the plugin reports an error instead of writing both into one file:
+generate such namespaces in separate `protoc` runs, each with its own `src_path`.
 
 ### `grpc`
 
