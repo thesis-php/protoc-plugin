@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package php_namespace.verbatim.lowercase;
+
+import "underscore.proto";
+
+// A php_namespace starting with a lowercase letter keeps its case for nested types as well.
+option php_namespace = "verbatim\\Lower_Case";
+
+message Envelope {
+    message Body {
+        php_namespace.verbatim.underscore.Outer.Inner inner = 1;
+    }
+
+    Body body = 1;
+
+    oneof payload {
+        Body inline_body = 2;
+        php_namespace.verbatim.underscore.Outer.Kind kind = 3;
+    }
+}

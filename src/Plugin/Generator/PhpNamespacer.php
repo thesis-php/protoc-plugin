@@ -29,13 +29,14 @@ final readonly class PhpNamespacer
         $paths = explode('.', $path);
         $name = $paths[\count($paths) - 1];
 
-        return Naming::joinNamespace([
-            '',
-            $this->resolve($path),
-            $name,
-        ]);
+        return '\\' . $this->resolve($path) . '\\' . Naming::pascalCase($name);
     }
 
+    /**
+     * Only the protobuf segments of the type path are normalised. The namespace of the file
+     * is already a PHP namespace, possibly a user-defined one ("Foo_Bar\\baz"), so it is kept
+     * verbatim: nested types must land in the very namespace the top-level ones are declared in.
+     */
     private function resolve(string $path): string
     {
         $rewritten = $this->rewrite($path);
@@ -51,10 +52,7 @@ final readonly class PhpNamespacer
         $typeNamespace = \array_slice($paths, 0, \count($paths) - 1);
 
         if (\count($typeNamespace) > 0) {
-            return Naming::joinNamespace([
-                $this->namespace,
-                ...$typeNamespace,
-            ]);
+            return $this->namespace . '\\' . Naming::joinNamespace($typeNamespace);
         }
 
         return $this->namespace;
