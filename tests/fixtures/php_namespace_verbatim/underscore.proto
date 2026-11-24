@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package php_namespace.verbatim.underscore;
+
+// A php_namespace is already a PHP namespace and is used as is: nested types, oneof interfaces and their
+// variants are generated into Verbatim_Ns\under_score\…, next to the top-level types, not into VerbatimNs\…
+option php_namespace = "Verbatim_Ns\\under_score";
+
+message Outer {
+    message Inner {
+        message Deep {
+            string value = 1;
+        }
+
+        Deep deep = 1;
+    }
+
+    enum Kind {
+        KIND_UNSPECIFIED = 0;
+        KIND_ONE = 1;
+    }
+
+    Inner inner = 1;
+    Kind kind = 2;
+
+    oneof choice {
+        string text = 3;
+        Inner nested = 4;
+        Kind known = 5;
+    }
+}
+
+message Holder {
+    Outer.Inner inner = 1;
+    Outer.Inner.Deep deep = 2;
+    Outer.Kind kind = 3;
+    repeated Outer.Inner list = 4;
+    map<string, Outer.Inner.Deep> by_name = 5;
+}
+
+service Lookup {
+    rpc Find(Outer.Inner) returns (Outer.Inner.Deep);
+}
