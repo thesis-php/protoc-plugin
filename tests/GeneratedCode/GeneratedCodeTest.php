@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Thesis\Protoc\GeneratedCode;
 
-use Composer\InstalledVersions;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -55,13 +54,6 @@ final class GeneratedCodeTest extends TestCase
         ],
     ];
 
-    /**
-     * thesis/protobuf before 0.2.2 writes expanded repeated fields (ListT(..., false)) packed and then cannot read
-     * them back, so the populated samples do not round-trip on the lowest dependencies. Remove the gate once the
-     * plugin requires thesis/protobuf ^0.2.2.
-     */
-    private const string SAMPLES_MIN_RUNTIME = '0.2.2';
-
     #[DataProvider('provideSnapshotCases')]
     public function testSnapshotFilesCompile(string $case): void
     {
@@ -105,8 +97,6 @@ final class GeneratedCodeTest extends TestCase
         ));
 
         $samples = self::SAMPLES_DIR . "/{$case}.php";
-        $runtime = InstalledVersions::getVersion('thesis/protobuf') ?? '0';
-        $skipSamples = is_file($samples) && version_compare($runtime, self::SAMPLES_MIN_RUNTIME, '<');
 
         $code = <<<'PHP'
             require 'vendor/autoload.php';
@@ -114,13 +104,11 @@ final class GeneratedCodeTest extends TestCase
             PHP;
 
         [$exitCode, $output, $stderr] = self::runPhp(
-            ['-r', $code, '--', self::SNAPSHOTS_DIR . "/{$case}", is_file($samples) && !$skipSamples ? $samples : '', ...$lintOnly],
+            ['-r', $code, '--', self::SNAPSHOTS_DIR . "/{$case}", is_file($samples) ? $samples : '', ...$lintOnly],
             \dirname(__DIR__, 2),
         );
 
-        $knownDefects = $skipSamples
-            ? array_filter(self::KNOWN_DEFECTS[$case] ?? [], static fn(string $step): bool => !str_starts_with($step, 'round-trip sample '), ARRAY_FILTER_USE_KEY)
-            : self::KNOWN_DEFECTS[$case] ?? [];
+        $knownDefects = self::KNOWN_DEFECTS[$case] ?? [];
         $step = null;
         $failures = [];
         $noise = '';
@@ -153,10 +141,6 @@ final class GeneratedCodeTest extends TestCase
             $knownDefects,
             "Snapshot case {$case}: these known defects do not reproduce any more, remove them from KNOWN_DEFECTS.",
         );
-
-        if ($skipSamples) {
-            self::markTestSkipped("Samples of {$case} are not round-tripped: thesis/protobuf {$runtime} < " . self::SAMPLES_MIN_RUNTIME . '.');
-        }
     }
 
     /**

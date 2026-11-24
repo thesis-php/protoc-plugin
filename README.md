@@ -788,7 +788,7 @@ To avoid having to generate these types each time, it is recommended to use libr
 - [x] `enum defaults`
 - [x] `proto3 optional`
 - [ ] `extensions`
-- [ ] `groups`
+- [x] `groups`
 - [x] `nested types`
 - [x] `import public`
 - [x] `packed repeated`

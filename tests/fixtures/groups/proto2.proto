@@ -1,0 +1,37 @@
+syntax = "proto2";
+
+package groups.proto2.v1;
+
+// A group is written between a start and an end group tag (wire types 3 and 4), not after its length.
+message SearchResponse {
+    optional group Result = 1 {
+        optional string url = 2;
+        optional int32 rank = 3;
+    }
+
+    repeated group Item = 4 {
+        optional int32 id = 5;
+
+        // A group nested in a group.
+        optional group Tag = 6 {
+            optional string name = 7;
+        }
+    }
+
+    // The type of a group is an ordinary message: as a message field it is length-prefixed.
+    optional Result best = 8;
+    repeated Result others = 9;
+
+    oneof choice {
+        group Picked = 10 {
+            optional int32 id = 11;
+        }
+        string none = 12;
+    }
+}
+
+message RequiredGroup {
+    required group Header = 1 {
+        optional int32 version = 2;
+    }
+}

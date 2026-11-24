@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thesis\Protoc\Plugin\Generator;
 
 use Nette\PhpGenerator\Literal;
+use Thesis\Google\Protobuf\FeatureSet\MessageEncoding;
 use Thesis\Google\Protobuf\FieldDescriptorProto\Type;
 use Thesis\Protoc\Plugin\Dependency;
 use Thesis\Protoc\Plugin\Naming;
@@ -19,7 +20,10 @@ final readonly class TypeDeclarationFactory
         private Dependency\Graph $graph,
     ) {}
 
-    public function create(Parser\FieldDescriptor $field, RuntimeImports $runtime): TypeDeclaration
+    /**
+     * @param bool $mapEntry whether $field is the key or the value of a map entry, which is always length-prefixed
+     */
+    public function create(Parser\FieldDescriptor $field, RuntimeImports $runtime, bool $mapEntry = false): TypeDeclaration
     {
         if ($field->typeName !== null) {
             $fieldType = $this->graph->get($field->typeName);
@@ -41,7 +45,11 @@ final readonly class TypeDeclarationFactory
 
             return new TypeDeclaration(
                 phpType: $fieldType->fqcn,
-                reflectionType: Literal::new($runtime->reflection($isEnum ? 'EnumT' : 'ObjectT'), [
+                reflectionType: Literal::new($runtime->reflection(match (true) {
+                    $isEnum => 'EnumT',
+                    self::isGroup($field, $mapEntry) => 'GroupT',
+                    default => 'ObjectT',
+                }), [
                     new Literal("{$fieldType->fqcn}::class"),
                 ]),
                 nullable: !$isEnum,
@@ -111,5 +119,17 @@ final readonly class TypeDeclarationFactory
             ),
             default => throw new \RuntimeException('No suitable declaration found.'),
         };
+    }
+
+    /**
+     * Whether $field holds a message written as a group, between a start and an end group tag: a proto2 group, or
+     * an editions message field with `features.message_encoding = DELIMITED`, set on the field or inherited from
+     * the file. DELIMITED does not apply to a map entry: its key and value stay length-prefixed, as in protoc,
+     * and the runtime does not support groups as map values.
+     */
+    private static function isGroup(Parser\FieldDescriptor $field, bool $mapEntry): bool
+    {
+        return $field->type === Type::TYPE_GROUP
+            || (!$mapEntry && $field->type === Type::TYPE_MESSAGE && $field->features?->messageEncoding === MessageEncoding::DELIMITED);
     }
 }
