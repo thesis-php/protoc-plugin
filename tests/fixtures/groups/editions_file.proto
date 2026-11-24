@@ -1,0 +1,25 @@
+edition = "2023";
+
+package groups.editions.file.v1;
+
+// DELIMITED for every message field of the file.
+option features.message_encoding = DELIMITED;
+
+message Leaf {
+    int32 value = 1;
+}
+
+message Tree {
+    Leaf single = 1;
+    repeated Leaf list = 2;
+    // A map is never a group: its entries and their message values stay length-prefixed.
+    map<string, Leaf> by_name = 3;
+    Leaf plain = 4 [features.message_encoding = LENGTH_PREFIXED];
+    // A message referring to itself through a group.
+    Tree child = 5;
+
+    oneof choice {
+        Leaf variant = 6;
+        int32 number = 7;
+    }
+}

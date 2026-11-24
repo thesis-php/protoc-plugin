@@ -319,13 +319,6 @@ final readonly class ProtoGenerator
         $properties = [];
 
         foreach ($message->fields as $field) {
-            // A group is written between start and end group tags, not length-prefixed like a message. The runtime
-            // has no such encoding, so generating it as a message would silently produce an incompatible wire format.
-            // Checked before oneofs are set aside, as a group may also be a oneof variant.
-            if ($field->type === FieldDescriptorProto\Type::TYPE_GROUP) {
-                throw new CodeCannotBeGenerated("Message {$message->fqcn}: field {$field->name} is a group, groups are not supported.");
-            }
-
             if ($field->oneOfIndex !== null && $field->proto3Optional === null) {
                 $oneOfByIndex[$field->oneOfIndex][] = $field;
 
@@ -333,10 +326,6 @@ final readonly class ProtoGenerator
             }
 
             $features = $field->features;
-
-            if ($features?->messageEncoding === FeatureSet\MessageEncoding::DELIMITED) {
-                throw new CodeCannotBeGenerated('DELIMITED message encoding are not supported');
-            }
 
             $parameterName = self::fieldPropertyName($field);
 
@@ -347,8 +336,8 @@ final readonly class ProtoGenerator
             $type = null;
 
             if ($field->map !== null) {
-                $keyType = $this->types->create($field->map->key, $runtime);
-                $valueType = $this->types->create($field->map->value, $runtime);
+                $keyType = $this->types->create($field->map->key, $runtime, mapEntry: true);
+                $valueType = $this->types->create($field->map->value, $runtime, mapEntry: true);
                 $map = $runtime->protobuf('Map');
 
                 $type = new TypeDeclaration(
